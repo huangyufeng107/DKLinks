@@ -287,6 +287,9 @@ html, body {
     <button class="tab-btn" data-tab="3" onclick="switchTab(3)">
       功能清单<span class="tab-badge">116条</span>
     </button>
+    <button class="tab-btn" data-tab="4" onclick="switchTab(4)">
+      逻辑说明图<span class="tab-badge">1项</span>
+    </button>
   </div>
 
   <div class="toolbar">
@@ -320,13 +323,18 @@ html, body {
     onload="onFrameLoad(3)"
     onerror="onFrameError(3)">
   </iframe>
+
+  <iframe id="frame4"
+    onload="onFrameLoad(4)"
+    onerror="onFrameError(4)">
+  </iframe>
 </div>
 
 <!-- Footer -->
 <div class="footer">
   <span class="stat"><span class="dot"></span> 文档就绪</span>
   <span>|</span>
-  <span>原型 859 KB · 功能说明 72 KB · 流程图 91 KB · 功能清单 59 KB</span>
+  <span>原型 859 KB · 功能说明 72 KB · 流程图 91 KB · 功能清单 59 KB · 逻辑说明图 1项</span>
   <span>|</span>
   <span>键盘切换：← →</span>
   <span>|</span>
@@ -335,16 +343,42 @@ html, body {
 
 <script>
 var currentTab = 0;
-var tabCount = 4;
+var tabCount = 5;
 var loadingTimer = null;
 
-var tabNames = ['原型文件', '功能说明', '交互流程图', '功能清单'];
+var tabNames = ['原型文件', '功能说明', '交互流程图', '功能清单', '逻辑说明图'];
 var tabUrls = [
   "https://huangyufeng107.github.io/DKLinks/DKLinks_v1.1.html",
   "https://huangyufeng107.github.io/DKLinks/DKLinks_%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.html",
   "https://huangyufeng107.github.io/DKLinks/DKLinks_%E4%BA%A4%E4%BA%92%E6%B5%81%E7%A8%8B%E5%9B%BE.html",
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95.html"
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95.html",
+  "https://www.processon.com/f/6a0c0327c2a07d6a4fc22033#%E6%96%B0%E5%A2%9E%E7%BA%BF%E7%B4%A2"
 ];
+
+var logicIndexHtml = [
+  '<!DOCTYPE html>',
+  '<html lang="zh-CN">',
+  '<head>',
+  '<meta charset="UTF-8">',
+  '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+  '<style>',
+  '*{box-sizing:border-box}body{margin:0;background:#f0f2f5;color:#1f2937;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.wrap{max-width:960px;margin:0 auto;padding:40px 28px}.title{font-size:22px;font-weight:700;margin-bottom:6px}.desc{font-size:13px;color:#6b7280;margin-bottom:22px}.list{display:grid;gap:12px}.item{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;text-decoration:none;color:#1f2937;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:all .18s}.item:hover{border-color:#1a56db;box-shadow:0 6px 18px rgba(26,86,219,.12);transform:translateY(-1px)}.item-title{font-size:15px;font-weight:600}.item-meta{font-size:12px;color:#6b7280;margin-top:4px}.arrow{color:#1a56db;font-size:18px;font-weight:700}@media(max-width:640px){.wrap{padding:24px 16px}.item{align-items:flex-start;flex-direction:column}}',
+  '</style>',
+  '</head>',
+  '<body>',
+  '<main class="wrap">',
+  '<div class="title">逻辑说明图</div>',
+  '<div class="desc">选择目录项查看对应的业务逻辑图。</div>',
+  '<div class="list">',
+  '<a class="item" href="https://www.processon.com/f/6a0c0327c2a07d6a4fc22033#%E6%96%B0%E5%A2%9E%E7%BA%BF%E7%B4%A2" target="_blank" rel="noopener noreferrer">',
+  '<span><span class="item-title">线索接收逻辑</span><span class="item-meta">ProcessOn · 新增线索</span></span>',
+  '<span class="arrow">↗</span>',
+  '</a>',
+  '</div>',
+  '</main>',
+  '</body>',
+  '</html>'
+].join('');
 
 function switchTab(index) {
   if (index === currentTab) return;
@@ -364,7 +398,9 @@ function switchTab(index) {
 
   // Show loading if frame hasn't loaded yet
   var frame = document.getElementById('frame' + index);
-  if (!frame.getAttribute('src')) {
+  if (index === 4 && !frame.getAttribute('srcdoc')) {
+    frame.setAttribute('srcdoc', logicIndexHtml);
+  } else if (index !== 4 && !frame.getAttribute('src')) {
     frame.setAttribute('src', tabUrls[index]);
   }
   var loaded = frame.getAttribute('data-loaded');
