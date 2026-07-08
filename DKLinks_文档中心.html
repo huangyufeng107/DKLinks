@@ -302,22 +302,21 @@ html, body {
   </div>
 
   <iframe id="frame0" class="active"
-    src="https://huangyufeng107.github.io/DKLinks/DKLinks_v1.1.html"
     onload="onFrameLoad(0)"
     onerror="onFrameError(0)">
   </iframe>
 
-  <iframe id="frame1" src="https://huangyufeng107.github.io/DKLinks/DKLinks_功能说明.html"
+  <iframe id="frame1"
     onload="onFrameLoad(1)"
     onerror="onFrameError(1)">
   </iframe>
 
-  <iframe id="frame2" src="https://huangyufeng107.github.io/DKLinks/DKLinks_交互流程图.html"
+  <iframe id="frame2"
     onload="onFrameLoad(2)"
     onerror="onFrameError(2)">
   </iframe>
 
-  <iframe id="frame3" src="https://huangyufeng107.github.io/DKLinks/DKLinks_功能清单.html"
+  <iframe id="frame3"
     onload="onFrameLoad(3)"
     onerror="onFrameError(3)">
   </iframe>
@@ -337,13 +336,14 @@ html, body {
 <script>
 var currentTab = 0;
 var tabCount = 4;
+var loadingTimer = null;
 
 var tabNames = ['原型文件', '功能说明', '交互流程图', '功能清单'];
 var tabUrls = [
   "https://huangyufeng107.github.io/DKLinks/DKLinks_v1.1.html",
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_功能说明.html",
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_交互流程图.html",
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_功能清单.html"
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.html",
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E4%BA%A4%E4%BA%92%E6%B5%81%E7%A8%8B%E5%9B%BE.html",
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95.html"
 ];
 
 function switchTab(index) {
@@ -364,6 +364,9 @@ function switchTab(index) {
 
   // Show loading if frame hasn't loaded yet
   var frame = document.getElementById('frame' + index);
+  if (!frame.getAttribute('src')) {
+    frame.setAttribute('src', tabUrls[index]);
+  }
   var loaded = frame.getAttribute('data-loaded');
   if (!loaded) {
     showLoading(tabNames[index]);
@@ -398,11 +401,18 @@ function showLoading(name) {
   var overlay = document.getElementById('loadingOverlay');
   overlay.classList.remove('hidden');
   document.getElementById('loadingText').textContent = '正在加载' + name + '…';
+  clearTimeout(loadingTimer);
+  loadingTimer = setTimeout(function() {
+    if (!overlay.classList.contains('hidden')) {
+      document.getElementById('loadingText').textContent = name + '加载较慢，可点击"新窗口"打开';
+    }
+  }, 10000);
 }
 
 function hideLoading() {
   var overlay = document.getElementById('loadingOverlay');
   overlay.classList.add('hidden');
+  clearTimeout(loadingTimer);
 }
 
 // Keyboard navigation
@@ -418,6 +428,8 @@ document.addEventListener('keydown', function(e) {
 
 // Initialize new-window link
 document.getElementById('btnNewWindow').href = tabUrls[0];
+showLoading(tabNames[0]);
+document.getElementById('frame0').setAttribute('src', tabUrls[0]);
 </script>
 
 </body>
