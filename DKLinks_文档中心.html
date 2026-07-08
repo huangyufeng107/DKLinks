@@ -89,6 +89,8 @@ html, body {
 }
 
 .tab-btn {
+  display: inline-flex;
+  align-items: center;
   padding: 8px 20px;
   border-radius: 6px;
   border: 1px solid rgba(255,255,255,0.2);
@@ -100,6 +102,7 @@ html, body {
   white-space: nowrap;
   font-family: inherit;
   outline: none;
+  text-decoration: none;
 }
 
 .tab-btn:hover {
@@ -299,22 +302,22 @@ html, body {
   </div>
 
   <iframe id="frame0" class="active"
-    src="file:///Users/keny_wong/Documents/Codex/D客连系统/原型文件/D客连 · SaaS平台_v1.1.html"
+    src="https://huangyufeng107.github.io/DKLinks/DKLinks_v1.1.html"
     onload="onFrameLoad(0)"
     onerror="onFrameError(0)">
   </iframe>
 
-  <iframe id="frame1" src="./D客连_功能说明.html"
+  <iframe id="frame1" src="https://huangyufeng107.github.io/DKLinks/DKLinks_功能说明.html"
     onload="onFrameLoad(1)"
     onerror="onFrameError(1)">
   </iframe>
 
-  <iframe id="frame2" src="./D客连_交互流程图.html"
+  <iframe id="frame2" src="https://huangyufeng107.github.io/DKLinks/DKLinks_交互流程图.html"
     onload="onFrameLoad(2)"
     onerror="onFrameError(2)">
   </iframe>
 
-  <iframe id="frame3" src="./D客连_功能清单.html"
+  <iframe id="frame3" src="https://huangyufeng107.github.io/DKLinks/DKLinks_功能清单.html"
     onload="onFrameLoad(3)"
     onerror="onFrameError(3)">
   </iframe>
@@ -337,10 +340,10 @@ var tabCount = 4;
 
 var tabNames = ['原型文件', '功能说明', '交互流程图', '功能清单'];
 var tabUrls = [
-  "file:///Users/keny_wong/Documents/Codex/D客连系统/原型文件/D客连 · SaaS平台_v1.1.html",
-  "./D客连_功能说明.html",
-  "./D客连_交互流程图.html",
-  "./D客连_功能清单.html"
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_v1.1.html",
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_功能说明.html",
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_交互流程图.html",
+  "https://huangyufeng107.github.io/DKLinks/DKLinks_功能清单.html"
 ];
 
 function switchTab(index) {
