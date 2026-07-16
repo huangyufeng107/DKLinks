@@ -3,27 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>D客连 · SaaS平台 v1.1.1 — 文档中心</title>
+<title>D客连 v1.1.1 — 文档中心</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --color-primary: #1a56db;
-  --color-primary-dark: #1e3a8a;
-  --color-accent: #6366f1;
-  --color-bg: #f0f2f5;
+  --color-primary: #003594;
+  --color-primary-dark: #00174b;
+  --color-accent: #004ac6;
+  --color-bg: #faf8ff;
   --color-white: #ffffff;
-  --color-text: #1f2937;
-  --color-text-muted: #6b7280;
-  --color-border: #e5e7eb;
+  --color-text: #191b23;
+  --color-text-muted: #434654;
+  --color-border: #c3c6d6;
   --radius: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,53,148,0.2);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   overflow: hidden;
@@ -39,7 +41,7 @@ html, body {
   gap: 32px;
   flex-shrink: 0;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,53,148,0.2);
 }
 
 .header-logo {
@@ -115,15 +117,7 @@ html, body {
   border-color: rgba(255,255,255,0.4);
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.tab-badge {
-  font-size: 10px;
-  background: rgba(255,255,255,0.18);
-  padding: 1px 6px;
-  border-radius: 10px;
-  margin-left: 4px;
+  box-shadow: 0 2px 6px rgba(0,53,148,0.25);
 }
 
 /* Toolbar */
@@ -215,16 +209,6 @@ html, body {
   color: var(--color-text-muted);
 }
 
-/* Keyboard hint */
-.kb-hint {
-  font-size: 10px;
-  opacity: 0.5;
-  padding: 4px 8px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 4px;
-  margin-left: 8px;
-}
-
 /* Footer */
 .footer {
   padding: 6px 24px;
@@ -248,7 +232,7 @@ html, body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10b981;
+  background: #22c55e;
 }
 
 @media (max-width: 900px) {
@@ -275,25 +259,16 @@ html, body {
   </div>
 
   <div class="tab-nav" id="tabNav">
-    <button class="tab-btn active" data-tab="0" onclick="switchTab(0)">
-      原型文件<span class="tab-badge">1</span>
-    </button>
-    <button class="tab-btn" data-tab="1" onclick="switchTab(1)">
-      功能说明<span class="tab-badge">16页</span>
-    </button>
-    <button class="tab-btn" data-tab="2" onclick="switchTab(2)">
-      交互流程图<span class="tab-badge">67图</span>
-    </button>
-    <button class="tab-btn" data-tab="3" onclick="switchTab(3)">
-      功能清单<span class="tab-badge">116条</span>
-    </button>
-    <button class="tab-btn" data-tab="4" onclick="switchTab(4)">
-      逻辑说明图<span class="tab-badge">1项</span>
-    </button>
+    <button class="tab-btn active" data-tab="0" onclick="switchTab(0)">版本日志</button>
+    <button class="tab-btn" data-tab="1" onclick="switchTab(1)">原型文件</button>
+    <button class="tab-btn" data-tab="2" onclick="switchTab(2)">功能说明</button>
+    <button class="tab-btn" data-tab="3" onclick="switchTab(3)">交互流程图</button>
+    <button class="tab-btn" data-tab="4" onclick="switchTab(4)">功能清单</button>
+    <button class="tab-btn" data-tab="5" onclick="switchTab(5)">逻辑流程图</button>
   </div>
 
   <div class="toolbar">
-    <a class="tool-btn" id="btnNewWindow" href="#" target="_blank" title="在新窗口打开当前文档">↗ 新窗口</a>
+    <a class="tool-btn" id="btnNewWindow" href="#" target="_blank" title="在新窗口打开当前文档">&#8599; 新窗口</a>
   </div>
 </div>
 
@@ -301,106 +276,61 @@ html, body {
 <div class="content-area" id="contentArea">
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text" id="loadingText">正在加载原型文件…</div>
+    <div class="loading-text" id="loadingText">正在加载版本日志…</div>
   </div>
 
-  <iframe id="frame0" class="active"
-    onload="onFrameLoad(0)"
-    onerror="onFrameError(0)">
-  </iframe>
-
-  <iframe id="frame1"
-    onload="onFrameLoad(1)"
-    onerror="onFrameError(1)">
-  </iframe>
-
-  <iframe id="frame2"
-    onload="onFrameLoad(2)"
-    onerror="onFrameError(2)">
-  </iframe>
-
-  <iframe id="frame3"
-    onload="onFrameLoad(3)"
-    onerror="onFrameError(3)">
-  </iframe>
-
-  <iframe id="frame4"
-    onload="onFrameLoad(4)"
-    onerror="onFrameError(4)">
-  </iframe>
+  <iframe id="frame0" class="active" onload="onFrameLoad(0)" onerror="onFrameError(0)"></iframe>
+  <iframe id="frame1" onload="onFrameLoad(1)" onerror="onFrameError(1)"></iframe>
+  <iframe id="frame2" onload="onFrameLoad(2)" onerror="onFrameError(2)"></iframe>
+  <iframe id="frame3" onload="onFrameLoad(3)" onerror="onFrameError(3)"></iframe>
+  <iframe id="frame4" onload="onFrameLoad(4)" onerror="onFrameError(4)"></iframe>
+  <iframe id="frame5" onload="onFrameLoad(5)" onerror="onFrameError(5)"></iframe>
 </div>
 
 <!-- Footer -->
 <div class="footer">
   <span class="stat"><span class="dot"></span> 文档就绪</span>
   <span>|</span>
-  <span>原型 859 KB · 功能说明 72 KB · 流程图 91 KB · 功能清单 59 KB · 逻辑说明图 1项</span>
+  <span>键盘切换：&larr; &rarr;</span>
   <span>|</span>
-  <span>键盘切换：← →</span>
-  <span>|</span>
-  <span id="footerStatus">当前：原型文件</span>
+  <span id="footerStatus">当前：版本日志</span>
 </div>
 
 <script>
 var currentTab = 0;
-var tabCount = 5;
+var tabCount = 6;
 var loadingTimer = null;
 
-var tabNames = ['原型文件', '功能说明', '交互流程图', '功能清单', '逻辑说明图'];
+var tabNames = ['版本日志', '原型文件', '功能说明', '交互流程图', '功能清单', '逻辑流程图'];
 var tabUrls = [
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_v1.1.html",
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.html",
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E4%BA%A4%E4%BA%92%E6%B5%81%E7%A8%8B%E5%9B%BE.html",
-  "https://huangyufeng107.github.io/DKLinks/DKLinks_%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95.html",
-  "https://www.processon.com/f/6a0c0327c2a07d6a4fc22033#%E6%96%B0%E5%A2%9E%E7%BA%BF%E7%B4%A2"
+  'https://huangyufeng107.github.io/DKLinks/DKLinks_%E7%89%88%E6%9C%AC%E6%97%A5%E5%BF%97.html',
+  'https://huangyufeng107.github.io/DKLinks/DKLinks_v1.1.html',
+  'https://huangyufeng107.github.io/DKLinks/DKLinks_功能说明.html',
+  'https://huangyufeng107.github.io/DKLinks/DKLinks_交互流程图.html',
+  'https://huangyufeng107.github.io/DKLinks/DKLinks_功能清单.html',
+  ''
 ];
 
-var logicIndexHtml = [
-  '<!DOCTYPE html>',
-  '<html lang="zh-CN">',
-  '<head>',
-  '<meta charset="UTF-8">',
-  '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-  '<style>',
-  '*{box-sizing:border-box}body{margin:0;background:#f0f2f5;color:#1f2937;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.wrap{max-width:960px;margin:0 auto;padding:40px 28px}.title{font-size:22px;font-weight:700;margin-bottom:6px}.desc{font-size:13px;color:#6b7280;margin-bottom:22px}.list{display:grid;gap:12px}.item{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;text-decoration:none;color:#1f2937;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:all .18s}.item:hover{border-color:#1a56db;box-shadow:0 6px 18px rgba(26,86,219,.12);transform:translateY(-1px)}.item-title{font-size:15px;font-weight:600}.item-meta{font-size:12px;color:#6b7280;margin-top:4px}.arrow{color:#1a56db;font-size:18px;font-weight:700}@media(max-width:640px){.wrap{padding:24px 16px}.item{align-items:flex-start;flex-direction:column}}',
-  '</style>',
-  '</head>',
-  '<body>',
-  '<main class="wrap">',
-  '<div class="title">逻辑说明图</div>',
-  '<div class="desc">选择目录项查看对应的业务逻辑图。</div>',
-  '<div class="list">',
-  '<a class="item" href="https://www.processon.com/f/6a0c0327c2a07d6a4fc22033#%E6%96%B0%E5%A2%9E%E7%BA%BF%E7%B4%A2" target="_blank" rel="noopener noreferrer">',
-  '<span><span class="item-title">线索接收逻辑</span><span class="item-meta">ProcessOn · 新增线索</span></span>',
-  '<span class="arrow">↗</span>',
-  '</a>',
-  '</div>',
-  '</main>',
-  '</body>',
-  '</html>'
-].join('');
+var logicFlowHtml = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>@import url(\'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\');*{box-sizing:border-box}body{margin:0;background:#faf8ff;color:#191b23;font-family:\'Inter\',-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}.wrap{max-width:960px;margin:0 auto;padding:40px 28px}.title{font-size:22px;font-weight:700;margin-bottom:6px}.desc{font-size:13px;color:#434654;margin-bottom:22px}.list{display:grid;gap:12px}.item{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;background:#fff;border:1px solid #c3c6d6;border-radius:8px;text-decoration:none;color:#191b23;box-shadow:0 1px 2px rgba(0,0,0,.06);transition:all .18s}.item:hover{border-color:#003594;box-shadow:0 6px 18px rgba(0,53,148,.12);transform:translateY(-1px)}.item-title{font-size:15px;font-weight:600}.item-meta{font-size:12px;color:#434654;margin-top:4px}.arrow{color:#003594;font-size:18px;font-weight:700}@media(max-width:640px){.wrap{padding:24px 16px}.item{align-items:flex-start;flex-direction:column}}</style></head><body><main class="wrap"><div class="title">逻辑流程图</div><div class="desc">选择目录项查看对应的业务逻辑图。</div><div class="list"><a class="item" href="https://www.processon.com/f/6a0c0327c2a07d6a4fc22033" target="_blank" rel="noopener noreferrer"><span><span class="item-title">线索接收逻辑</span><span class="item-meta">ProcessOn · 新增线索</span></span><span class="arrow">↗</span></a></div></main></body></html>';
 
 function switchTab(index) {
   if (index === currentTab) return;
   currentTab = index;
 
-  // Update buttons
   var btns = document.querySelectorAll('.tab-btn');
   btns.forEach(function(b, i) {
     b.classList.toggle('active', i === index);
   });
 
-  // Update iframes
   var frames = document.querySelectorAll('.content-area iframe');
   frames.forEach(function(f, i) {
     f.classList.toggle('active', i === index);
   });
 
-  // Show loading if frame hasn't loaded yet
   var frame = document.getElementById('frame' + index);
-  if (index === 4 && !frame.getAttribute('srcdoc')) {
-    frame.setAttribute('srcdoc', logicIndexHtml);
-  } else if (index !== 4 && !frame.getAttribute('src')) {
+  if (index === 5 && !frame.getAttribute('srcdoc')) {
+    frame.setAttribute('srcdoc', logicFlowHtml);
+  } else if (index !== 5 && !frame.getAttribute('src')) {
     frame.setAttribute('src', tabUrls[index]);
   }
   var loaded = frame.getAttribute('data-loaded');
@@ -410,8 +340,7 @@ function switchTab(index) {
     hideLoading();
   }
 
-  // Update new-window link
-  document.getElementById('btnNewWindow').href = tabUrls[index];
+  document.getElementById('btnNewWindow').href = index === 5 ? '#' : tabUrls[index];
   document.getElementById('footerStatus').textContent = '当前：' + tabNames[index];
 }
 
@@ -462,7 +391,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// Initialize new-window link
+// Initialize
 document.getElementById('btnNewWindow').href = tabUrls[0];
 showLoading(tabNames[0]);
 document.getElementById('frame0').setAttribute('src', tabUrls[0]);
