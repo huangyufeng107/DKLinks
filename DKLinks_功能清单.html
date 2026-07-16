@@ -5,60 +5,69 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>D客连 · 功能清单</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg: #f6f8fb;
+  --bg: #faf8ff;
   --panel: #ffffff;
-  --text: #1f2937;
-  --muted: #667085;
-  --border: #d9e0ea;
-  --accent: #2563eb;
-  --accent-soft: #eff6ff;
-  --success: #0f766e;
-  --warning: #b45309;
-  --danger: #b42318;
+  --text: #191b23;
+  --muted: #434654;
+  --border: #c3c6d6;
+  --accent: #003594;
+  --accent-soft: #dbe1ff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #0ea5e9;
   --radius: 8px;
-  --shadow: 0 1px 2px rgba(16,24,40,0.06);
-  --header-gradient: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+  --shadow: 0 1px 2px rgba(0,0,0,0.06);
+  --header-gradient: linear-gradient(135deg, #00174b 0%, #003594 50%, #004ac6 100%);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 15px; line-height: 1.65; color: var(--text); background: var(--bg);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px; line-height: 1.65; color: var(--text); background: var(--bg);
 }
-.page { max-width: 1180px; margin: 0 auto; padding: 24px 24px 60px; }
+.page { max-width: 1180px; margin: 0 auto; padding: 24px 4px 60px; }
+
+/* 头部 */
 .doc-header {
   background: var(--header-gradient); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 32px 36px 28px; margin-bottom: 18px; color: #fff;
 }
 .doc-header .doc-type-badge {
-  display: inline-block; background: #ffffff; color: var(--accent);
+  display: inline-block; background: rgba(255, 255, 255, 0.15); color: #fff;
+  backdrop-filter: blur(4px);
   font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; margin-bottom: 14px;
 }
-.doc-header h1 { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: 0.5px; }
+.doc-header h1 { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: 0.5px; }
 .doc-header .doc-subtitle { color: rgba(255,255,255,0.88); font-size: 14px; margin-bottom: 18px; }
 .doc-header .doc-meta-list { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.92); }
 .doc-header .doc-meta-list span { display: flex; align-items: center; gap: 4px; }
 .doc-header .doc-meta-list .meta-label { font-weight: 700; color: #fff; }
+
+/* 汇总卡片 */
 .summary-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
 .summary-card {
   background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
-  box-shadow: var(--shadow); padding: 14px 20px; flex: 1; min-width: 140px;
+  box-shadow: var(--shadow); padding: 16px 20px; flex: 1; min-width: 140px;
 }
 .summary-card .summary-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
-.summary-card .summary-value { font-size: 20px; font-weight: 800; color: var(--text); }
+.summary-card .summary-value { font-size: 20px; font-weight: 700; color: var(--text); }
+
+/* 搜索框 */
 .search-box { margin-bottom: 16px; }
 .table-card .search-box {
-  margin: 0;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--panel);
+  margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--panel);
 }
 .search-box input {
   width: 100%; max-width: 400px; padding: 8px 14px;
   border: 1px solid var(--border); border-radius: 6px; font-size: 14px;
   background: var(--panel); color: var(--text);
 }
-.search-box input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.search-box input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,53,148,0.1); }
+
+/* 表格卡片 */
 .table-card {
   background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: var(--shadow); overflow: hidden; margin-bottom: 18px;
@@ -76,21 +85,27 @@ body {
 }
 .btn:hover { background: var(--accent-soft); border-color: var(--accent); }
 .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-primary:hover { background: #1e40af; }
+.btn-primary:hover { background: #002b73; }
+
+/* 表格 */
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead { background: #f8fafc; }
 th { padding: 10px 12px; text-align: left; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
 td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+/* 表格行 hover 已禁用：保持无底色，避免视觉干扰 */
 tr:last-child td { border-bottom: none; }
 .empty-row { text-align: center; color: var(--muted); padding: 40px 0; }
+
+/* Tab 导航（多菜单模式） */
 .tab-nav {
-  display: flex; gap: 8px; padding: 6px 12px; background: var(--panel); border-radius: var(--radius);
-  box-shadow: var(--shadow); margin-bottom: 14px; overflow-x: auto; flex-wrap: wrap;
+  display: flex; gap: 8px; padding: 16px 24px; background: var(--panel);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 18px; overflow-x: auto;
 }
 .tab-btn {
-  padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px;
-  background: var(--panel); color: var(--text); font-size: 13px; cursor: pointer;
+  padding: 8px 18px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--panel); color: var(--text); font-size: 14px; cursor: pointer;
   white-space: nowrap; transition: all 0.2s;
 }
 .tab-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
