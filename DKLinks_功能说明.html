@@ -5,20 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>D客连 · 功能说明文档</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg: #f6f8fb; --panel: #ffffff; --text: #1f2937; --muted: #667085;
-  --border: #d9e0ea; --accent: #2563eb; --accent-soft: #eff6ff;
-  --success: #0f766e; --warning: #b45309; --danger: #b42318;
-  --radius: 8px; --shadow: 0 1px 2px rgba(16,24,40,0.06);
+  --bg: #faf8ff; --panel: #ffffff; --text: #191b23; --muted: #434654;
+  --border: #c3c6d6; --accent: #003594; --accent-soft: #dbe1ff;
+  --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+  --info: #0ea5e9; --radius: 8px; --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.65;color:var(--text);background:var(--bg)}
-.page{max-width:1180px;margin:0 auto;padding:20px 24px 0}
-.doc-header{background:linear-gradient(135deg,#1d4ed8 0%,#3b82f6 100%);border-radius:var(--radius);box-shadow:0 4px 12px rgba(37,99,235,0.2);padding:28px 32px 0;margin-bottom:18px;color:#fff}
-.doc-header .doc-type-badge{display:inline-block;background:rgba(255,255,255,0.95);color:var(--accent);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:10px}
-.doc-header h1{font-size:24px;font-weight:800;color:#fff;margin-bottom:6px}
+body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.65;color:var(--text);background:var(--bg)}
+.page{max-width:1180px;margin:0 auto;padding:20px 4px 0}
+.doc-header{background:linear-gradient(135deg,#00174b 0%,#003594 50%,#004ac6 100%);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,53,148,0.2);padding:28px 32px 0;margin-bottom:18px;color:#fff}
+.doc-header .doc-type-badge{display:inline-block;background:rgba(255,255,255,0.15);color:#fff;backdrop-filter:blur(4px);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+.doc-header h1{font-size:24px;font-weight:700;color:#fff;margin-bottom:6px}
 .doc-header .doc-subtitle{color:rgba(255,255,255,0.88);font-size:14px;margin-bottom:14px}
-.doc-header .doc-meta-list{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:rgba(255,255,255,0.85)}
+.doc-header .doc-meta-list{display:flex;gap:24px;flex-wrap:wrap;font-size:13px;color:rgba(255,255,255,0.85)}
 .doc-header .doc-meta-list span{display:flex;align-items:center;gap:4px}
 .doc-header .doc-meta-list .meta-label{font-weight:700;color:#fff}
 .doc-header-tab-bar{display:flex;gap:6px;flex-wrap:wrap;margin:20px -32px 0;padding:10px 32px;background:rgba(255,255,255,0.98);border-top:1px solid rgba(255,255,255,0.2);border-radius:0 0 var(--radius) var(--radius)}
@@ -26,42 +28,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .doc-header-tab-btn:hover{background:var(--accent-soft)}
 .doc-header-tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
 .summary-strip{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-.summary-strip .summary-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;flex:1;min-width:140px}
+.summary-strip .summary-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;flex:1;min-width:140px}
 .summary-strip .summary-label{font-size:12px;color:var(--muted);margin-bottom:2px}
-.summary-strip .summary-value{font-size:20px;font-weight:800;color:var(--text)}
+.summary-strip .summary-value{font-size:20px;font-weight:700;color:var(--text)}
 .toc{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 28px;margin-bottom:18px}
-.toc-title{font-size:16px;font-weight:700;margin-bottom:10px}
+.toc-title{font-size:16px;font-weight:600;margin-bottom:10px}
 .toc-links{display:flex;flex-wrap:wrap;gap:8px 16px}
 .toc-links a{font-size:14px;color:var(--accent);text-decoration:none;padding:4px 0;border-bottom:1px solid transparent;transition:border-color .15s}
 .toc-links a:hover,.toc-links a:focus{border-bottom-color:var(--accent)}
 .section{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 28px;margin-bottom:18px}
-.section-title{font-size:18px;font-weight:800;color:#111827;margin-bottom:4px}
+.section-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
 .section-desc{font-size:13px;color:var(--muted);margin-bottom:16px}
 .table-wrap{width:100%;overflow-x:auto;margin-bottom:12px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 table th,table td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border);min-width:60px}
-table th{background:#f3f5f9;font-weight:700;color:var(--text);font-size:12px;white-space:nowrap}
+table th{background:#f3f5f9;font-weight:600;color:var(--text);font-size:12px;white-space:nowrap}
 table td{color:var(--text)}
-.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;line-height:1.4;margin-right:4px}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;line-height:1.4;margin-right:4px}
 .badge-warn{background:#fef3c7;color:var(--warning)}
 .badge-danger{background:#fde8e8;color:var(--danger)}
 .badge-success{background:#d1fae5;color:var(--success)}
 .badge-info{background:var(--accent-soft);color:var(--accent)}
 .badge-muted{background:#f3f5f9;color:var(--muted)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:14px}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 .feature-card{background:#f8fafd;border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px}
 .feature-card+.feature-card{margin-top:16px}
-.feature-card .fc-title{font-size:15px;font-weight:700;color:#111827;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.feature-card .fc-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .feature-card .fc-body{font-size:13px;color:var(--muted);line-height:1.55}
 .feature-card .fc-body p{margin-bottom:6px}
 .feature-card .fc-body strong{color:var(--text)}
 .feature-card .fc-body ul{padding-left:16px;margin-bottom:6px}
 .feature-card .fc-body li{margin-bottom:2px}
 details{margin-top:10px;padding-top:2px}
-details summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent);padding:4px 0;user-select:none}
+details summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);padding:4px 0;user-select:none}
 details summary:hover{text-decoration:underline}
-@media(max-width:720px){.page{padding:20px 12px 0}.summary-strip .summary-card{min-width:100%}.doc-header{padding:18px 16px 0}.doc-header-tab-bar{margin:20px -16px 0;padding:10px 16px}.section{padding:16px 14px}}
+@media(max-width:720px){.page{padding:20px 12px 0}.summary-strip .summary-card{min-width:100%}.doc-header{padding:18px 16px 0}.doc-header-tab-bar{margin:20px -16px 0;padding:10px 16px}.section{padding:16px 14px}.card-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
