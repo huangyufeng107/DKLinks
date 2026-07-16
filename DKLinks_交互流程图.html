@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>D客连 — 交互流程分析</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f8f9fa; color: #1a1a2e;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px; background: #faf8ff; color: #191b23;
   }
   .page {
     max-width: 1180px;
@@ -16,15 +18,16 @@
     padding: 20px 0 0;
   }
   .header {
-    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    background: linear-gradient(135deg, #00174b 0%, #003594 50%, #004ac6 100%);
     color: #fff; padding: 28px 32px 0;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   }
   .header-badge {
     display: inline-block;
-    background: rgba(255,255,255,.95);
-    color: #1d4ed8;
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    backdrop-filter: blur(4px);
     font-size: 12px;
     font-weight: 700;
     padding: 4px 10px;
@@ -53,61 +56,60 @@
     padding: 10px 32px;
     background: rgba(255,255,255,.96);
     border-top: 1px solid rgba(255,255,255,.25);
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 8px 8px;
   }
   .page-tabs button {
-    background: transparent; color: #1d4ed8;
+    background: transparent; color: #003594;
     border: 1px solid transparent; padding: 7px 16px; cursor: pointer;
     font-size: 13px; font-family: inherit;
     border-radius: 999px;
     white-space: nowrap; transition: all .15s;
     font-weight: 500;
   }
-  .page-tabs button:hover { background: rgba(29,78,216,.08); }
+  .page-tabs button:hover { background: rgba(0,53,148,.08); }
   .page-tabs button.active {
-    background: #1d4ed8; color: #fff; font-weight: 700;
+    background: #003594; color: #fff; font-weight: 700;
   }
   .op-tabs {
     background: #fff;
     max-width: 1180px; margin: 12px auto 0;
     display: flex; gap: 4px; padding: 8px 28px;
-    border-radius: 12px;
-    border-bottom: 2px solid #e8ecf1;
-    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    border: 1px solid #c3c6d6; border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   .op-tabs button {
-    background: transparent; color: #64748b;
+    background: transparent; color: #434654;
     border: 1px solid transparent; padding: 6px 16px; cursor: pointer;
     font-size: 12px; font-family: inherit;
     border-radius: 6px; white-space: nowrap; transition: all .2s;
   }
-  .op-tabs button:hover { background: #f1f5f9; color: #334155; }
+  .op-tabs button:hover { background: #dbe1ff; color: #191b23; }
   .op-tabs button.active {
-    background: #1d4ed8; color: #fff; border-color: #1d4ed8; font-weight: 600;
+    background: #003594; color: #fff; border-color: #003594; font-weight: 600;
   }
   .op-tabs .op-group { display: none; }
   .op-tabs .op-group.active { display: flex; gap: 4px; }
   .container { max-width: 1180px; margin: 0 auto; padding: 20px 4px 0; position: relative; }
   .chart-card {
-    background: #fff; border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    background: #fff; border: 1px solid #c3c6d6; border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
     padding: 32px 32px 16px; margin-bottom: 0; overflow-x: auto;
     position: absolute; visibility: hidden; width: 100%; left: 0; top: 0;
   }
   .chart-card.active { position: relative; visibility: visible; }
   .chart-card h2 {
-    font-size: 16px; color: #1d4ed8; margin-bottom: 20px;
-    padding-bottom: 12px; border-bottom: 2px solid #e8ecf1;
+    font-size: 16px; color: #003594; margin-bottom: 20px;
+    padding-bottom: 12px; border-bottom: 2px solid #c3c6d6;
   }
   .chart-card h2 .card-index {
-    display: inline-block; background: #1d4ed8; color: #fff;
+    display: inline-block; background: #003594; color: #fff;
     font-size: 12px; padding: 2px 8px; border-radius: 10px;
     margin-right: 8px; vertical-align: middle;
   }
   .chart-card .page-badge {
-    display: inline-block; background: #f1f5f9; color: #64748b;
+    display: inline-block; background: #f3f5f9; color: #434654;
     font-size: 11px; padding: 2px 8px; border-radius: 8px;
     margin-left: 8px; vertical-align: middle; font-weight: 400;
   }
@@ -115,16 +117,16 @@
   .legend .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend .dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; flex-shrink: 0; }
   .param-box {
-    background: #f8fafc; border: 1px solid #e2e8f0;
+    background: #f8fafc; border: 1px solid #c3c6d6;
     border-radius: 8px; padding: 16px 20px; margin: 20px 0 12px;
-    font-size: 13px; color: #475569; line-height: 1.8;
+    font-size: 13px; color: #434654; line-height: 1.8;
   }
-  .param-box strong { color: #1e293b; }
+  .param-box strong { color: #191b23; }
   .mermaid { display: flex; justify-content: center; }
   .mermaid svg { max-width: 100%; height: auto; }
   .mermaid {
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #c3c6d6;
     border-radius: 8px;
     padding: 16px;
     overflow-x: auto;
@@ -134,12 +136,12 @@
     white-space: pre;
   }
   .empty-hint {
-    text-align: center; padding: 48px 20px; color: #94a3b8; font-size: 14px;
+    text-align: center; padding: 48px 20px; color: #434654; font-size: 14px;
   }
-  .end-hint { text-align: center; padding: 24px 0 16px; color: #94a3b8; font-size: 13px; }
+  .end-hint { text-align: center; padding: 24px 0 16px; color: #434654; font-size: 13px; }
   @media (max-width: 768px) {
     .page { padding: 12px 0 0; }
-    .header { padding: 20px 18px 0; border-radius: 10px; }
+    .header { padding: 20px 18px 0; border-radius: 8px; }
     .header h1 { font-size: 19px; }
     .header .desc { font-size: 13px; }
     .header .meta { gap: 12px; font-size: 11.5px; }
