@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D客连 — 交互流程图</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px; line-height: 1.65; background: #faf8ff; color: #191b23;
+  }
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 20px 0 0;
+  }
+  /* 使用流程图页专属类名，避免与文档中心的 .header 样式冲突。 */
+  .flow-header {
+    background: linear-gradient(135deg, #00174b 0%, #003594 50%, #004ac6 100%);
+    color: #fff; padding: 28px 32px 0; margin-bottom: 18px;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .flow-header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    backdrop-filter: blur(4px);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .flow-header h1 {
+    font-size: 26px; font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+  }
+  .flow-header .desc {
+    font-size: 14px; opacity: .88; margin-top: 10px;
+    line-height: 1.6; max-width: 900px;
+  }
+  .flow-header .meta {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    margin-top: 16px; font-size: 13px;
+    color: rgba(255,255,255,0.85);
+  }
+  .flow-header .meta span { display: flex; align-items: center; gap: 4px; }
+  .flow-header .meta .meta-label { font-weight: 700; color: #fff; }
+  .page-tabs {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin: 20px -32px 0;
+    padding: 10px 32px 0;
+    background: rgba(255,255,255,.98);
+    border-top: 1px solid rgba(255,255,255,.2);
+  }
+  .page-tabs button {
+    background: transparent; color: #003594;
+    border: 1px solid transparent; padding: 7px 16px; cursor: pointer;
+    font-size: 13px; font-family: inherit;
+    border-radius: 999px;
+    white-space: nowrap; transition: all .15s;
+    font-weight: 500;
+  }
+  .page-tabs button:hover { background: rgba(0,53,148,.08); }
+  .page-tabs button.active {
+    background: #003594; color: #fff; font-weight: 600;
+  }
+  .op-tabs {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin: 0 -32px;
+    padding: 8px 32px 10px;
+    background: rgba(255,255,255,.98);
+    border-radius: 0 0 8px 8px;
+  }
+  .op-tabs button {
+    background: transparent; color: #003594;
+    border: 1px solid transparent; padding: 6px 16px; cursor: pointer;
+    font-size: 12px; font-family: inherit;
+    border-radius: 999px; white-space: nowrap; transition: all .2s;
+  }
+  .op-tabs button:hover { background: rgba(0,53,148,.08); }
+  .op-tabs button.active {
+    background: #003594; color: #fff; border-color: #003594; font-weight: 600;
+  }
+  .op-tabs .op-group { display: none; }
+  .op-tabs .op-group.active { display: flex; gap: 4px; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 20px 4px 0; position: relative; }
+  .chart-card {
+    background: #fff; border: 1px solid #c3c6d6; border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    padding: 32px 32px 16px; margin-bottom: 0; overflow-x: auto;
+    position: absolute; visibility: hidden; width: 100%; left: 0; top: 0;
+  }
+  .chart-card.active { position: relative; visibility: visible; }
+  .chart-card h2 {
+    font-size: 16px; color: #003594; margin-bottom: 20px;
+    padding-bottom: 12px; border-bottom: 2px solid #c3c6d6;
+  }
+  .chart-card h2 .card-index {
+    display: inline-block; background: #003594; color: #fff;
+    font-size: 12px; padding: 2px 8px; border-radius: 10px;
+    margin-right: 8px; vertical-align: middle;
+  }
+  .chart-card .page-badge {
+    display: inline-block; background: #f3f5f9; color: #434654;
+    font-size: 11px; padding: 2px 8px; border-radius: 8px;
+    margin-left: 8px; vertical-align: middle; font-weight: 400;
+  }
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; font-size: 13px; }
+  .legend .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend .dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; flex-shrink: 0; }
+  .param-box {
+    background: #f8fafc; border: 1px solid #c3c6d6;
+    border-radius: 8px; padding: 16px 20px; margin: 20px 0 12px;
+    font-size: 13px; color: #434654; line-height: 1.8;
+  }
+  .param-box strong { color: #191b23; }
+  .mermaid { display: flex; justify-content: center; }
+  .mermaid svg { max-width: 100%; height: auto; }
+  .mermaid {
+    background: #f8fafc;
+    border: 1px solid #c3c6d6;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #334155;
+    white-space: pre;
+  }
+  .empty-hint {
+    text-align: center; padding: 48px 20px; color: #434654; font-size: 14px;
+  }
+  .end-hint { text-align: center; padding: 24px 0 16px; color: #434654; font-size: 13px; }
+  @media (max-width: 768px) {
+    .page { padding: 12px 0 0; }
+    .flow-header { padding: 20px 18px 0; border-radius: 8px; }
+    .flow-header h1 { font-size: 19px; }
+    .flow-header .desc { font-size: 13px; }
+    .flow-header .meta { gap: 12px; font-size: 11.5px; }
+    .page-tabs { margin: 14px -18px 0; padding: 8px 18px 0; }
+    .page-tabs button { padding: 6px 12px; font-size: 12px; }
+    .op-tabs { margin: 0 -18px; padding: 6px 18px 8px; }
+    .op-tabs button { padding: 5px 12px; font-size: 11px; }
+    .container { padding: 16px 4px 0; }
+    .chart-card { padding: 16px 16px 8px; }
+    .legend { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="flow-header">
+  <div class="flow-header-badge">交互流程图 · 多菜单版（HTML 阅读版）</div>
+  <h1>D客连 · SaaS平台</h1>
+  <p class="desc">汽车行业线索培育管理系统 — 面向产品与研发团队的产品文档</p>
+  <div class="meta">
+    <span><span class="meta-label">系统：</span>D客连 · SaaS平台</span>
+    <span><span class="meta-label">板块：</span>多板块</span>
+    <span><span class="meta-label">版本：</span>v1.1.1</span>
+    <span><span class="meta-label">日期：</span>2026-07-16</span>
+  </div>
+  <div class="page-tabs">
+    <button class="active" data-page="登录页">登录页</button>
+    <button data-page="框架布局">框架布局</button>
+    <button data-page="工作台">工作台</button>
+    <button data-page="品牌管理">品牌管理</button>
+    <button data-page="车系管理">车系管理</button>
+    <button data-page="城市管理">城市管理</button>
+    <button data-page="品牌区域">品牌区域</button>
+    <button data-page="门店管理">门店管理</button>
+    <button data-page="开发者管理">开发者管理</button>
+    <button data-page="排期管理">排期管理</button>
+    <button data-page="报表权限">报表权限</button>
+    <button data-page="SmartCode管理">SmartCode管理</button>
+    <button data-page="拦截规则">拦截规则</button>
+    <button data-page="线索列表">线索列表</button>
+    <button data-page="自定义字段">自定义字段</button>
+    <button data-page="帐号管理">帐号管理</button>
+    <button data-page="权限管理">权限管理</button>
+    <button data-page="角色管理">角色管理</button>
+  </div>
+  <div class="op-tabs">
+    <div class="op-group active"><button class="active" data-op="登录流程">登录流程</button></div>
+    <div class="op-group"><button data-op="页面导航">页面导航</button><button data-op="通知中心">通知中心</button></div>
+    <div class="op-group"><button class="active" data-op="数据概览">数据概览</button><button data-op="快捷操作">快捷操作</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="停用启用">停用/启用</button><button data-op="删除品牌">删除品牌</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看详情">查看详情</button><button data-op="停用启用">停用/启用</button><button data-op="删除车系">删除车系</button><button data-op="批量导入">批量导入</button><button data-op="导出数据">导出数据</button></div>
+    <div class="op-group"><button data-op="树形导航">树形导航</button><button data-op="新增节点">新增节点</button><button data-op="编辑节点">编辑节点</button><button data-op="删除节点">删除节点</button><button data-op="批量导入">批量导入</button><button data-op="导出数据">导出数据</button></div>
+    <div class="op-group"><button data-op="树形导航">树形导航</button><button data-op="新增节点">新增节点</button><button data-op="编辑节点">编辑节点</button><button data-op="删除节点">删除节点</button><button data-op="批量导入">批量导入</button><button data-op="导出数据">导出数据</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看详情">查看详情</button><button data-op="停用启用">停用/启用</button><button data-op="删除门店">删除门店</button><button data-op="批量操作">批量操作</button><button data-op="地图选址">地图选址</button><button data-op="批量导入">批量导入</button><button data-op="导出数据">导出数据</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看详情">查看详情</button><button data-op="停用启用">停用/启用</button><button data-op="重置Key">重置APIKey</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看报表">查看报表</button><button data-op="线索明细">线索明细</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="删除帐号">删除帐号</button></div>
+    <div class="op-group"><button data-op="SmartCode维护">SmartCode维护</button><button data-op="SmartCode映射">SmartCode映射</button><button data-op="批量导入">批量导入</button></div>
+    <div class="op-group"><button data-op="规则配置">规则配置</button><button data-op="拦截记录">拦截记录</button><button data-op="黑名单管理">黑名单管理</button><button data-op="导出规则">导出规则</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="查看详情">查看详情</button><button data-op="重新下发">重新下发</button><button data-op="列设置">列设置</button><button data-op="导出数据">导出数据</button></div>
+    <div class="op-group"><button data-op="接收字段">接收字段</button><button data-op="下发字段">下发字段</button><button data-op="字段预览">字段预览</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="停用启用">停用/启用</button></div>
+    <div class="op-group"><button data-op="功能权限点">功能权限点</button><button data-op="角色权限绑定">角色权限绑定</button></div>
+    <div class="op-group"><button data-op="新增编辑">新增/编辑</button></div>
+  </div>
+</div>
+</div>
+
+<div class="container">
+
+<!-- ====== 登录页 ====== -->
+<div class="chart-card active" data-page="登录页" data-op="登录流程">
+  <h2><span class="card-index">1</span>登录页 · 登录流程<span class="page-badge">登录页</span></h2>
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:#3b82f6"></span>起始/结束</div>
+    <div class="legend-item"><span class="dot" style="background:#f59e0b"></span>用户操作</div>
+    <div class="legend-item"><span class="dot" style="background:#10b981"></span>Toast提示</div>
+  </div>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>username（用户名，预设admin）、password（密码，预填充）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>原型级模拟无实际接口，登录成功后显示主应用框架
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户打开系统"] --> A2["显示登录页<br/>居中卡片布局(440px)"]
+    A2 --> A3["品牌区展示<br/>车辆SVG+系统名称+副标题"]
+    A3 --> A4["用户名输入框<br/>预设值admin"]
+    A4 --> A5["密码输入框<br/>type=password预填充"]
+    A5 --> A6["点击「登 录」按钮"]
+    A6 --> A7["doLogin()触发"]
+    A7 --> A8["隐藏loginPage<br/>display:none"]
+    A8 --> A9["显示主应用<br/>mainApp添加active类"]
+    A9 --> A10["showToast<br/>'登录成功，欢迎回来！'"]
+    A10 --> A11["主应用加载<br/>默认显示工作台"]
+  </pre>
+</div>
+
+<!-- ====== 框架布局 ====== -->
+<div class="chart-card" data-page="框架布局" data-op="页面导航">
+  <h2><span class="card-index">1</span>框架布局 · 页面导航（navigateTo）<span class="page-badge">框架布局</span></h2>
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:#3b82f6"></span>起始/结束</div>
+    <div class="legend-item"><span class="dot" style="background:#8b5cf6"></span>路由处理</div>
+    <div class="legend-item"><span class="dot" style="background:#10b981"></span>决策</div>
+  </div>
+  <div class="param-box">
+    <strong>接口入参（根据页面字段推导）：</strong>page（目标页面ID，如dashboard/brand/leads等共18个）<br>
+    <strong>接口出参（根据页面字段推导）：</strong>目标页面显示、面包屑文本更新、侧边栏激活态同步、页面初始化回调执行
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户点击侧边栏导航项<br/>或快捷入口"] --> A2["navigateTo(page)"]
+    A2 --> A3["页面ID映射<br/>scmapping→smartcode"]
+    A3 --> A4["关闭排期抽屉(如打开)"]
+    A4 --> A5["隐藏所有.page容器"]
+    A5 --> A6["显示目标.page容器"]
+    A6 --> A7["更新面包屑<br/>名称字典18项映射"]
+    A7 --> A8["更新侧边栏激活态<br/>子页面高亮父级导航"]
+    A8 --> D1{"页面有初始化回调？"}
+    D1 -->|是| A9["触发init函数<br/>initCityTree/filterSupplierList<br/>renderScheduleTable等"]
+    D1 -->|否| A10["页面渲染完成"]
+    A9 --> A10
+  </pre>
+</div>
+
+<div class="chart-card" data-page="框架布局" data-op="通知中心">
+  <h2><span class="card-index">2</span>框架布局 · 通知中心<span class="page-badge">框架布局</span></h2>
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:#3b82f6"></span>起始/结束</div>
+    <div class="legend-item"><span class="dot" style="background:#f59e0b"></span>用户操作</div>
+  </div>
+  <div class="param-box">
+    <strong>接口入参（根据页面字段推导）：</strong>无参数，页面加载时硬编码通知数据<br>
+    <strong>接口出参（根据页面字段推导）：</strong>通知列表（3条：黑名单策略命中、外呼标签同步、配置待审核）
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户查看顶部导航栏"] --> A2["通知中心图标<br/>铃铛SVG+红色角标(3)"]
+    A2 --> A3["点击通知图标"]
+    A3 --> A4["展开通知下拉弹窗"]
+    A4 --> A5["显示3条通知：<br/>1.黑名单策略命中<br/>2.外呼标签同步<br/>3.配置待审核"]
+    A5 --> A6["用户查看通知内容"]
+    A6 --> A7["点击外部区域"]
+    A7 --> A8["关闭通知弹窗"]
+  </pre>
+</div>
+
+<!-- ====== 工作台 ====== -->
+<div class="chart-card" data-page="工作台" data-op="数据概览">
+  <h2><span class="card-index">1</span>工作台 · 数据概览<span class="page-badge">工作台</span></h2>
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:#3b82f6"></span>起始/结束</div>
+    <div class="legend-item"><span class="dot" style="background:#f59e0b"></span>数据加载</div>
+    <div class="legend-item"><span class="dot" style="background:#10b981"></span>决策</div>
+    <div class="legend-item"><span class="dot" style="background:#ef4444"></span>异常</div>
+  </div>
+  <div class="param-box">
+    <strong>接口入参（根据页面字段推导）：</strong>无需参数，页面加载后自动拉取<br>
+    <strong>接口出参（根据页面字段推导）：</strong>今日新增线索量、今日已下发量、A级高意向数量、今日成交量、线索趋势(近7天)、开发者分布比例、待处理事项列表
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入工作台"] --> A2["页面加载数据"]
+    A2 --> D1{"数据加载成功？"}
+    D1 -->|是| A3["渲染统计卡片<br/>今日新增/已下发/A级/成交"]
+    D1 -->|否| A4["显示加载失败<br/>提示刷新重试"]
+    A3 --> A5["渲染线索趋势图<br/>近7天柱状图"]
+    A3 --> A6["渲染开发者分布<br/>进度条列表"]
+    A5 --> A7["渲染待处理事项<br/>列表及操作按钮"]
+    A6 --> A7
+    A7 --> A8["页面渲染完成"]
+    A4 --> A9["结束：提示用户刷新"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="工作台" data-op="快捷操作">
+  <h2><span class="card-index">2</span>工作台 · 快捷操作<span class="page-badge">工作台</span></h2>
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:#3b82f6"></span>起始/结束</div>
+    <div class="legend-item"><span class="dot" style="background:#8b5cf6"></span>导航</div>
+    <div class="legend-item"><span class="dot" style="background:#10b981"></span>Toast提示</div>
+  </div>
+  <div class="param-box">
+    <strong>接口入参（根据页面字段推导）：</strong>各快捷按钮绑定的 navigateTo 目标页面 ID<br>
+    <strong>接口出参（根据页面字段推导）：</strong>跳转到目标页面后按目标页面加载对应的数据
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户查看快捷操作区"] --> A2["点击快捷操作按钮"]
+    A2 --> D1{"选择哪个操作？"}
+    D1 -->|线索列表| B1["navigateTo('leads')<br/>跳转线索列表页"]
+    D1 -->|仅接收线索| B2["navigateToLeadStatus('5')<br/>跳转线索列表+筛选仅接收"]
+    D1 -->|拦截规则| B3["navigateTo('lead-intercept')<br/>跳转拦截规则页"]
+    D1 -->|黑名单| B4["navigateToLeadInterceptTab('blacklist')<br/>跳转拦截规则黑名单Tab"]
+    D1 -->|门店管理| B5["navigateTo('store')<br/>跳转门店管理页"]
+    D1 -->|开发者管理| B6["navigateTo('supplier')<br/>跳转开发者管理页"]
+    D1 -->|自定义字段| B7["navigateTo('custom-fields')<br/>跳转自定义字段页"]
+    D1 -->|排期管理| B8["navigateTo('schedule')<br/>跳转排期管理页"]
+    B1 --> C1["showToast 提示信息"]
+    B2 --> C1
+    B3 --> C1
+    B4 --> C1
+    B5 --> C1
+    B6 --> C1
+    B7 --> C1
+    B8 --> C1
+    C1 --> A9["目标页面加载完成"]
+  </pre>
+</div>
+
+<!-- ====== 品牌管理 ====== -->
+<div class="chart-card" data-page="品牌管理" data-op="查询筛选">
+  <h2><span class="card-index">1</span>品牌管理 · 查询筛选<span class="page-badge">品牌管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>brandSearchName（品牌名称关键词）、brandSearchCode（品牌编码关键词）、状态（全部/启用/停用）、页码<br>
+    <strong>接口出参（根据表格字段推导）：</strong>ID、品牌名称、品牌编码、品牌Logo、车系列表（数量）、门店数量、状态、总条数
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入品牌管理页"] --> A2["初始加载全部品牌列表"]
+    A2 --> A3["用户输入筛选条件<br/>名称/编码/状态"]
+    A3 --> A4["触发 filterBrandList()"]
+    A4 --> A5["客户端过滤表格行<br/>匹配名称/编码/状态"]
+    A5 --> D1{"有匹配数据？"}
+    D1 -->|是| A6["渲染匹配行<br/>更新分页信息"]
+    D1 -->|否| A7["显示空状态提示<br/>无匹配数据"]
+    A3 --> A8["点击重置按钮"]
+    A8 --> A9["clearBrandFilter()<br/>清空搜索框和状态下拉"]
+    A9 --> A10["重新显示全部品牌"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌管理" data-op="新增编辑">
+  <h2><span class="card-index">2</span>品牌管理 · 新增/编辑<span class="page-badge">品牌管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>品牌名称（必填）、品牌编码（必填，大写英文，创建后不可修改）、品牌Logo（图片文件）、排序值（正整数，默认255）、状态（启用/停用）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>创建成功返回品牌ID、编辑成功返回更新确认
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「新增数据」或「编辑」"] --> A2["openBrandModal()<br/>打开品牌弹窗"]
+    A2 --> D1{"新增还是编辑？"}
+    D1 -->|新增| A3["表单初始化为空<br/>标题显示新增品牌"]
+    D1 -->|编辑| A4["预填已有数据<br/>标题显示编辑品牌"]
+    A3 --> A5["用户填写表单字段"]
+    A4 --> A5
+    A5 --> A6["点击确认创建/保存"]
+    A6 --> D2{"品牌名称是否为空？"}
+    D2 -->|是| E1["showToast('请填写品牌名称','error')"]
+    D2 -->|否| D3{"品牌编码是否为空？"}
+    D3 -->|是| E2["showToast('请填写品牌编码','error')"]
+    D3 -->|否| A7["closeModal('brandModal')"]
+    A7 --> A8["showToast('品牌创建/修改成功','success')"]
+    A8 --> A9["刷新品牌列表"]
+    A5 --> A10["点击取消"]
+    A10 --> A11["closeModal('brandModal')<br/>关闭弹窗不保存"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌管理" data-op="停用启用">
+  <h2><span class="card-index">3</span>品牌管理 · 停用/启用<span class="page-badge">品牌管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>品牌ID、目标状态（启用/停用）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>操作结果，更新后的品牌状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「停用」或「启用」"] --> D1{"当前状态？"}
+    D1 -->|启用→停用| A2["toggleBrandStatus()<br/>弹出确认对话框"]
+    D1 -->|停用→启用| A3["toggleBrandStatus()<br/>直接执行"]
+    A2 --> D2{"用户确认停用？"}
+    D2 -->|否| A4["取消操作<br/>不做任何变更"]
+    D2 -->|是| A5["showToast('品牌「name」已停用','warning')"]
+    A3 --> A6["showToast('品牌「name」已启用','success')"]
+    A5 --> A7["更新行状态Badge<br/>按钮切换为启用"]
+    A6 --> A8["更新行状态Badge<br/>按钮切换为停用"]
+    A7 --> A9["同步更新关联数据状态<br/>车系/门店同步停用"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌管理" data-op="删除品牌">
+  <h2><span class="card-index">4</span>品牌管理 · 删除品牌<span class="page-badge">品牌管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>品牌ID<br>
+    <strong>接口出参（根据表单字段推导）：</strong>删除结果，关联数据同步停用确认
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「删除」"] --> A2["deleteBrand()<br/>打开删除确认弹窗"]
+    A2 --> A3["弹窗显示关联数据<br/>车系数量、门店数量"]
+    A3 --> A4["显示警告：删除后不可恢复<br/>关联数据将同步停用"]
+    A4 --> D1{"用户确认删除？"}
+    D1 -->|取消| A5["closeBrandDeleteModal()<br/>关闭弹窗"]
+    D1 -->|确认删除| A6["执行删除操作"]
+    A6 --> D2{"删除成功？"}
+    D2 -->|是| A7["showToast('已删除品牌「name」','success')"]
+    D2 -->|否| A8["showToast('删除失败','error')"]
+    A7 --> A9["刷新品牌列表<br/>移除已删除行"]
+  </pre>
+</div>
+
+<!-- ====== 车系管理 ====== -->
+<div class="chart-card" data-page="车系管理" data-op="查询筛选">
+  <h2><span class="card-index">1</span>车系管理 · 查询筛选<span class="page-badge">车系管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>seriesSearchName（车系名称关键词）、seriesSearchBrand（所属品牌）、seriesSearchEnergy（能源类型）、seriesSearchStatus（状态）、页码<br>
+    <strong>接口出参（根据表格字段推导）：</strong>ID、车型图片、车系名称、所属品牌、能源类型、指导价区间(万)、排序值、关联专营店、状态、总条数
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入车系管理页"] --> A2["初始加载全部车系列表<br/>共27条数据"]
+    A2 --> A3["用户选择筛选条件<br/>名称搜索/品牌/能源类型/状态"]
+    A3 --> A4["触发 filterSeriesList()"]
+    A4 --> A5["客户端过滤表格行"]
+    A5 --> D1{"有匹配数据？"}
+    D1 -->|是| A6["渲染匹配行<br/>更新分页信息"]
+    D1 -->|否| A7["显示空状态"]
+    A3 --> A8["点击重置"]
+    A8 --> A9["clearSeriesFilter()<br/>清空所有筛选条件"]
+    A9 --> A10["重新显示全部车系"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="车系管理" data-op="新增编辑">
+  <h2><span class="card-index">2</span>车系管理 · 新增/编辑<span class="page-badge">车系管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>车系名称（必填）、车系编码（必填，大写英文+下划线）、所属品牌（必填）、能源类型（必填）、指导价区间(最低/最高)、排序值、车系图片、车系介绍、关联专营店（多选）、备注说明、状态（启用/停用）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>创建/更新成功返回车系ID
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「新增数据」或「编辑」"] --> A2["openVehicleModal()<br/>打开抽屉式弹窗"]
+    A2 --> D1{"新增还是编辑？"}
+    D1 -->|新增| A3["表单初始化为空"]
+    D1 -->|编辑| A4["预填已有车系数据"]
+    A3 --> A5["用户填写表单<br/>基础信息+关联专营店"]
+    A4 --> A5
+    A5 --> D2{"选择所属品牌？"}
+    D2 -->|选择| A6["onVehicleBrandChange()<br/>过滤关联专营店列表"]
+    A6 --> A7["加载该品牌下专营店<br/>支持搜索/全选"]
+    D2 -->|未选| A5
+    A7 --> A8["用户选择关联专营店"]
+    A8 --> A9["点击确认创建/保存"]
+    A9 --> D3{"车系名称/编码/品牌/能源类型为空？"}
+    D3 -->|是| E1["showToast 提示必填项"]
+    D3 -->|否| A10["closeModal('vehicleModal')"]
+    A10 --> A11["showToast('车系创建成功','success')"]
+    A11 --> A12["刷新车系列表"]
+    A5 --> A13["点击取消"]
+    A13 --> A14["closeModal('vehicleModal')"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="车系管理" data-op="查看详情">
+  <h2><span class="card-index">3</span>车系管理 · 查看详情<span class="page-badge">车系管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>车系ID<br>
+    <strong>接口出参（根据表单字段推导）：</strong>车系图片、名称、副标题、所属品牌、能源类型、状态、编码、指导价区间、排序值、创建时间、车系介绍、关联专营店列表、备注说明
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「查看」"] --> A2["openVehicleDetailModal()<br/>打开详情抽屉"]
+    A2 --> A3["加载车系完整信息"]
+    A3 --> A4["渲染详情区域：<br/>图片+基本信息"]
+    A4 --> A5["渲染基本信息：<br/>编码/指导价/排序/创建时间"]
+    A5 --> A6["渲染车系介绍"]
+    A6 --> A7["渲染关联专营店标签列表"]
+    A7 --> A8["渲染备注说明"]
+    A8 --> A9["显示只读状态<br/>无编辑操作"]
+    A9 --> A10["点击关闭"]
+    A10 --> A11["closeModal('vehicleDetailModal')"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="车系管理" data-op="停用启用">
+  <h2><span class="card-index">4</span>车系管理 · 停用/启用<span class="page-badge">车系管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>车系ID、目标状态<br>
+    <strong>接口出参（根据表单字段推导）：</strong>操作结果，更新后状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「停用」或「启用」"] --> D1{"当前状态？"}
+    D1 -->|启用→停用| A2["toggleSeriesStatus()<br/>弹出确认对话框"]
+    D1 -->|停用→启用| A3["toggleSeriesStatus()<br/>直接执行"]
+    A2 --> D2{"用户确认？"}
+    D2 -->|否| A4["取消操作"]
+    D2 -->|是| A5["showToast('已停用','warning')"]
+    A3 --> A6["showToast('已启用','success')"]
+    A5 --> A7["更新行状态Badge<br/>按钮切换"]
+    A6 --> A7
+  </pre>
+</div>
+
+<div class="chart-card" data-page="车系管理" data-op="删除车系">
+  <h2><span class="card-index">5</span>车系管理 · 删除车系<span class="page-badge">车系管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>车系ID<br>
+    <strong>接口出参（根据表单字段推导）：</strong>删除结果，关联门店同步停用确认
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「删除」"] --> A2["deleteSeries()<br/>打开删除确认弹窗"]
+    A2 --> A3["显示关联门店数量<br/>警告：删除后同步停用关联数据"]
+    A3 --> D1{"用户确认删除？"}
+    D1 -->|取消| A4["closeSeriesDeleteModal()"]
+    D1 -->|确认| A5["执行删除"]
+    A5 --> A6["showToast('已删除车系「name」','success')"]
+    A6 --> A7["刷新列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="车系管理" data-op="批量导入">
+  <h2><span class="card-index">6</span>车系管理 · 批量导入<span class="page-badge">车系管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>Excel文件(.xlsx/.xls/.csv)，包含车系名称、所属品牌、能源类型、指导价区间、状态等字段<br>
+    <strong>接口出参（根据表单字段推导）：</strong>导入结果统计（成功数/失败数）、失败行详情
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「批量导入」"] --> A2["openModal('importSeriesModal')<br/>打开3步导入向导"]
+    A2 --> A3["Step1: 上传文件"]
+    A3 --> A4["点击下载模板<br/>downloadSeriesTemplate()"]
+    A3 --> A5["用户拖拽或选择Excel文件"]
+    A5 --> D1{"文件读取成功？"}
+    D1 -->|否| E1["showToast('文件读取失败','error')"]
+    D1 -->|是| A6["showToast('文件读取成功','success')"]
+    A6 --> A7["下一步按钮启用"]
+    A7 --> A8["Step2: 数据预览"]
+    A8 --> A9["展示预览表格<br/>显示通过/失败统计"]
+    A9 --> D2{"用户确认导入？"}
+    D2 -->|取消| A10["关闭导入弹窗"]
+    D2 -->|确认| A11["Step3: 导入完成"]
+    A11 --> A12["showToast('导入成功，共X条数据','success')"]
+    A12 --> A13["可继续导入或完成"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="车系管理" data-op="导出数据">
+  <h2><span class="card-index">7</span>车系管理 · 导出数据<span class="page-badge">车系管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>当前筛选条件、导出列配置<br>
+    <strong>接口出参（根据表单字段推导）：</strong>文件名「车系管理_YYYY-MM-DD.csv」、UTF-8 BOM格式CSV文件、导出列：ID/车系名称/所属品牌/能源类型/指导价区间/排序值/关联门店/状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「导出数据」"] --> A2["exportSeriesData()"]
+    A2 --> A3["显示异步导出进度弹窗"]
+    A3 --> A4["20%：正在收集车系数据"]
+    A4 --> A5["50%：正在整理车系信息"]
+    A5 --> A6["80%：正在处理导出格式"]
+    A6 --> A7["95%：即将完成"]
+    A7 --> A8["生成CSV文件<br/>UTF-8 BOM编码"]
+    A8 --> A9["触发浏览器下载"]
+    A9 --> A10["showToast('数据导出成功','success')"]
+  </pre>
+</div>
+
+<!-- ====== 城市管理 ====== -->
+<div class="chart-card" data-page="城市管理" data-op="树形导航">
+  <h2><span class="card-index">1</span>城市管理 · 树形导航与搜索<span class="page-badge">城市管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>搜索关键词（省/市/区名称）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>匹配的树节点列表，点击节点显示右侧详情面板
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入城市管理页"] --> A2["加载省级树形结构"]
+    A2 --> A3["显示省份→城市→区县<br/>三级树形结构"]
+    A3 --> A4["用户输入搜索关键词"]
+    A4 --> A5["filterCityTree()<br/>过滤树节点"]
+    A5 --> D1{"有匹配节点？"}
+    D1 -->|是| A6["高亮匹配节点<br/>自动展开父级"]
+    D1 -->|否| A7["树为空状态"]
+    A3 --> A8["点击展开全部"]
+    A8 --> A9["expandAllCityTree()<br/>展开所有节点"]
+    A3 --> A10["点击收起全部"]
+    A10 --> A11["collapseAllCityTree()<br/>收起所有节点"]
+    A3 --> A12["点击树节点"]
+    A12 --> A13["右侧显示详情面板<br/>类型/编码/下辖数量"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="城市管理" data-op="新增节点">
+  <h2><span class="card-index">2</span>城市管理 · 新增节点<span class="page-badge">城市管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>节点类型（省份/城市/区县）、名称（必填）、编码（必填）、所属上级（自动关联）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>新增节点信息，树形结构更新
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击树节点旁的「+」<br/>或顶部「新增省份」"] --> A2["openCityTreeModal()<br/>打开新增弹窗"]
+    A2 --> A3["根据节点类型显示对应表单"]
+    A3 --> A4["用户填写名称和编码"]
+    A4 --> A5["点击保存"]
+    A5 --> D1{"名称是否为空？"}
+    D1 -->|是| E1["showToast('请输入名称','error')"]
+    D1 -->|否| D2{"编码是否为空？"}
+    D2 -->|是| E2["showToast('请输入编码','error')"]
+    D2 -->|否| D3{"名称是否已存在？"}
+    D3 -->|是| E3["showToast('该省份/城市/区县已存在','error')"]
+    D3 -->|否| A6["saveCityTreeData()"]
+    A6 --> A7["showToast('保存成功','success')"]
+    A7 --> A8["刷新树形结构"]
+    A4 --> A9["点击取消"]
+    A9 --> A10["closeModal('cityTreeModal')"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="城市管理" data-op="编辑节点">
+  <h2><span class="card-index">3</span>城市管理 · 编辑节点<span class="page-badge">城市管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>节点ID、节点类型、新名称（必填）、新编码（必填）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>更新后的节点信息
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击树节点旁的「✎」"] --> A2["openCityTreeModal()<br/>打开编辑弹窗"]
+    A2 --> A3["预填当前节点数据"]
+    A3 --> A4["用户修改名称或编码"]
+    A4 --> A5["点击保存"]
+    A5 --> D1{"校验通过？"}
+    D1 -->|否| E1["showToast 错误提示"]
+    D1 -->|是| A6["saveCityTreeData()"]
+    A6 --> A7["showToast('保存成功','success')"]
+    A7 --> A8["更新树节点显示<br/>更新右侧详情面板"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="城市管理" data-op="删除节点">
+  <h2><span class="card-index">4</span>城市管理 · 删除节点<span class="page-badge">城市管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>节点ID、节点类型<br>
+    <strong>接口出参（根据表单字段推导）：</strong>删除结果，树形结构更新
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击树节点旁的「×」"] --> A2["deleteCityNode()"]
+    A2 --> D1{"节点是否有子节点？"}
+    D1 -->|有| A3["提示：需先删除子节点"]
+    D1 -->|无| A4["执行删除"]
+    A4 --> A5["showToast('删除成功','success')"]
+    A5 --> A6["刷新树形结构<br/>移除节点"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="城市管理" data-op="批量导入">
+  <h2><span class="card-index">5</span>城市管理 · 批量导入<span class="page-badge">城市管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>Excel文件，包含省/市/区三级层级数据<br>
+    <strong>接口出参（根据表单字段推导）：</strong>导入结果统计
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「批量导入」"] --> A2["openCityTreeImportModal()<br/>3步导入向导"]
+    A2 --> A3["Step1: 下载模板+上传Excel"]
+    A3 --> A4["Step2: 数据预览<br/>列：行号/省份/城市/区县/编码/校验结果"]
+    A4 --> A5["Step3: 确认导入"]
+    A5 --> A6["showToast('导入成功','success')"]
+    A6 --> A7["刷新城市树"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="城市管理" data-op="导出数据">
+  <h2><span class="card-index">6</span>城市管理 · 导出数据<span class="page-badge">城市管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>导出范围（全部或当前筛选）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>文件名「城市数据_YYYY-MM-DD_HHmmss.xlsx」、XLSX格式文件
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「导出数据」"] --> A2["exportCityData()"]
+    A2 --> A3["生成XLSX文件"]
+    A3 --> A4["触发浏览器下载"]
+    A4 --> A5["showToast('导出成功，共X条数据','success')"]
+  </pre>
+</div>
+
+<!-- ====== 品牌区域 ====== -->
+<div class="chart-card" data-page="品牌区域" data-op="树形导航">
+  <h2><span class="card-index">1</span>品牌区域 · 树形导航与搜索<span class="page-badge">品牌区域</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>搜索关键词（品牌/大区/小区名称）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>匹配的树节点列表，点击节点显示详情面板
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入品牌区域页"] --> A2["加载品牌→大区→小区<br/>三级树形结构"]
+    A2 --> A3["用户输入搜索关键词"]
+    A3 --> A4["filterRegionTree()<br/>过滤树节点"]
+    A4 --> D1{"有匹配节点？"}
+    D1 -->|是| A5["高亮匹配<br/>自动展开父级"]
+    D1 -->|否| A6["树为空"]
+    A2 --> A7["展开全部/收起全部"]
+    A7 --> A8["expandAllRegionTree()<br/>collapseAllRegionTree()"]
+    A2 --> A9["点击节点→右侧详情"]
+    A9 --> A10["显示品牌/大区/小区信息"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌区域" data-op="新增节点">
+  <h2><span class="card-index">2</span>品牌区域 · 新增节点<span class="page-badge">品牌区域</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>节点类型（品牌/大区/小区）、名称（必填）、编码（必填）、关联城市（仅小区层级）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>新增节点信息
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「+」或「新增品牌」"] --> A2["openRegionModal()"]
+    A2 --> D1{"节点类型？"}
+    D1 -->|品牌| A3["显示品牌选择下拉框<br/>从已有品牌中选择"]
+    D1 -->|大区| A4["文本输入大区名称<br/>显示所属品牌(只读)"]
+    D1 -->|小区| A5["文本输入小区名称<br/>显示关联城市选择器"]
+    A3 --> A6["填写编码等字段"]
+    A4 --> A6
+    A5 --> A7["选择关联城市<br/>支持省份筛选+城市搜索+全选"]
+    A7 --> A6
+    A6 --> A8["点击保存"]
+    A8 --> D2{"校验通过？"}
+    D2 -->|否| E1["showToast 错误提示"]
+    D2 -->|是| A9["saveRegionData()"]
+    A9 --> A10["showToast('保存成功','success')"]
+    A10 --> A11["刷新区域树"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌区域" data-op="编辑节点">
+  <h2><span class="card-index">3</span>品牌区域 · 编辑节点<span class="page-badge">品牌区域</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>节点ID、节点类型、新名称、新编码<br>
+    <strong>接口出参（根据表单字段推导）：</strong>更新后的节点信息
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「✎」"] --> A2["openRegionModal()<br/>编辑模式"]
+    A2 --> A3["预填当前数据"]
+    A3 --> A4["用户修改"]
+    A4 --> A5["点击保存"]
+    A5 --> D1{"校验通过？"}
+    D1 -->|否| E1["showToast 错误"]
+    D1 -->|是| A6["saveRegionData()"]
+    A6 --> A7["showToast('保存成功','success')"]
+    A7 --> A8["更新树节点+详情面板"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌区域" data-op="删除节点">
+  <h2><span class="card-index">4</span>品牌区域 · 删除节点<span class="page-badge">品牌区域</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>节点ID、节点类型<br>
+    <strong>接口出参（根据表单字段推导）：</strong>删除结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「×」"] --> A2["deleteRegionNode()"]
+    A2 --> D1{"是否有子节点？"}
+    D1 -->|有| A3["提示需先删除子节点"]
+    D1 -->|无| A4["执行删除"]
+    A4 --> A5["showToast('删除成功','success')"]
+    A5 --> A6["刷新树"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌区域" data-op="批量导入">
+  <h2><span class="card-index">5</span>品牌区域 · 批量导入<span class="page-badge">品牌区域</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>Excel文件，包含品牌→大区→小区层级数据<br>
+    <strong>接口出参（根据表单字段推导）：</strong>导入结果统计
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「批量导入」"] --> A2["openRegionImportModal()<br/>3步向导"]
+    A2 --> A3["Step1: 下载模板+上传"]
+    A3 --> A4["Step2: 预览<br/>列：品牌/编码/大区/小区"]
+    A4 --> A5["Step3: 确认导入"]
+    A5 --> A6["showToast('导入成功','success')"]
+    A6 --> A7["刷新区域树"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="品牌区域" data-op="导出数据">
+  <h2><span class="card-index">6</span>品牌区域 · 导出数据<span class="page-badge">品牌区域</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>导出范围<br>
+    <strong>接口出参（根据表单字段推导）：</strong>文件名「品牌区域_YYYY-MM-DD_HHmmss.xlsx」
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「导出数据」"] --> A2["exportRegionData()"]
+    A2 --> A3["生成XLSX"]
+    A3 --> A4["触发下载"]
+    A4 --> A5["showToast('导出成功，共X条数据','success')"]
+  </pre>
+</div>
+
+<!-- ====== 门店管理 ====== -->
+<div class="chart-card" data-page="门店管理" data-op="查询筛选">
+  <h2><span class="card-index">1</span>门店管理 · 查询筛选<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>storeSearchName（门店名称/编码）、storeSearchBrand（品牌）、storeSearchCity（城市）、storeSearchType（门店类型）、页码<br>
+    <strong>接口出参（根据表格字段推导）：</strong>checkbox、经销商名称、经销商编码、所属品牌、所属城市、类型、售后电话、状态、总条数(共256条)
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入门店管理页"] --> A2["初始加载门店列表"]
+    A2 --> A3["用户输入筛选条件<br/>名称/编码/品牌/城市/类型"]
+    A3 --> A4["filterStoreList()"]
+    A4 --> A5["客户端过滤表格行"]
+    A5 --> D1{"有匹配？"}
+    D1 -->|是| A6["渲染匹配行<br/>更新已选计数"]
+    D1 -->|否| A7["空状态"]
+    A3 --> A8["点击重置"]
+    A8 --> A9["clearStoreFilter()"]
+    A9 --> A10["重新显示全部"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="新增编辑">
+  <h2><span class="card-index">2</span>门店管理 · 新增/编辑<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>经销商名称、经销商编码（全局唯一）、门店类型（一网店/二网店）、所属品牌、所在地区（省/市/区三级联动）、品牌大区、品牌小区、关联车系（多选）、售后电话、邮箱、详细地址、经纬度<br>
+    <strong>接口出参（根据表单字段推导）：</strong>创建/更新成功返回门店ID
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「新增数据」或「编辑」"] --> A2["openStoreModal()<br/>抽屉式弹窗"]
+    A2 --> D1{"新增还是编辑？"}
+    D1 -->|新增| A3["空表单"]
+    D1 -->|编辑| A4["预填门店数据"]
+    A3 --> A5["填写基本信息：<br/>名称/编码/类型/状态"]
+    A4 --> A5
+    A5 --> A6["选择所属品牌"]
+    A6 --> A7["onStoreBrandChange()<br/>联动过滤车系/大区/小区"]
+    A7 --> A8["选择所在地区<br/>省→市→区三级联动"]
+    A8 --> A9["选择关联车系<br/>支持搜索+全选"]
+    A9 --> A10["填写联系信息/地址"]
+    A10 --> A11["可选：地图选址填经纬度"]
+    A11 --> A12["点击确认保存"]
+    A12 --> D2{"校验通过？"}
+    D2 -->|否| E1["showToast 对应错误"]
+    D2 -->|是| A13["saveStoreData()"]
+    A13 --> A14["showToast('门店保存成功','success')"]
+    A14 --> A15["刷新门店列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="查看详情">
+  <h2><span class="card-index">3</span>门店管理 · 查看详情（只读）<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>门店ID<br>
+    <strong>接口出参（根据表单字段推导）：</strong>门店全部字段信息，以只读模式展示
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「查看」"] --> A2["viewStoreDetail(id)"]
+    A2 --> A3["以只读模式打开storeModal"]
+    A3 --> A4["所有输入框readonly<br/>下拉框disabled"]
+    A4 --> A5["隐藏保存按钮<br/>显示关闭按钮"]
+    A5 --> A6["用户查看完成后关闭"]
+    A6 --> A7["closeStoreModalAndReset()"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="停用启用">
+  <h2><span class="card-index">4</span>门店管理 · 停用/启用<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>门店ID、目标状态<br>
+    <strong>接口出参（根据表单字段推导）：</strong>操作结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「停用」"] --> A2["toggleStatus()"]
+    A2 --> A3["切换行状态Badge<br/>按钮变为启用"]
+    A3 --> A4["点击「启用」"]
+    A4 --> A5["toggleStatus()"]
+    A5 --> A6["切换行状态Badge<br/>按钮变为停用"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="批量操作">
+  <h2><span class="card-index">5</span>门店管理 · 批量操作<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>选中门店ID列表、操作类型（启用/停用）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>批量操作结果，已启用/停用X条数据
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户勾选表格行checkbox"] --> A2["updateStoreSelectionInfo()<br/>更新已选计数"]
+    A2 --> A3["点击批量启用/批量停用"]
+    A3 --> D1{"是否有选中行？"}
+    D1 -->|否| E1["showToast('请先选择数据','warning')"]
+    D1 -->|是| A4["batchToggleStoreStatus()"]
+    A4 --> D2{"批量停用？"}
+    D2 -->|是| A5["弹出确认：停用后门店停止接收新线索"]
+    A5 --> D3{"用户确认？"}
+    D3 -->|否| A6["取消"]
+    D3 -->|是| A7["showToast('已停用X条','success')"]
+    D2 -->|否| A7
+    A7 --> A8["刷新列表和已选计数"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="删除门店">
+  <h2><span class="card-index">6</span>门店管理 · 删除门店<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>门店ID、门店名称<br>
+    <strong>接口出参（根据表单字段推导）：</strong>删除结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「删除」"] --> A2["confirmDeleteStore(id,name)"]
+    A2 --> A3["打开删除确认弹窗<br/>显示门店名称"]
+    A3 --> A4["警告：删除后无法恢复"]
+    A4 --> D1{"用户确认？"}
+    D1 -->|取消| A5["closeStoreDeleteModal()"]
+    D1 -->|确认| A6["执行删除"]
+    A6 --> A7["showToast('门店删除成功','success')"]
+    A7 --> A8["刷新列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="地图选址">
+  <h2><span class="card-index">7</span>门店管理 · 地图选址<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>搜索地址关键词<br>
+    <strong>接口出参（根据表单字段推导）：</strong>搜索结果地址列表、选中位置的经纬度坐标
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["在门店表单中点击「地图选址」"] --> A2["openMapPicker()<br/>打开地图选址弹窗"]
+    A2 --> A3["显示SVG模拟地图"]
+    A3 --> A4["用户输入地址搜索"]
+    A4 --> A5["searchMapAddress()"]
+    A5 --> D1{"搜索词为空？"}
+    D1 -->|是| E1["showToast('请输入搜索地址','error')"]
+    D1 -->|否| A6["显示搜索结果列表"]
+    A6 --> A7["用户点击搜索结果的地址"]
+    A7 --> A8["地图定位到该位置<br/>显示标记点"]
+    A3 --> A9["用户直接点击地图选点"]
+    A9 --> A8
+    A8 --> A10["显示地址和坐标信息"]
+    A10 --> A11["点击确认选址"]
+    A11 --> A12["confirmMapLocation()"]
+    A12 --> A13["showToast('经纬度已填充','success')"]
+    A13 --> A14["关闭地图弹窗<br/>填充经纬度到门店表单"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="批量导入">
+  <h2><span class="card-index">8</span>门店管理 · 批量导入<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>Excel文件，包含门店数据<br>
+    <strong>接口出参（根据表单字段推导）：</strong>导入结果统计
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「批量导入」"] --> A2["openStoreImportModal()<br/>3步向导"]
+    A2 --> A3["Step1: 下载模板+上传"]
+    A3 --> A4["Step2: 预览"]
+    A4 --> A5["Step3: 确认导入"]
+    A5 --> A6["showToast('导入完成，共X条','success')"]
+    A6 --> A7["刷新门店列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="门店管理" data-op="导出数据">
+  <h2><span class="card-index">9</span>门店管理 · 导出数据<span class="page-badge">门店管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>当前筛选条件<br>
+    <strong>接口出参（根据表单字段推导）：</strong>XLSX格式文件
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「导出数据」"] --> A2["exportStoreData()"]
+    A2 --> A3["生成XLSX"]
+    A3 --> A4["触发下载"]
+    A4 --> A5["showToast('导出成功，共X条数据','success')"]
+  </pre>
+</div>
+
+<!-- ====== 开发者管理 ====== -->
+<div class="chart-card" data-page="开发者管理" data-op="查询筛选">
+  <h2><span class="card-index">1</span>开发者管理 · 查询筛选<span class="page-badge">开发者管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>搜索关键词（账号名称/编码）、开发者类型（平台方/媒体方/供应商）<br>
+    <strong>接口出参（根据表格字段推导）：</strong>ID、账号名称、帐号简称、账号编码、类型、授权品牌、接口清单、API Key、今日推送、状态、总条数
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入开发者管理页"] --> A2["加载全部开发者列表"]
+    A2 --> A3["用户输入筛选条件<br/>名称/编码/类型"]
+    A3 --> A4["filterSupplierList()"]
+    A4 --> A5["客户端过滤"]
+    A5 --> D1{"有匹配？"}
+    D1 -->|是| A6["渲染匹配行"]
+    D1 -->|否| A7["空状态"]
+    A3 --> A8["点击重置"]
+    A8 --> A9["resetSupplierFilter()"]
+    A9 --> A10["重新显示全部"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="开发者管理" data-op="新增编辑">
+  <h2><span class="card-index">2</span>开发者管理 · 新增/编辑<span class="page-badge">开发者管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>账号名称（必填）、帐号简称（必填）、开发者类型（必填）、状态、对接联系人姓名、手机号(11位)、授权品牌（多选checkbox）、接口清单（按品牌授权矩阵）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>创建成功返回开发者ID、自动生成帐号编码(DEV+YYMMDD+3位序号)
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「新增数据」或「编辑」"] --> A2["openSupplierModal()"]
+    A2 --> D1{"新增还是编辑？"}
+    D1 -->|新增| A3["空表单<br/>帐号编码自动生成"]
+    D1 -->|编辑| A4["预填数据"]
+    A3 --> A5["填写基本信息"]
+    A4 --> A5
+    A5 --> A6["选择授权品牌checkbox"]
+    A6 --> A7["syncSupplierInterfaceBrandAvailability()<br/>同步接口清单可选品牌"]
+    A7 --> A8["在接口矩阵中勾选<br/>各品牌支持哪些接口"]
+    A8 --> A9["点击确认保存"]
+    A9 --> D2{"校验通过？"}
+    D2 -->|否| E1["showToast 对应错误"]
+    D2 -->|是| A10["handleSupplierSubmit()"]
+    A10 --> A11["showToast('保存成功','success')"]
+    A11 --> A12["刷新列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="开发者管理" data-op="查看详情">
+  <h2><span class="card-index">3</span>开发者管理 · 查看详情<span class="page-badge">开发者管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>开发者ID<br>
+    <strong>接口出参（根据表单字段推导）：</strong>开发者完整信息（账号名称/编码/简称/类型/状态/联系人/手机/授权品牌/接口清单/API Key/今日推送量）
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「查看」"] --> A2["openSupplierViewModal(id)"]
+    A2 --> A3["打开只读查看弹窗"]
+    A3 --> A4["显示全部字段信息<br/>包括API Key(明文)"]
+    A4 --> A5["显示今日推送量"]
+    A5 --> A6["点击关闭"]
+    A6 --> A7["closeModal('supplierViewModal')"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="开发者管理" data-op="停用启用">
+  <h2><span class="card-index">4</span>开发者管理 · 停用/启用<span class="page-badge">开发者管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>开发者ID、目标状态<br>
+    <strong>接口出参（根据表单字段推导）：</strong>操作结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「停用」"] --> A2["toggleSupplierStatusById()"]
+    A2 --> A3["弹出确认：停用后API调用<br/>立即返回401"]
+    A3 --> D1{"用户确认？"}
+    D1 -->|否| A4["取消"]
+    D1 -->|是| A5["showToast('开发者已停用','warning')"]
+    A5 --> A6["更新状态Badge+按钮"]
+    A1 --> A7["点击「启用」"]
+    A7 --> A8["直接执行<br/>showToast('开发者已启用','success')"]
+    A8 --> A6
+  </pre>
+</div>
+
+<div class="chart-card" data-page="开发者管理" data-op="重置Key">
+  <h2><span class="card-index">5</span>开发者管理 · 重置API Key<span class="page-badge">开发者管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>开发者ID<br>
+    <strong>接口出参（根据表单字段推导）：</strong>新生成的API Key(以dk_开头的24位字符串)、API Secret（默认隐藏，仅显示一次）
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「重置Key」"] --> A2["resetApiKey(id,name)"]
+    A2 --> A3["Step1: 确认弹窗<br/>警告：旧Key立即失效"]
+    A3 --> D1{"用户确认重置？"}
+    D1 -->|取消| A4["关闭弹窗"]
+    D1 -->|确认| A5["doResetApiKey(id,name)"]
+    A5 --> A6["Step2: 显示重置结果"]
+    A6 --> A7["显示新API Key(明文)"]
+    A7 --> A8["显示API Secret<br/>默认隐藏·点击显示"]
+    A8 --> A9["警告：Secret仅显示一次"]
+    A9 --> A10["用户点击复制Key"]
+    A10 --> A11["复制到剪切板"]
+    A11 --> A12["点击我已知晓关闭"]
+  </pre>
+</div>
+
+<!-- ====== 排期管理 ====== -->
+<div class="chart-card" data-page="排期管理" data-op="查询筛选">
+  <h2><span class="card-index">1</span>排期管理 · 查询筛选<span class="page-badge">排期管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>scheduleSearchName（排期名称）、scheduleStatusFilter（状态：全部/启用/禁用）、品牌Tab切换<br>
+    <strong>接口出参（根据表格字段推导）：</strong>序号、关联品牌、排期名称、排期时间、总预算、状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入排期管理页"] --> A2["切换品牌Tab"]
+    A2 --> D1{"品牌是否在设计中？"}
+    D1 -->|是| A3["showScheduleDesignStage()<br/>showToast('产品设计阶段','info')"]
+    D1 -->|否| A4["switchScheduleBrandTab()<br/>加载该品牌排期列表"]
+    A4 --> A5["用户输入筛选条件<br/>名称/状态"]
+    A5 --> A6["filterScheduleList()"]
+    A6 --> A7["客户端过滤"]
+    A5 --> A8["点击重置"]
+    A8 --> A9["clearScheduleFilter()"]
+    A9 --> A10["重置为东风日产"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="排期管理" data-op="新增编辑">
+  <h2><span class="card-index">2</span>排期管理 · 新增/编辑排期<span class="page-badge">排期管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>排期名称（必填）、状态、总预算（必填）、开始时间（必填）、结束时间（必填）、关联车系（多选，品牌→车系联动）、供应商配置（可多行，含帐号ID/分配预算/SMARTCODE/结算方式/价格/关联专营店）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>创建/更新成功返回排期ID，底部摘要显示：车系数·供应商数·专营店数·已分配预算
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「新增数据」"] --> A2["openScheduleModal('add')<br/>打开抽屉弹窗"]
+    A2 --> A3["填写基础信息：<br/>名称/状态/总预算/时间"]
+    A3 --> A4["选择关联车系：<br/>品牌多选→车系多选<br/>支持搜索/全选"]
+    A4 --> A5["添加供应商：<br/>选择帐号→填预算/SMARTCODE"]
+    A5 --> A6["选择结算方式"]
+    A6 --> D1{"CPL还是CPS？"}
+    D1 -->|CPL| A7["填写商机成本价/销售价"]
+    D1 -->|CPS| A8["填写交车成本价/销售价"]
+    A7 --> A9["选择关联专营店"]
+    A8 --> A9
+    A9 --> D2{"是否添加更多供应商？"}
+    D2 -->|是| A5
+    D2 -->|否| A10["点击确认保存"]
+    A10 --> D3{"校验通过？"}
+    D3 -->|否| E1["showToast 对应错误<br/>帐号ID/SMARTCODE不可重复"]
+    D3 -->|是| A11["saveSchedule()"]
+    A11 --> A12["showToast('排期创建成功','success')"]
+    A12 --> A13["刷新列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="排期管理" data-op="查看报表">
+  <h2><span class="card-index">3</span>排期管理 · 查看报表（子页）<span class="page-badge">排期管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>创建时间范围（必填，支持快捷选择今天/昨天/近7天/近30天/本月）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>树形报表数据：排期名称/账号简称/大区/小区/专营店/分配预算/预算消耗/消耗进度/有效线索量/到店量/交车量/线索有效率/线索转化率，支持展开详情行（预算/价格/线索质量/锁单与转化）
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["在排期列表点击「查看报表」"] --> A2["navigateTo('dk-report')<br/>跳转报表子页"]
+    A2 --> A3["显示排期信息<br/>日期筛选器"]
+    A3 --> A4["用户选择创建时间范围"]
+    A4 --> A5["点击查询"]
+    A5 --> D1{"时间范围完整？"}
+    D1 -->|否| E1["showToast('请选择完整的创建时间范围','warning')"]
+    D1 -->|是| A6["loadReportData()"]
+    A6 --> A7["渲染树形报表表格<br/>多层级展开"]
+    A7 --> A8["点击行展开详情"]
+    A8 --> A9["显示预算/质量/转化明细"]
+    A3 --> A10["点击返回列表"]
+    A10 --> A11["navigateTo('schedule')"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="排期管理" data-op="线索明细">
+  <h2><span class="card-index">4</span>排期管理 · 线索明细（子页）<span class="page-badge">排期管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>线索编码/客户姓名/电话号码/意向车系/意向门店/SmartCode/来源ID/线索状态/帐号ID、创建时间范围（必填）、排序字段+方式<br>
+    <strong>接口出参（根据表单字段推导）：</strong>24列详细线索数据（含金额成本、利润、成交信息），电话号码脱敏显示(138****8000)，按角色控制字段可见性
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["在排期列表点击「线索明细」"] --> A2["navigateTo('dk-leaddetail')<br/>跳转线索明细子页"]
+    A2 --> A3["显示主要筛选条件<br/>编码/姓名/电话/车系/时间"]
+    A3 --> A4["用户可展开更多筛选<br/>门店/SmartCode/来源/状态"]
+    A4 --> A5["选择排序字段+方式"]
+    A5 --> A6["点击查询"]
+    A6 --> D1{"时间范围完整？"}
+    D1 -->|否| E1["showToast 提示"]
+    D1 -->|是| A7["加载线索数据"]
+    A7 --> A8["按角色控制字段可见性<br/>总部全部可见<br/>供应商/专营店隐藏金额"]
+    A8 --> A9["渲染线索明细表格<br/>24列"]
+    A9 --> A10["点击导出数据"]
+    A10 --> A11["showToast('正在导出数据','info')"]
+  </pre>
+</div>
+
+<!-- ====== 报表权限 ====== -->
+<div class="chart-card" data-page="报表权限" data-op="查询筛选">
+  <h2><span class="card-index">1</span>报表权限 · 查询筛选<span class="page-badge">报表权限</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>dkAccountId（帐号ID）、dkAccountName（帐号全称）、dkAccountShortName（帐号简称）、dkAccountType（类型）、dkAccountStatusFilter（状态）<br>
+    <strong>接口出参（根据表格字段推导）：</strong>序号、帐号ID、帐号全称、帐号简称、帐号类型、状态、更新时间、更新操作者
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入报表权限页"] --> A2["加载概览卡片<br/>总数/启用/近7天更新"]
+    A2 --> A3["加载帐号列表"]
+    A3 --> A4["用户输入筛选条件<br/>ID/全称/简称/类型/状态"]
+    A4 --> A5["filterDkAccountList()"]
+    A5 --> A6["客户端过滤"]
+    A4 --> A7["点击重置"]
+    A7 --> A8["resetDkAccountFilters()<br/>清空所有条件"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="报表权限" data-op="新增编辑">
+  <h2><span class="card-index">2</span>报表权限 · 新增/编辑<span class="page-badge">报表权限</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>帐号ID（从系统帐号中单选）、帐号类型（总部/经销商/供应商）、帐号全称（必填）、帐号简称（必填）、排序值、状态<br>
+    <strong>接口出参（根据表单字段推导）：</strong>创建/更新成功返回
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「新增数据」或「编辑」"] --> A2["openDkAccountModal()"]
+    A2 --> A3["帐号ID选择器<br/>从系统帐号中单选<br/>支持搜索"]
+    A3 --> A4["手动填写类型/全称/简称<br/>排序/状态"]
+    A4 --> A5["点击确认"]
+    A5 --> D1{"校验通过？"}
+    D1 -->|否| E1["showToast('请填写帐号ID、全称和简称','error')"]
+    D1 -->|是| A6["saveDkAccount()"]
+    A6 --> A7["showToast('帐号创建/保存成功','success')"]
+    A7 --> A8["刷新列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="报表权限" data-op="删除帐号">
+  <h2><span class="card-index">3</span>报表权限 · 删除帐号<span class="page-badge">报表权限</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>帐号记录ID<br>
+    <strong>接口出参（根据表单字段推导）：</strong>删除结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「删除」"] --> A2["直接删除"]
+    A2 --> A3["showToast('已删除','success')"]
+    A3 --> A4["刷新列表<br/>更新概览卡片"]
+  </pre>
+</div>
+
+<!-- ====== SmartCode管理 ====== -->
+<div class="chart-card" data-page="SmartCode管理" data-op="SmartCode维护">
+  <h2><span class="card-index">1</span>SmartCode管理 · SmartCode维护<span class="page-badge">SmartCode管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>smartcodeMaintainSearchCode（搜索SmartCode）、SmartCode（新增/编辑时必填）、备注说明<br>
+    <strong>接口出参（根据表格字段推导）：</strong>序号、SmartCode、更新时间、更新操作者
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["切换到SmartCode维护Tab"] --> A2["加载SmartCode列表"]
+    A2 --> A3["用户搜索SmartCode"]
+    A3 --> A4["filterSmartCodeMaintainTable()"]
+    A2 --> A5["点击新增数据"]
+    A5 --> A6["openSmartCodeMaintainModal('add')"]
+    A6 --> A7["填写SmartCode+备注"]
+    A7 --> A8["确认保存"]
+    A8 --> A9["showToast('已保存','success')"]
+    A2 --> A10["点击编辑"]
+    A10 --> A11["预填数据，修改后保存"]
+    A2 --> A12["点击删除"]
+    A12 --> A13["showToast('已删除','success')"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="SmartCode管理" data-op="SmartCode映射">
+  <h2><span class="card-index">2</span>SmartCode管理 · SmartCode映射<span class="page-badge">SmartCode管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>原SmartCode（必填）、映射行（关联车系/排期名称/新SmartCode/分配比例，必填）<br>
+    <strong>接口出参（根据表格字段推导）：</strong>序号、原SmartCode、意向车系、更新时间、更新操作者
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["切换到SmartCode映射Tab"] --> A2["加载映射列表"]
+    A2 --> A3["搜索原SmartCode/意向车系"]
+    A3 --> A4["filterScMappingTable()"]
+    A2 --> A5["点击新增数据"]
+    A5 --> A6["openScMappingModal()<br/>抽屉弹窗"]
+    A6 --> A7["填写原SmartCode"]
+    A7 --> A8["添加映射行<br/>选择关联车系→排期→新SC→比例"]
+    A8 --> D1{"继续添加？"}
+    D1 -->|是| A8
+    D1 -->|否| A9["点击保存"]
+    A9 --> A10["showToast('保存成功','success')"]
+    A2 --> A11["编辑/删除"]
+    A11 --> A12["预填修改/直接删除+toast"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="SmartCode管理" data-op="批量导入">
+  <h2><span class="card-index">3</span>SmartCode管理 · 批量导入<span class="page-badge">SmartCode管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>Excel文件(.xlsx/.xls/.csv)，包含SmartCode和备注说明<br>
+    <strong>接口出参（根据表单字段推导）：</strong>导入结果统计，覆盖已有数据
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["在维护Tab点击「批量导入」"] --> A2["openModal('importSCMaintainModal')<br/>3步向导"]
+    A2 --> A3["Step1: 下载模板+上传"]
+    A3 --> A4["Step2: 预览<br/>列：SmartCode/备注/校验结果"]
+    A4 --> A5["警告：导入将覆盖已有数据"]
+    A5 --> A6["Step3: 确认导入"]
+    A6 --> A7["showToast('导入成功','success')"]
+    A7 --> A8["刷新列表"]
+  </pre>
+</div>
+
+<!-- ====== 拦截规则 ====== -->
+<div class="chart-card" data-page="拦截规则" data-op="规则配置">
+  <h2><span class="card-index">1</span>拦截规则 · 规则配置（新增/编辑）<span class="page-badge">拦截规则</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>规则名称（必填）、关联品牌、来源组合命中条件（开关控制）、规则作用域（跨来源/单来源）、来源渠道（多选checkbox或单选radio）、去重维度（手机号/手机号+品牌/手机号+车系/手机号+品牌+车系）、时间窗口类型+数值、拦截动作（拒绝入库/追加标记）、优先级、备注<br>
+    <strong>接口出参（根据表单字段推导）：</strong>规则配置结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["切换到规则配置Tab"] --> A2["加载规则列表"]
+    A2 --> A3["筛选作用域/状态"]
+    A3 --> A4["filterInterceptRules()"]
+    A2 --> A5["点击新增数据"]
+    A5 --> A6["openInterceptRuleModal()"]
+    A6 --> A7["填写规则名称"]
+    A7 --> A8["选择关联品牌"]
+    A8 --> A9["开启来源组合命中条件？"]
+    A9 --> D1{"是否开启？"}
+    D1 -->|是| A10["选择作用域"]
+    A10 --> D2{"跨来源还是单来源？"}
+    D2 -->|跨来源| A11["多选渠道checkbox<br/>至少选2个"]
+    D2 -->|单来源| A12["单选渠道radio<br/>选1个"]
+    A11 --> A13["配置去重维度+时间窗口"]
+    A12 --> A13
+    D1 -->|否| A13
+    A13 --> A14["选择拦截动作"]
+    A14 --> A15["设置优先级+备注"]
+    A15 --> A16["点击保存"]
+    A16 --> D3{"校验通过？"}
+    D3 -->|否| E1["showToast 对应警告"]
+    D3 -->|是| A17["saveInterceptRule()"]
+    A17 --> A18["showToast('规则已添加','success')"]
+    A18 --> A19["刷新规则列表"]
+    A2 --> A20["编辑/停用/启用/删除"]
+    A20 --> A21["对应弹窗/toast操作"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="拦截规则" data-op="拦截记录">
+  <h2><span class="card-index">2</span>拦截规则 · 拦截记录<span class="page-badge">拦截规则</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>规则筛选、动作筛选（拒绝入库/追加标记）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>统计卡片（今日拦截/累计拒绝/累计标记/拦截率）、记录列表（时间/命中规则/来源渠道/手机号/动作/关联线索ID）
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["切换到拦截记录Tab"] --> A2["加载统计卡片"]
+    A2 --> A3["今日拦截/累计拒绝/<br/>累计标记/拦截率"]
+    A3 --> A4["加载拦截记录列表"]
+    A4 --> A5["筛选规则/动作"]
+    A5 --> A6["filterInterceptLogs()"]
+    A6 --> A7["刷新记录列表"]
+    A4 --> A8["点击刷新统计"]
+    A8 --> A9["refreshInterceptStats()<br/>更新统计卡片"]
+    A4 --> A10["空状态：暂无拦截记录"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="拦截规则" data-op="黑名单管理">
+  <h2><span class="card-index">3</span>拦截规则 · 黑名单管理<span class="page-badge">拦截规则</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>手机号（必填，11位）、黑名单类型（外呼/营销/投诉/全业务）、来源渠道、标签/备注、失效时间（可选，支持永久有效）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>黑名单列表：手机号（脱敏）、类型、来源渠道、备注、加入方式、加入时间、失效时间、状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["切换到黑名单Tab"] --> A2["加载统计卡片"]
+    A2 --> A3["总数/外呼/营销/拦截中"]
+    A3 --> A4["加载黑名单列表"]
+    A4 --> A5["筛选类型/状态/来源"]
+    A5 --> A6["filterBlacklist()"]
+    A4 --> A7["点击新增数据"]
+    A7 --> A8["openBlacklistModal()"]
+    A8 --> A9["填写手机号"]
+    A9 --> D1{"手机号格式正确？"}
+    D1 -->|否| E1["showToast('格式不正确','error')"]
+    D1 -->|是| D2{"是否已在黑名单？"}
+    D2 -->|是| E2["showToast('已存在','error')"]
+    D2 -->|否| A10["选择类型/来源/备注"]
+    A10 --> A11["设置失效时间<br/>可选永久有效"]
+    A11 --> A12["点击保存"]
+    A12 --> A13["showToast('已添加','success')"]
+    A13 --> A14["刷新列表"]
+    A4 --> A15["编辑/停用启用/移出"]
+    A15 --> A16["对应的弹窗确认+toast"]
+    A4 --> A17["批量导入(3步向导)"]
+    A4 --> A18["导出CSV"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="拦截规则" data-op="导出规则">
+  <h2><span class="card-index">4</span>拦截规则 · 导出规则<span class="page-badge">拦截规则</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>当前筛选条件<br>
+    <strong>接口出参（根据表单字段推导）：</strong>文件名「拦截规则_日期.xlsx」、导出列：规则名称/关联品牌/作用域/去重维度/渠道范围/时间窗口/拦截动作/优先级/状态/备注
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["在规则配置Tab点击「导出数据」"] --> A2["exportInterceptRules()"]
+    A2 --> A3["异步导出进度弹窗"]
+    A3 --> A4["20%：收集规则数据"]
+    A4 --> A5["50%：整理配置信息"]
+    A5 --> A6["80%：生成文件"]
+    A6 --> A7["95%：即将完成"]
+    A7 --> A8["生成XLSX文件"]
+    A8 --> A9["触发下载"]
+    A9 --> A10["showToast('导出成功，共N条规则','success')"]
+  </pre>
+</div>
+
+<!-- ====== 线索列表 ====== -->
+<div class="chart-card" data-page="线索列表" data-op="查询筛选">
+  <h2><span class="card-index">1</span>线索列表 · 查询筛选<span class="page-badge">线索列表</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>搜索关键词（客户姓名/电话/编码）、线索状态（6种Tab）、线索等级（A/B/C/D）、API Key、品牌、意向车系<br>
+    <strong>接口出参（根据表格字段推导）：</strong>线索编号、客户信息（姓名+脱敏电话）、意向品牌、意向车系、意向等级、API Key、意向门店、线索状态、接收时间
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入线索列表页"] --> A2["加载全部线索<br/>默认Tab：全部(128条)"]
+    A2 --> A3["用户点击状态Tab"]
+    A3 --> A4["filterByStatus()<br/>筛选：待处理/处理中/已下发/下发失败/仅接收"]
+    A4 --> A5["显示对应状态线索数量"]
+    A2 --> A6["用户输入多维筛选<br/>姓名/电话/编码/等级/Key/品牌/车系"]
+    A6 --> A7["filterClueList()"]
+    A7 --> A8["组合过滤表格行"]
+    A2 --> A9["点击重置"]
+    A9 --> A10["clearClueFilter()<br/>清空+重置Tab"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="线索列表" data-op="查看详情">
+  <h2><span class="card-index">2</span>线索列表 · 查看详情<span class="page-badge">线索列表</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>线索编号<br>
+    <strong>接口出参（根据表单字段推导）：</strong>4个Tab的详情信息：基本信息（客户信息/来源/意向车型/状态/接收校验）、拓展信息（品牌专属字段）、意向信息（对比车型）、操作日志
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「详情」"] --> A2["openLeadDetail(type)<br/>打开详情弹窗"]
+    A2 --> A3["Tab1：基本信息<br/>客户/来源/意向/状态"]
+    A3 --> A4["Tab2：拓展信息<br/>品牌专属接收字段"]
+    A4 --> A5["Tab3：意向信息<br/>购车用途/颜色偏好/对比车型"]
+    A5 --> A6["Tab4：操作日志<br/>时间/操作人/操作内容"]
+    A6 --> A7["点击关闭"]
+    A7 --> A8["关闭弹窗"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="线索列表" data-op="重新下发">
+  <h2><span class="card-index">3</span>线索列表 · 重新下发<span class="page-badge">线索列表</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>线索编号<br>
+    <strong>接口出参（根据表单字段推导）：</strong>重新下发结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["仅下发失败行显示「重新下发」"] --> A2["reDispatchLead(leadCode)"]
+    A2 --> A3["弹出确认对话框"]
+    A3 --> A4["确认重新下发线索XX？"]
+    A4 --> D1{"用户确认？"}
+    D1 -->|取消| A5["关闭弹窗"]
+    D1 -->|确认| A6["执行重新下发"]
+    A6 --> D2{"下发成功？"}
+    D2 -->|是| A7["showToast('线索XX重新下发成功','success')"]
+    D2 -->|否| A8["showToast('下发失败','error')"]
+    A7 --> A9["更新线索状态"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="线索列表" data-op="列设置">
+  <h2><span class="card-index">4</span>线索列表 · 列设置<span class="page-badge">线索列表</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>列可见性配置（9列checkbox，其中4列必选不可取消）<br>
+    <strong>接口出参（根据表单字段推导）：</strong>更新后的表格列显示，配置持久化到localStorage
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击表头⚙列设置"] --> A2["toggleColumnSettings()<br/>展开/收起下拉菜单"]
+    A2 --> A3["显示9列可见性checkbox"]
+    A3 --> A4["必选列disabled：<br/>线索编号/客户信息/线索状态/操作"]
+    A4 --> A5["用户勾选/取消可选列"]
+    A5 --> A6["点击应用"]
+    A6 --> A7["applyColumnVisibility()"]
+    A7 --> A8["更新表格列显示"]
+    A8 --> A9["保存到localStorage<br/>leadColumnSettings"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="线索列表" data-op="导出数据">
+  <h2><span class="card-index">5</span>线索列表 · 导出数据<span class="page-badge">线索列表</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>当前筛选条件、列可见性配置（从localStorage读取），客户信息列拆分为姓名+电话<br>
+    <strong>接口出参（根据表单字段推导）：</strong>文件名「线索数据_YYYY-MM-DD.xlsx」、XLSX格式、异步导出含4步进度
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「导出数据」"] --> A2["exportClueData()"]
+    A2 --> A3["读取localStorage列设置"]
+    A3 --> A4["读取当前可见表格行"]
+    A4 --> A5["显示异步导出进度"]
+    A5 --> A6["20%：收集数据"]
+    A6 --> A7["50%：整理信息"]
+    A7 --> A8["80%：处理格式"]
+    A8 --> A9["95%：即将完成"]
+    A9 --> A10["生成XLSX"]
+    A10 --> A11["触发下载"]
+    A11 --> A12["showToast('导出成功，共N条','success')"]
+  </pre>
+</div>
+
+<!-- ====== 自定义字段 ====== -->
+<div class="chart-card" data-page="自定义字段" data-op="接收字段">
+  <h2><span class="card-index">1</span>自定义字段 · 线索接收字段<span class="page-badge">自定义字段</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>字段名称（必填）、字段Key（必填，小写英文+下划线）、字段类型（必填，8种类型）、作用域（公共/品牌）、关联品牌（品牌字段必填）、必填toggle、默认值、枚举值（单选/多选必填）、提示文字、字段描述<br>
+    <strong>接口出参（根据表格字段推导）：</strong>排序、字段名称、字段Key、字段类型、作用域、必填、状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["切换到线索接收字段Tab"] --> A2["加载字段列表"]
+    A2 --> A3["筛选字段类型"]
+    A3 --> A4["filterFieldList()"]
+    A2 --> A5["点击新增字段"]
+    A5 --> A6["openFieldModal()"]
+    A6 --> A7["填写字段名称"]
+    A7 --> A8["oninput自动生成Key<br/>小写英文+下划线"]
+    A8 --> A9["选择字段类型"]
+    A9 --> D1{"单选或多选？"}
+    D1 -->|是| A10["添加枚举值<br/>输入+回车添加"]
+    D1 -->|否| A11["选择作用域"]
+    A10 --> A11
+    A11 --> D2{"品牌字段？"}
+    D2 -->|是| A12["选择关联品牌"]
+    D2 -->|否| A13["设置必填+默认值+描述"]
+    A12 --> A13
+    A13 --> A14["点击确认保存"]
+    A14 --> D3{"校验通过？"}
+    D3 -->|否| E1["showToast 对应错误"]
+    D3 -->|是| A15["showToast('字段创建成功','success')"]
+    A15 --> A16["刷新列表"]
+    A2 --> A17["编辑/停用启用/删除"]
+    A17 --> A18["对应弹窗+确认+toast"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="自定义字段" data-op="下发字段">
+  <h2><span class="card-index">2</span>自定义字段 · 线索下发字段<span class="page-badge">自定义字段</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>目标品牌（必选）、源字段（必选）、目标字段名（必选）、映射方式（直接映射/固定值/枚举映射）、固定值（固定值方式必填）、枚举映射表（枚举方式必填）、是否必传<br>
+    <strong>接口出参（根据表格字段推导）：</strong>排序、源字段、源Key、目标字段名、映射方式、必传、状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["切换到线索下发字段Tab"] --> A2["选择目标品牌"]
+    A2 --> A3["onDispatchBrandChange()<br/>加载该品牌映射列表"]
+    A3 --> A4["点击新增映射"]
+    A4 --> A5["openDispatchFieldModal()"]
+    A5 --> A6["选择源字段"]
+    A6 --> A7["输入目标字段名"]
+    A7 --> A8["选择映射方式"]
+    A8 --> D1{"映射方式？"}
+    D1 -->|直接映射| A9["直接传递源字段值"]
+    D1 -->|固定值| A10["填写固定值"]
+    D1 -->|枚举映射| A11["配置枚举映射表<br/>源值→目标值"]
+    A9 --> A12["设置必传+排序+备注"]
+    A10 --> A12
+    A11 --> A12
+    A12 --> A13["点击保存"]
+    A13 --> A14["showToast('映射保存成功','success')"]
+    A3 --> A15["编辑/删除/停用启用"]
+    A15 --> A16["对应操作+toast"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="自定义字段" data-op="字段预览">
+  <h2><span class="card-index">3</span>自定义字段 · 线索表单预览<span class="page-badge">自定义字段</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>作用域筛选（全部/公共/品牌）、关联品牌筛选<br>
+    <strong>接口出参（根据表单字段推导）：</strong>根据筛选条件动态渲染的各字段类型表单控件预览
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["右侧预览面板"] --> A2["默认显示全部字段预览"]
+    A2 --> A3["用户切换作用域筛选"]
+    A3 --> A4["onPreviewScopeChange()"]
+    A4 --> D1{"品牌字段？"}
+    D1 -->|是| A5["显示关联品牌下拉"]
+    D1 -->|否| A6["隐藏品牌下拉"]
+    A5 --> A7["选择品牌"]
+    A7 --> A8["过滤显示该品牌字段"]
+    A6 --> A9["显示公共字段"]
+    A8 --> A10["按字段类型渲染<br/>文本/数字/日期/单选/多选等"]
+    A9 --> A10
+  </pre>
+</div>
+
+<!-- ====== 帐号管理 ====== -->
+<div class="chart-card" data-page="帐号管理" data-op="查询筛选">
+  <h2><span class="card-index">1</span>帐号管理 · 查询筛选<span class="page-badge">帐号管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>搜索框（帐号/姓名/手机号）、角色筛选、状态筛选<br>
+    <strong>接口出参（根据表格字段推导）：</strong>帐号、姓名、手机号(脱敏)、角色、开发者、最后登录、状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入帐号管理页"] --> A2["加载帐号列表(5条)"]
+    A2 --> A3["输入搜索关键词<br/>帐号/姓名/手机号"]
+    A3 --> A4["Enter触发filterAccountList()"]
+    A4 --> A5["结合角色/状态筛选<br/>客户端过滤"]
+    A3 --> A6["点击重置"]
+    A6 --> A7["resetAccountFilter()<br/>清空所有条件"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="帐号管理" data-op="新增编辑">
+  <h2><span class="card-index">2</span>帐号管理 · 新增/编辑<span class="page-badge">帐号管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>帐号（必填，编辑时只读）、姓名（必填）、手机号（必填，11位）、角色（必填）、开发者（可选）、登录密码（新增必填≥6位，编辑时留空不修改）、状态、SMARTCODE、线索售价、线索有效率保底、线索转化率保底、交车成本保底、排序序号<br>
+    <strong>接口出参（根据表单字段推导）：</strong>创建/更新成功返回
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击「新增帐号」或「编辑」"] --> A2["openAccountModal()"]
+    A2 --> D1{"新增还是编辑？"}
+    D1 -->|新增| A3["帐号可输入<br/>密码字段必填"]
+    D1 -->|编辑| A4["帐号只读<br/>密码留空不修改"]
+    A3 --> A5["填写基本信息<br/>帐号/姓名/手机号"]
+    A4 --> A5
+    A5 --> A6["选择角色"]
+    A6 --> A7["可选选择开发者"]
+    A7 --> A8["填写业务参数<br/>SMARTCODE/售价/保底率"]
+    A8 --> A9["点击确认创建/保存修改"]
+    A9 --> D2{"校验通过？"}
+    D2 -->|否| E1["showToast 对应错误<br/>帐号空/姓名空/手机号格式/密码长度"]
+    D2 -->|是| A10["saveAccount()"]
+    A10 --> A11["showToast('帐号创建/修改成功','success')"]
+    A11 --> A12["刷新列表"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="帐号管理" data-op="停用启用">
+  <h2><span class="card-index">3</span>帐号管理 · 停用/启用<span class="page-badge">帐号管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>帐号ID、目标状态<br>
+    <strong>接口出参（根据表单字段推导）：</strong>操作结果
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["点击操作列「停用」或「启用」"] --> A2["toggleAccountStatus()"]
+    A2 --> D1{"当前状态？"}
+    D1 -->|启用→停用| A3["Badge变为status-danger<br/>显示停用<br/>按钮变为启用(绿色)"]
+    D1 -->|停用→启用| A4["Badge变为status-active<br/>显示启用<br/>按钮变为停用(红色)"]
+    A3 --> A5["showToast('帐号已停用','success')"]
+    A4 --> A6["showToast('帐号已启用','success')"]
+  </pre>
+</div>
+
+<!-- ====== 权限管理 ====== -->
+<div class="chart-card" data-page="权限管理" data-op="功能权限点">
+  <h2><span class="card-index">1</span>权限管理 · 功能权限点（只读）<span class="page-badge">权限管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>无需参数<br>
+    <strong>接口出参（根据表单字段推导）：</strong>功能权限点列表：权限模块、权限标识、权限名称、描述、类型（菜单/操作）、标记为系统内置
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入权限管理页"] --> A2["加载功能权限点列表"]
+    A2 --> A3["渲染权限表格"]
+    A3 --> A4["9个权限点<br/>分菜单和操作类型"]
+    A4 --> A5["所有权限标记为系统内置<br/>不可编辑/删除"]
+  </pre>
+</div>
+
+<div class="chart-card" data-page="权限管理" data-op="角色权限绑定">
+  <h2><span class="card-index">2</span>权限管理 · 角色权限绑定（只读）<span class="page-badge">权限管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>无需参数<br>
+    <strong>接口出参（根据表单字段推导）：</strong>4个角色的权限绑定：角色名称、菜单权限列表、操作权限列表、数据范围
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户查看角色权限绑定表"] --> A2["显示4个角色绑定"]
+    A2 --> A3["超级管理员：全部权限"]
+    A3 --> A4["品牌运营：品牌数据+线索"]
+    A4 --> A5["开发者管理员：自定义字段"]
+    A5 --> A6["经销商坐席：线索跟进<br/>数据范围：本门店"]
+  </pre>
+</div>
+
+<!-- ====== 角色管理 ====== -->
+<div class="chart-card" data-page="角色管理" data-op="新增编辑">
+  <h2><span class="card-index">1</span>角色管理 · 新增/编辑<span class="page-badge">角色管理</span></h2>
+  <div class="param-box">
+    <strong>接口入参（根据表单字段推导）：</strong>角色名称（必填）、角色编码（必填，小写英文+下划线，创建后不可修改）、描述、状态<br>
+    <strong>接口出参（根据表格字段推导）：</strong>角色名称、角色编码、成员数量、描述、状态
+  </div>
+  <pre class="mermaid">flowchart TD
+    A1["用户进入角色管理页"] --> A2["加载角色列表<br/>4个角色（超级管理员/品牌运营/开发者管理员/经销商坐席）"]
+    A2 --> A3["显示权限说明卡片"]
+    A2 --> A4["点击新增角色"]
+    A4 --> A5["openRoleModal()"]
+    A5 --> A6["填写角色名称"]
+    A6 --> A7["填写角色编码<br/>小写英文+下划线"]
+    A7 --> A8["填写描述+选择状态"]
+    A8 --> A9["点击确认创建"]
+    A9 --> D1{"校验通过？"}
+    D1 -->|否| E1["showToast 对应错误<br/>名称空/编码空/格式错误"]
+    D1 -->|是| A10["saveRole()"]
+    A10 --> A11["showToast('角色创建成功','success')"]
+    A11 --> A12["刷新列表"]
+    A2 --> A13["点击编辑"]
+    A13 --> A14["openRoleModal(roleCode)<br/>预填数据"]
+    A14 --> A15["修改后保存<br/>showToast('角色修改成功','success')"]
+  </pre>
+</div>
+
+</div><!-- /container -->
+
+<div class="end-hint">— 当前操作流程结束，切换上方标签查看其他流程 —</div>
+
+<script>
+  (function() {
+    var pageTabs = document.querySelectorAll('.page-tabs button');
+    var opGroups = document.querySelectorAll('.op-tabs .op-group');
+    var opButtons = document.querySelectorAll('.op-tabs .op-group button');
+    var cards = document.querySelectorAll('.chart-card');
+
+    var currentPageIdx = 0;
+    var currentOpIdx  = 0;
+
+    function switchPage(pageIdx) {
+      if (pageIdx < 0 || pageIdx >= pageTabs.length) return;
+      currentPageIdx = pageIdx;
+      currentOpIdx = 0;
+      pageTabs.forEach(function(t, i) { t.classList.toggle('active', i === pageIdx); });
+      opGroups.forEach(function(g, i) { g.classList.toggle('active', i === pageIdx); });
+      var pageName = pageTabs[pageIdx].getAttribute('data-page');
+      var pageCards = document.querySelectorAll('.chart-card[data-page="' + pageName + '"]');
+      cards.forEach(function(c) { c.classList.remove('active'); });
+      if (pageCards.length > 0) {
+        pageCards[0].classList.add('active');
+        opButtons.forEach(function(b) { b.classList.remove('active'); });
+        var firstOpBtn = document.querySelector('.op-group.active button');
+        if (firstOpBtn) firstOpBtn.classList.add('active');
+      }
+    }
+
+    function switchOp(opIdx) {
+      var activeGroup = document.querySelector('.op-group.active');
+      if (!activeGroup) return;
+      var btns = activeGroup.querySelectorAll('button');
+      if (opIdx < 0 || opIdx >= btns.length) return;
+      currentOpIdx = opIdx;
+      btns.forEach(function(b, i) { b.classList.toggle('active', i === opIdx); });
+      var targetOp = btns[opIdx].getAttribute('data-op');
+      var targetPage = pageTabs[currentPageIdx].getAttribute('data-page');
+      cards.forEach(function(c) {
+        c.classList.toggle('active',
+          c.getAttribute('data-page') === targetPage && c.getAttribute('data-op') === targetOp);
+      });
+    }
+
+    pageTabs.forEach(function(tab, i) {
+      tab.addEventListener('click', function() { switchPage(i); });
+    });
+
+    document.querySelector('.op-tabs').addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON') {
+        var btns = Array.from(e.target.parentElement.querySelectorAll('button'));
+        switchOp(btns.indexOf(e.target));
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          var newPage = e.key === 'ArrowLeft'
+            ? (currentPageIdx - 1 + pageTabs.length) % pageTabs.length
+            : (currentPageIdx + 1) % pageTabs.length;
+          switchPage(newPage);
+          pageTabs[newPage].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          var activeGroup = document.querySelector('.op-group.active');
+          if (!activeGroup) return;
+          var btns = activeGroup.querySelectorAll('button');
+          if (btns.length === 0) return;
+          var newOp = e.key === 'ArrowLeft'
+            ? (currentOpIdx - 1 + btns.length) % btns.length
+            : (currentOpIdx + 1) % btns.length;
+          switchOp(newOp);
+          btns[newOp].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }
+    });
+
+    switchPage(0);
+  })();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' } });
+</script>
+</body>
+</html>

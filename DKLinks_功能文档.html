@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D客连 · 功能文档</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #faf8ff; --panel: #ffffff; --text: #191b23; --muted: #434654;
+  --border: #c3c6d6; --accent: #003594; --accent-soft: #dbe1ff;
+  --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+  --info: #0ea5e9; --radius: 8px; --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.65;color:var(--text);background:var(--bg)}
+.page{max-width:1180px;margin:0 auto;padding:20px 0 0}
+.doc-header{background:linear-gradient(135deg,#00174b 0%,#003594 50%,#004ac6 100%);border-radius:var(--radius);box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:28px 32px 0;margin-bottom:18px;color:#fff}
+.doc-header .doc-type-badge{display:inline-block;background:rgba(255,255,255,0.15);color:#fff;backdrop-filter:blur(4px);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+.doc-header h1{font-size:26px;font-weight:700;color:#fff;line-height:1.3;letter-spacing:0.5px}
+.doc-header .doc-subtitle{color:rgba(255,255,255,0.88);font-size:14px;margin-top:10px;line-height:1.6}
+.doc-header .doc-meta-list{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:rgba(255,255,255,0.85);margin-top:16px}
+.doc-header .doc-meta-list span{display:flex;align-items:center;gap:4px}
+.doc-header .doc-meta-list .meta-label{font-weight:700;color:#fff}
+.doc-header-tab-bar{display:flex;gap:6px;flex-wrap:wrap;margin:20px -32px 0;padding:10px 32px;background:rgba(255,255,255,0.98);border-top:1px solid rgba(255,255,255,0.2);border-radius:0 0 var(--radius) var(--radius)}
+.doc-header-tab-btn{padding:7px 16px;font-size:13px;font-weight:500;border-radius:999px;border:1px solid transparent;cursor:pointer;color:var(--accent);background:transparent;white-space:nowrap;transition:all .15s}
+.doc-header-tab-btn:hover{background:rgba(0,53,148,.12)}
+.doc-header-tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.summary-strip{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.summary-strip .summary-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;flex:1;min-width:140px}
+.summary-strip .summary-label{font-size:12px;color:var(--muted);margin-bottom:2px}
+.summary-strip .summary-value{font-size:20px;font-weight:700;color:var(--text)}
+.toc{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 28px;margin-bottom:18px}
+.toc-title{font-size:16px;font-weight:600;margin-bottom:10px}
+.toc-links{display:flex;flex-wrap:wrap;gap:8px 16px}
+.toc-links a{font-size:14px;color:var(--accent);text-decoration:none;padding:4px 0;border-bottom:1px solid transparent;transition:border-color .15s}
+.toc-links a:hover,.toc-links a:focus{border-bottom-color:var(--accent)}
+.section{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 28px;margin-bottom:18px}
+.section-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.section-desc{font-size:13px;color:var(--muted);margin-bottom:16px}
+.table-wrap{width:100%;overflow-x:auto;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+table th,table td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border);min-width:60px}
+table th{background:#f3f5f9;font-weight:600;color:var(--text);font-size:12px;white-space:nowrap}
+table td{color:var(--text)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;line-height:1.4;margin-right:4px}
+.badge-warn{background:#fef3c7;color:var(--warning)}
+.badge-danger{background:#fde8e8;color:var(--danger)}
+.badge-success{background:#d1fae5;color:var(--success)}
+.badge-info{background:var(--accent-soft);color:var(--accent)}
+.badge-muted{background:#f3f5f9;color:var(--muted)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:14px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.feature-card{background:#f8fafd;border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px}
+.feature-card+.feature-card{margin-top:16px}
+.feature-card .fc-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.feature-card .fc-body{font-size:13px;color:var(--muted);line-height:1.55}
+.feature-card .fc-body p{margin-bottom:6px}
+.feature-card .fc-body strong{color:var(--text)}
+.feature-card .fc-body ul{padding-left:16px;margin-bottom:6px}
+.feature-card .fc-body li{margin-bottom:2px}
+details{margin-top:10px;padding-top:2px}
+details summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);padding:4px 0;user-select:none}
+details summary:hover{text-decoration:underline}
+@media(max-width:720px){.page{padding:20px 12px 0}.summary-strip .summary-card{min-width:100%}.doc-header{padding:18px 16px 0}.doc-header-tab-bar{margin:20px -16px 0;padding:10px 16px}.section{padding:16px 14px}.card-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="doc-header">
+  <div class="doc-header-top">
+    <div class="doc-type-badge">功能文档 · 多菜单版（HTML 阅读版）</div>
+    <h1>D客连 · SaaS平台</h1>
+    <div class="doc-subtitle">汽车行业线索培育管理系统 — 面向产品与研发团队的产品文档</div>
+    <div class="doc-meta-list">
+      <span><span class="meta-label">系统：</span>D客连 · SaaS平台</span>
+      <span><span class="meta-label">板块：</span>多板块</span>
+      <span><span class="meta-label">版本：</span>v1.1.1</span>
+      <span><span class="meta-label">日期：</span>2026-07-16</span>
+    </div>
+  </div>
+  <div class="doc-header-tab-bar">
+    <button class="doc-header-tab-btn" data-tab="login">登录页</button>
+    <button class="doc-header-tab-btn" data-tab="framework">框架布局</button>
+    <button class="doc-header-tab-btn active" data-tab="0">工作台</button>
+    <button class="doc-header-tab-btn" data-tab="1">品牌管理</button>
+    <button class="doc-header-tab-btn" data-tab="2">车系管理</button>
+    <button class="doc-header-tab-btn" data-tab="3">城市管理</button>
+    <button class="doc-header-tab-btn" data-tab="4">品牌区域</button>
+    <button class="doc-header-tab-btn" data-tab="5">门店管理</button>
+    <button class="doc-header-tab-btn" data-tab="6">开发者管理</button>
+    <button class="doc-header-tab-btn" data-tab="7">排期管理</button>
+    <button class="doc-header-tab-btn" data-tab="8">报表权限</button>
+    <button class="doc-header-tab-btn" data-tab="9">SmartCode管理</button>
+    <button class="doc-header-tab-btn" data-tab="10">拦截规则</button>
+    <button class="doc-header-tab-btn" data-tab="11">线索列表</button>
+    <button class="doc-header-tab-btn" data-tab="12">自定义字段</button>
+    <button class="doc-header-tab-btn" data-tab="13">帐号管理</button>
+    <button class="doc-header-tab-btn" data-tab="14">权限管理</button>
+    <button class="doc-header-tab-btn" data-tab="15">角色管理</button>
+  </div>
+</div>
+
+<div class="summary-strip">
+  <div class="summary-card"><div class="summary-label">功能菜单</div><div class="summary-value">18</div></div>
+  <div class="summary-card"><div class="summary-label">功能总数</div><div class="summary-value">133</div></div>
+  <div class="summary-card"><div class="summary-label">涉及接口</div><div class="summary-value">80+ <span class="badge badge-warn">待确认 80+</span></div></div>
+  <div class="summary-card"><div class="summary-label">待确认项</div><div class="summary-value">16+</div></div>
+  <div class="summary-card"><div class="summary-label">产出日期</div><div class="summary-value">2026-07-08</div></div>
+</div>
+
+<!-- ====== TAB LOGIN: 登录页 ====== -->
+<div class="tab-panel" id="tab-panel-login">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-login-scope">项目范围</a><a href="#tab-login-logic">逻辑说明</a><a href="#tab-login-api">接口清单</a><a href="#tab-login-feature">功能说明</a><a href="#tab-login-other">其他说明</a></div></nav>
+<section class="section" id="tab-login-scope">
+  <div class="section-title">一. 项目范围</div>
+  <div class="section-desc">D客连 SaaS 平台的系统登录入口页面，承担身份鉴权与会话建立职责</div>
+  <div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>登录页（系统入口）</td><td>系统登录入口页面：6 大功能点——品牌区（SVG车辆图标+系统名称+副标题）、用户名输入（预填admin）、密码输入（type=password预填充）、登录按钮（深蓝主题）、Toast 反馈（成功/失败/警告）、页面切换（登录页→主应用）。布局为居中卡片，宽度 440px，背景浅渐变，底部版权区</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-login-logic">
+  <div class="section-title">二. 逻辑说明</div>
+  <div class="section-desc">登录流程、表单校验、错误处理与页面切换规则</div>
+  <div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody>
+    <tr><td>完整登录流程</td><td>输入用户名→输入密码→点击「登录」按钮→doLogin() 触发→调用登录接口【待确认：接口地址】→成功：隐藏 loginPage + 显示 mainApp + 激活 active 类 + showToast('登录成功，欢迎回来！', 'success')→失败：showToast(错误信息, 'error')</td></tr>
+    <tr><td>表单校验规则</td><td>用户名：必填，长度 2-20 位，英文/数字/下划线；密码：必填，长度 6-20 位，区分大小写；任一为空时点击登录按钮触发 showToast('请填写完整登录信息', 'warning') 且不调用接口</td></tr>
+    <tr><td>页面切换时序</td><td>loginPage.classList.add('hidden') → mainApp.classList.add('active') → 初始化全局事件监听 → 默认导航至工作台页 navigateTo('dashboard')</td></tr>
+    <tr><td>失败重试</td><td>密码错误时不清空已输入用户名，仅密码框清空并 focus；账号不存在时清空两个输入框并 focus 用户名</td></tr>
+    <tr><td>原型级模拟</td><td>当前原型无实际接口调用，doLogin() 直接执行页面切换逻辑；后续接入真实接口需增加 loading 态、失败重试、Token 持久化</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="tab-login-api">
+  <div class="section-title">三. 接口清单</div>
+  <div class="section-desc">登录鉴权相关接口列表</div>
+  <div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>6</td><td>1</td><td><span class="badge badge-warn">是</span> 登录鉴权（建立会话）</td><td><span class="badge badge-muted">无</span> 无（登录前）</td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">3</span> 接口地址/鉴权方式/校验规则</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>请求参数</th><th>响应字段</th><th>成功处理</th><th>失败处理</th></tr></thead><tbody>
+    <tr><td>用户登录</td><td>POST</td><td><span class="badge badge-muted">待确认</span> /api/auth/login</td><td>username*(string), password*(string), rememberMe(boolean)</td><td>token(string), refreshToken(string), expiresIn(number), userInfo{id, username, realName, role, avatar, permissions[]}</td><td>保存 token 至 localStorage，userInfo 写入 Pinia/Vuex，跳转至工作台，Toast「登录成功，欢迎回来！」</td><td>Toast「账号或密码错误」(401)/「账号已锁定」(423)/「网络异常，请重试」(500)，密码框自动 focus</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="tab-login-feature">
+  <div class="section-title">四. 功能说明</div>
+  <div class="section-desc">登录页 6 大功能点的详细规格说明</div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F1</span> 品牌展示区（车辆图标 + 系统名称）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>登录卡片顶部居中展示：1）车辆 SVG 图标（48×48px，主色 #003594）；2）系统主名称「D客连 · SaaS 平台」（font-size: 22px，font-weight: 700）；3）副标题「企业级线索深度培育系统」（font-size: 13px，color: #6b7280）。图标与文字垂直堆叠，间距 12px。整区为纯展示，hover 无效果，不可点击。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>静态资源，HTML 硬编码，无接口调用；SVG 内联嵌入。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>系统名称：</strong>统一配置在 constants/system.ts 中，便于后续品牌切换时改一处生效所有页面</li>
+        <li><strong>副标题：</strong>同来源，与主名称联动展示；支持按租户定制（如经销商可改为「XX 经销商专用」）</li>
+        <li><strong>图标：</strong>支持 light/dark 双主题切换，通过 prefers-color-scheme 媒体查询自动适配</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>品牌展示区</td><td>未登录访问任意 URL 均跳转至 /login</td><td>所有未登录用户</td><td>页面加载即展示，无交互</td><td>systemName, systemSubtitle, logoSvg</td><td>静态 HTML/常量文件</td><td>从 constants 读取</td><td>无</td><td>String + SVG</td><td>D客连 · SaaS 平台 / 企业级线索深度培育系统</td><td>资源加载失败时降级为 emoji 🚗 + 文字</td><td>当用户打开 /login 时，应在卡片顶部居中展示车辆图标 + 系统名称 + 副标题</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F2</span> 用户名输入框</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>卡片中部第一个表单字段：左侧 user 图标 + 输入框。输入框属性：type="text"、placeholder="请输入用户名"、maxlength=20、autocomplete="username"。focus 时输入框外发光（box-shadow: 0 0 0 3px rgba(0,53,148,.15)），blur 时恢复。预填默认值「admin」。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>用户手动输入；原型预填 admin；正式版通过 autocomplete 浏览器历史填充。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>校验规则：</strong>必填，长度 2-20，允许英文/数字/下划线/中文，正则 /^[a-zA-Z0-9_\u4e00-\u9fa5]{2,20}$/</li>
+        <li><strong>错误反馈：</strong>blur 时校验，失败时输入框红色边框 + 下方红字「请输入 2-20 位用户名」</li>
+        <li><strong>键盘交互：</strong>支持 Enter 键提交登录（等价于点击登录按钮）</li>
+        <li><strong>XSS 防护：</strong>前端 .trim() 去除首尾空格，特殊字符在后端二次过滤</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>用户名输入</td><td>登录页 / 用户名输入框</td><td>所有登录用户</td><td>键入用户名，blur 时校验</td><td>username: string(2-20)</td><td>用户输入</td><td>前端正则校验</td><td>无（提交时传入接口）</td><td>String</td><td>admin（仅原型）</td><td>校验失败时红框+红字提示</td><td>当用户输入非 2-20 位字符时，应在 blur 时显示错误提示</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F3</span> 密码输入框</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>用户名下方的第二个表单字段：左侧 lock 图标 + 输入框 + 右侧眼睛图标。输入框属性：type="password"、placeholder="请输入密码"、maxlength=20、autocomplete="current-password"。预填默认值「admin123」。点击眼睛图标切换 type 显隐（password ↔ text），状态持久化到当前会话。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>用户手动输入；原型预填 admin123；正式版不预填，由 autocomplete 历史填充。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>校验规则：</strong>必填，长度 6-20，区分大小写，不做格式校验（避免泄露密码复杂度要求给攻击者）</li>
+        <li><strong>眼睛图标：</strong>默认 type=password，点击切换 type=text，再次点击恢复；图标颜色随状态变化（隐藏=灰，显示=蓝）</li>
+        <li><strong>复制禁用：</strong>oncopy/onpaste 事件不阻止，但提交时通过 HTTPS 加密传输</li>
+        <li><strong>密码强度：</strong>【待确认：是否需要前端展示密码强度条，影响引导用户体验】</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>密码输入</td><td>登录页 / 密码输入框</td><td>所有登录用户</td><td>键入密码，可切换明文/密文</td><td>password: string(6-20)</td><td>用户输入</td><td>仅校验必填和长度</td><td>无（提交时传入接口）</td><td>String（传输时 HTTPS）</td><td>admin123（仅原型）</td><td>校验失败时红框提示</td><td>当用户点击眼睛图标时，应切换密码明文/密文显示</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F4</span> 登录按钮（提交）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>表单下方居中：宽 100%（与输入框对齐），高 44px，背景 #003594，文字「登 录」（字间距 0.5em，font-weight 600），文字白色，hover 时背景 #002870，active 时背景 #00174b。点击触发 doLogin()。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>触发 doLogin() 函数，原型无接口调用，正式版调用登录接口。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>Loading 态：</strong>点击后按钮禁用（disabled），文字切换为「登录中...」+ 转圈图标；接口完成后恢复</li>
+        <li><strong>防重复提交：</strong>loading 期间按钮 disabled，键盘事件屏蔽；防止用户连点</li>
+        <li><strong>异常超时：</strong>接口超时阈值 10s，超时后按钮恢复，Toast「登录超时，请重试」</li>
+        <li><strong>键盘触发：</strong>支持 Enter 键（任一输入框 focus 时）触发登录</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>登录按钮</td><td>登录页 / 登录按钮</td><td>所有登录用户</td><td>点击触发登录流程</td><td>—</td><td>用户点击</td><td>doLogin() → 表单校验 → 接口调用</td><td>POST /api/auth/login</td><td>—</td><td>「登 录」</td><td>接口失败时按钮恢复，Toast 错误</td><td>当用户点击登录按钮时，应触发完整登录流程并展示 loading 态</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F5</span> Toast 反馈（成功/失败/警告）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>右上角弹出式提示条：宽 320px，圆角 8px，三种类型——success（绿色 #d1fae5 + ✓ 图标）、error（红色 #fde8e8 + ✗ 图标）、warning（黄色 #fef3c7 + ⚠ 图标）。3 秒后自动消失，可手动关闭。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>showToast(message, type) 函数，全局单例（同时仅显示一个），新 Toast 覆盖旧 Toast。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>成功 Toast：</strong>「登录成功，欢迎回来！」（success 类型）</li>
+        <li><strong>失败 Toast：</strong>「账号或密码错误，请重试」（error 类型），错误消息来源于接口响应 msg 字段</li>
+        <li><strong>警告 Toast：</strong>「请填写完整登录信息」「账号已锁定，请联系管理员」（warning 类型）</li>
+        <li><strong>动效：</strong>从右侧滑入 300ms，停留 3s，从右侧滑出 300ms；用户 hover 时暂停倒计时</li>
+        <li><strong>多语言：</strong>【待确认：Toast 文案是否需要 i18n 国际化】</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>Toast 反馈</td><td>登录页 / 右上角浮层</td><td>所有登录用户</td><td>展示登录结果反馈</td><td>message: string, type: 'success'|'error'|'warning'</td><td>showToast() 全局函数</td><td>类型决定颜色和图标</td><td>无</td><td>—</td><td>success「登录成功，欢迎回来！」</td><td>接口异常时 Toast 错误信息</td><td>当登录成功时，应展示绿色 success Toast 3 秒后消失</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F6</span> 页面切换（登录页 → 主应用）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>登录成功后的页面切换动画：loginPage 使用 .hidden 类淡出（opacity 1→0，300ms），同时 mainApp 添加 .active 类淡入（opacity 0→1，300ms），形成交叉淡入淡出效果。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>doLogin() 末尾逻辑，调用 navigateTo('dashboard') 跳转至工作台。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>切换时序：</strong>loginPage.hidden = true → mainApp.active = true → 初始化侧边栏（initSidebar）→ 初始化通知中心（loadNotifications）→ 默认跳转工作台</li>
+        <li><strong>会话持久化：</strong>localStorage.setItem('token', token) / 'userInfo'；下次进入自动跳转主应用，跳过登录页</li>
+        <li><strong>退出登录：</strong>清除 localStorage + 跳转回 /login</li>
+        <li><strong>回退处理：</strong>登录成功后浏览器后退按钮被禁用（history.pushState + popstate 拦截）</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>页面切换</td><td>登录页 → 主应用</td><td>登录成功用户</td><td>登录页淡出，主应用淡入</td><td>—</td><td>doLogin() 触发</td><td>CSS 类切换 + navigateTo()</td><td>localStorage 写入 token/userInfo</td><td>—</td><td>默认跳转 dashboard</td><td>切换失败时刷新页面重试</td><td>当登录成功时，应完成登录页淡出、主应用淡入、跳转工作台三步操作</td></tr></tbody></table></div></details>
+  </div>
+</section>
+<section class="section" id="tab-login-other">
+  <div class="section-title">五. 其他说明</div>
+  <div id="tab-login-pending">
+    <div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div>
+    <div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th><th>备注</th></tr></thead><tbody>
+      <tr><td>【待确认：接口地址-用户登录】</td><td>前端鉴权流程 + 后端开发</td><td>POST /api/auth/login 路径需后端确认</td></tr>
+      <tr><td>【待确认：鉴权方式-Token 方案】</td><td>前端 Token 存储和后端校验</td><td>JWT / Session-Cookie / OAuth2.0 三选一</td></tr>
+      <tr><td>【待确认：字段规则-用户名密码格式】</td><td>前端校验规则和后端入库</td><td>密码是否需要复杂度、是否支持中文等</td></tr>
+      <tr><td>【待确认：业务口径-记住密码功能】</td><td>前端 UX 和安全策略</td><td>是否提供「记住密码」checkbox，影响自动填充行为</td></tr>
+      <tr><td>【待确认：业务口径-忘记密码流程】</td><td>前端入口和后端流程</td><td>是否提供「忘记密码」链接，影响登录页布局</td></tr>
+      <tr><td>【待确认：业务口径-多租户登录】</td><td>登录页扩展性</td><td>是否需要租户选择下拉/独立登录页</td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+</div>
+
+<!-- ====== TAB FRAMEWORK: 框架布局 ====== -->
+<div class="tab-panel" id="tab-panel-framework">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-fw-scope">项目范围</a><a href="#tab-fw-logic">逻辑说明</a><a href="#tab-fw-api">接口清单</a><a href="#tab-fw-feature">功能说明</a><a href="#tab-fw-other">其他说明</a></div></nav>
+<section class="section" id="tab-fw-scope">
+  <div class="section-title">一. 项目范围</div>
+  <div class="section-desc">D客连系统全局框架布局：顶部导航栏 + 左侧侧边栏 + SPA 路由引擎，承载所有内页的统一壳层</div>
+  <div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>框架布局（系统壳层）</td><td>11 大功能点：①顶部 Logo；②面包屑导航；③通知中心（铃铛+红角标+3 条通知下拉）；④用户信息区（头像+名称+角色）；⑤侧边栏 6 分组 18 导航项；⑥激活态样式（白字+3px 蓝竖条）；⑦数量角标（线索列表红角标 128）；⑧navigateTo() 路由引擎；⑨面包屑更新（18 项名称字典）；⑩侧边栏激活同步（子页面→父级高亮）；⑪初始化回调（initCityTree/filterSupplierList 等 8 个）</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-fw-logic">
+  <div class="section-title">二. 逻辑说明</div>
+  <div class="section-desc">SPA 路由、面包屑联动、侧边栏激活同步等核心交互规则</div>
+  <div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody>
+    <tr><td>navigateTo(page) 完整流程</td><td>①页面 ID 映射（scmapping→smartcode 等）→ ②关闭排期抽屉（scheduleDrawer.classList.remove('open')）→ ③隐藏所有 .page（page.forEach(p => p.classList.remove('active'))）→ ④显示目标 #page-{id}.active → ⑤更新面包屑（breadcrumbNameMap[pageId]）→ ⑥更新侧边栏激活态（sub-page 高亮父级）→ ⑦触发初始化回调（pageInitMap[pageId]?.()）</td></tr>
+    <tr><td>面包屑名称字典</td><td>18 项映射：dashboard→首页、brand→品牌管理、series→车系管理、city→城市管理、brand-region→品牌区域、store→门店管理、supplier→开发者管理、schedule→排期管理、report-perm→报表权限、smartcode→SmartCode 管理、lead-intercept→拦截规则、leads→线索管理、custom-fields→自定义字段、account→帐号管理、permission→权限管理、role→角色管理</td></tr>
+    <tr><td>侧边栏激活同步</td><td>子页面（dk-report、dk-leaddetail）→ 高亮父级「排期管理」；scmapping → 高亮「SmartCode 管理」；activeNavItem.classList.add('active') + 同组其他项移除 active</td></tr>
+    <tr><td>通知中心交互</td><td>点击铃铛 → 通知下拉弹窗展开（opacity 0→1 + translateY -8px→0）→ 显示 3 条硬编码通知（系统升级/新功能上线/待办提醒）→ 点击通知项跳转对应页 → 点击外部区域关闭弹窗</td></tr>
+    <tr><td>用户下拉菜单</td><td>点击用户信息区 → 下拉显示「个人中心」「设置」「退出登录」3 个选项；点击「退出登录」调用 doLogout() → 清除 token + 跳转 /login</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="tab-fw-api">
+  <div class="section-title">三. 接口清单</div>
+  <div class="section-desc">框架布局相关接口列表</div>
+  <div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>11</td><td>3</td><td><span class="badge badge-warn">是</span> 退出登录 / 标记已读</td><td><span class="badge badge-info">是</span> 角色权限控制侧边栏</td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">5</span> 通知/用户/权限/侧边栏配置</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>请求参数</th><th>响应字段</th><th>成功处理</th><th>失败处理</th></tr></thead><tbody>
+    <tr><td>获取通知列表</td><td>GET</td><td><span class="badge badge-muted">待确认</span> /api/notifications</td><td>page=1, pageSize=10, unreadOnly=false</td><td>list[{id, type, title, content, time, read}], unreadCount, total</td><td>渲染通知下拉弹窗，更新红角标数字</td><td>通知列表为空时角标隐藏</td></tr>
+    <tr><td>获取当前用户信息</td><td>GET</td><td><span class="badge badge-muted">待确认</span> /api/user/current</td><td>无（依赖 token）</td><td>id, username, realName, role, avatar, permissions[]</td><td>渲染头部用户区（头像/名称/角色）</td><td>Token 失效时跳转 /login</td></tr>
+    <tr><td>用户退出登录</td><td>POST</td><td><span class="badge badge-muted">待确认</span> /api/auth/logout</td><td>无</td><td>—</td><td>清除 localStorage，跳转 /login</td><td>无论成败均清除本地状态</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="tab-fw-feature">
+  <div class="section-title">四. 功能说明</div>
+  <div class="section-desc">框架布局 11 大功能点的详细规格说明</div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F1</span> 系统 Logo（顶部左侧）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>固定顶部导航栏最左侧：车辆 SVG 图标（24×24px，主色白）+ 文字「D客连 · SaaS 平台」（font-size: 16px，font-weight: 600，白色）。点击 Logo 触发 navigateTo('dashboard') 跳转工作台页，hover 时 logo 区域背景 rgba(255,255,255,0.08) 反馈。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>静态常量，与登录页 F1 共享 systemName 字段。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>固定展示：</strong>所有页面顶部都展示，不随页面切换变化</li>
+        <li><strong>点击行为：</strong>等价于点击侧边栏「工作台」，触发 navigateTo('dashboard')</li>
+        <li><strong>多租户预留：</strong>【待确认：是否需要按租户切换 Logo，影响多租户 SaaS 架构】</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>系统 Logo</td><td>所有内页 / 顶部导航栏最左侧</td><td>所有登录用户</td><td>点击跳工作台</td><td>systemName, logoSvg</td><td>静态常量</td><td>—</td><td>无</td><td>String + SVG</td><td>D客连 · SaaS 平台</td><td>资源加载失败降级为 emoji 🚗</td><td>当用户点击 Logo 时，应跳转至工作台页</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F2</span> 面包屑导航（动态）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>Logo 右侧、竖线分隔符之后：面包屑路径，例如「工作台 / 线索管理 / 线索详情」。支持点击上级面包屑跳转（如点击「线索管理」回到列表页）。子页面会显示完整层级路径。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>由 navigateTo() 内部根据 breadcrumbNameMap[pageId] 自动更新，原型硬编码 18 项映射。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>更新时机：</strong>每次 navigateTo() 触发后同步更新</li>
+        <li><strong>路径生成：</strong>根据 pageId 查询映射表，支持多级（如「D客连 / 排期管理 / 排期详情」）</li>
+        <li><strong>可点击：</strong>除最后一级（当前页）外，前面所有路径均可点击跳转</li>
+        <li><strong>溢出处理：</strong>超过 3 级时中间折叠显示「...」</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>面包屑导航</td><td>所有内页 / 顶部导航栏 Logo 右侧</td><td>所有登录用户</td><td>展示当前页路径，支持上级跳转</td><td>breadcrumb: string[]</td><td>breadcrumbNameMap[pageId]</td><td>从映射表查询，拼接层级</td><td>无</td><td>String[]</td><td>工作台</td><td>pageId 未映射时仅显示「首页」</td><td>当用户切换页面时，面包屑应同步更新为新页面路径</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F3</span> 通知中心（铃铛 + 红角标）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>顶部导航栏右上区域：铃铛 SVG 图标（24×24px，白色），右上角红色圆形角标显示未读数「3」（原型硬编码）。点击铃铛展开下拉弹窗：宽 360px，距顶 50px，右对齐；包含 3 条通知（系统升级通知/新功能上线/待办提醒），每条含图标+标题+时间+未读小红点。点击通知项跳转对应详情页（原型无实际跳转）。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>GET /api/notifications 接口，原型硬编码 3 条数据。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>角标规则：</strong>未读数 = 0 时角标隐藏；&gt; 99 时显示「99+」</li>
+        <li><strong>弹窗交互：</strong>点击铃铛展开，再次点击或点击外部区域关闭</li>
+        <li><strong>全部已读：</strong>弹窗底部「全部标记为已读」按钮，调用 PATCH /api/notifications/read-all</li>
+        <li><strong>查看全部：</strong>弹窗底部「查看全部」链接，跳转通知中心列表页（待开发）</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>通知中心</td><td>所有内页 / 顶部导航栏右上</td><td>所有登录用户</td><td>点击展开/收起通知弹窗</td><td>notifications, unreadCount</td><td>GET /api/notifications</td><td>按时间倒序，取最新 10 条</td><td>PATCH /api/notifications/read-all（标记已读）</td><td>JSON 数组</td><td>原型 3 条硬编码</td><td>接口失败时显示「通知加载失败」</td><td>当用户点击铃铛时，应展开通知下拉弹窗显示 3 条通知</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F4</span> 用户信息区（头像 + 名称 + 角色）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>顶部导航栏最右侧：圆形头像（32×32px，背景 #003594，文字白色显示首字母「A」原型写死）+ 用户名「管理员」+ 角色「总部超级管理员」。点击区域展开下拉菜单：个人中心 / 设置 / 退出登录 三个选项。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>GET /api/user/current 接口，原型硬编码管理员/总部超级管理员。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>首字母规则：</strong>realName 为空时取 username 首字符；中英文均取第一个字符</li>
+        <li><strong>头像颜色：</strong>根据 username 哈希到固定调色板（8 种），同用户每次颜色一致</li>
+        <li><strong>下拉菜单：</strong>宽 180px，右对齐，包含 hover 高亮和分割线</li>
+        <li><strong>退出登录：</strong>调用 POST /api/auth/logout，无论成败均清除 localStorage + 跳转 /login</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>用户信息区</td><td>所有内页 / 顶部导航栏最右侧</td><td>所有登录用户</td><td>展示用户信息，点击展开下拉菜单</td><td>avatar, realName, role</td><td>GET /api/user/current</td><td>从 userInfo 读取</td><td>POST /api/auth/logout</td><td>JSON</td><td>管理员/总部超级管理员（原型）</td><td>接口失败时显示「用户信息加载失败」</td><td>当用户点击用户信息区时，应展开包含「个人中心/设置/退出登录」的下拉菜单</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F5</span> 侧边栏导航分组（6 大分组 18 项）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>固定左侧 240px 宽，背景 #15161c（深色主题），自上而下 6 大分组：①工作台（1 项：首页）；②基础数据（6 项：品牌管理/车系管理/城市管理/品牌区域/门店管理/开发者管理）；③D客连（3 项：排期管理/报表权限/SmartCode 管理）；④拦截管理（1 项：拦截规则）；⑤线索管理（2 项：线索列表/自定义字段）；⑥系统（3 项：帐号管理/权限管理/角色管理）。每组有分组标题（小字、灰色 #6b7280），分组项 hover 时半透明白色背景。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>导航结构硬编码 HTML，权限由后端下发 permissions 数组控制显隐。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>分组标题：</strong>不可点击，仅展示</li>
+        <li><strong>权限过滤：</strong>【待确认：侧边栏权限控制，影响不同角色看到的导航项】当前所有角色看到全部菜单</li>
+        <li><strong>分组折叠：</strong>支持按分组折叠/展开，状态持久化到 localStorage</li>
+        <li><strong>滚动：</strong>超出视口高度时内部滚动，顶部 Logo 和底部用户区固定</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>侧边栏导航</td><td>所有内页 / 左侧 240px</td><td>所有登录用户（按权限过滤）</td><td>点击导航项切换页面</td><td>menuList: {group, items[]}</td><td>静态 HTML + 权限过滤</td><td>按用户 permissions 过滤 items</td><td>无</td><td>JSON</td><td>6 分组 18 项全部显示</td><td>权限不足时菜单项隐藏</td><td>当用户进入主应用时，应展示 6 大分组共 18 个导航项</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F6</span> 激活态样式（白字 + 3px 蓝竖条）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>当前页面对应的导航项激活态：背景 rgba(0,53,148,0.12) + 文字白色 #ffffff + 左侧 3px 蓝色竖条 #1890ff（用 ::before 伪元素实现）。其他导航项默认灰色 #94a3b8。切换页面时激活态自动跳转。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>由 navigateTo() 调用 sidebar.updateActive(pageId) 自动更新。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>激活判定：</strong>精确匹配 navItem.dataset.page === currentPageId</li>
+        <li><strong>同时仅一个：</strong>遍历移除所有 .active 后给当前项添加</li>
+        <li><strong>动效：</strong>激活态切换有 200ms 过渡动画（背景色 + 竖条位置）</li>
+        <li><strong>子页面特殊：</strong>子页面（如 dk-report、dk-leaddetail）→ 高亮父级「排期管理」而非自身</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>激活态样式</td><td>侧边栏导航 / 当前页对应项</td><td>所有登录用户</td><td>展示当前页高亮</td><td>activeNavItem</td><td>navigateTo() 自动更新</td><td>dataset.page === pageId</td><td>无</td><td>—</td><td>默认全部非激活</td><td>pageId 不匹配时全部非激活</td><td>当用户切换页面时，对应导航项应展示白色文字+左侧 3px 蓝竖条</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F7</span> 数量角标（线索列表红角标 128）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>导航项右侧的红色圆角徽章：背景 #ef4444，文字白色，font-size 11px，padding 2px 6px，圆角 10px。原型硬编码「线索列表」导航项展示「128」红色角标，表示待处理线索数。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>原型硬编码；正式版从「待处理线索数」接口实时获取，建议 GET /api/leads/pending-count。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>刷新策略：</strong>页面加载时拉取一次；后续每 5 分钟轮询一次；或 WebSocket 实时推送</li>
+        <li><strong>显示规则：</strong>count = 0 时隐藏角标；count &gt; 99 时显示「99+」</li>
+        <li><strong>可扩展性：</strong>其他导航项也可加角标（如「拦截规则」待审数）</li>
+        <li><strong>性能：</strong>【待确认：是否需要全量角标轮询，影响前端性能和服务端压力】</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>数量角标</td><td>侧边栏 / 线索列表导航项右侧</td><td>所有登录用户</td><td>展示待处理线索数</td><td>pendingCount: number</td><td>GET /api/leads/pending-count</td><td>实时统计当前用户待处理数</td><td>无（仅查询）</td><td>Number</td><td>128（原型）</td><td>接口失败时角标隐藏</td><td>当用户进入主应用时，线索列表导航项应展示红色「128」角标</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F8</span> SPA 路由引擎 navigateTo(pageId)</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>全局路由函数 navigateTo(pageId)，接受页面 ID 字符串，执行 7 步流程：①页面 ID 映射（如 scmapping→smartcode）→ ②关闭排期抽屉 → ③隐藏所有 .page → ④显示目标 .page → ⑤更新面包屑 → ⑥更新侧边栏激活态 → ⑦触发初始化回调。支持点击触发、JS 调用、URL hash 同步。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>纯前端路由，window.app.navigateTo() 全局函数，无接口调用。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>页面数量：</strong>18 个主页面 + 2 个子页面（排期报表 dk-report、线索明细 dk-leaddetail）</li>
+        <li><strong>URL 同步：</strong>支持 hash 路由（#/dashboard），浏览器前进/后退可切换页面</li>
+        <li><strong>历史记录：</strong>每次 navigateTo 调用 history.pushState，保留 50 条历史</li>
+        <li><strong>错误处理：</strong>pageId 不存在时跳转 /404 或回退到工作台</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>SPA 路由</td><td>所有内页切换入口</td><td>所有登录用户</td><td>触发页面切换</td><td>pageId: string, params?: object</td><td>JS 函数调用</td><td>7 步流程依次执行</td><td>history.pushState</td><td>—</td><td>—</td><td>pageId 错误时跳转工作台</td><td>当调用 navigateTo('leads') 时，应切换至线索列表页并更新面包屑/侧边栏</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F9</span> 面包屑更新（18 项名称字典）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>navigateTo() 内部根据 breadcrumbNameMap[pageId] 更新面包屑 DOM。映射表含 18 项：dashboard→首页、brand→品牌管理、series→车系管理、city→城市管理、brand-region→品牌区域、store→门店管理、supplier→开发者管理、schedule→排期管理、report-perm→报表权限、smartcode→SmartCode 管理、lead-intercept→拦截规则、leads→线索管理、custom-fields→自定义字段、account→帐号管理、permission→权限管理、role→角色管理。子页面会附加层级（如「D客连 / 排期管理 / 排期详情」）。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>JS 内置常量 breadcrumbNameMap，初始化时硬编码。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>更新时机：</strong>每次 navigateTo() 触发后立即同步</li>
+        <li><strong>多级路径：</strong>子页面（如 dk-leaddetail）追加「/ 线索详情」</li>
+        <li><strong>回退路径：</strong>页面参数可携带 parent 参数动态生成路径</li>
+        <li><strong>i18n 预留：</strong>【待确认：面包屑是否需要多语言，影响字典结构】</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>面包屑更新</td><td>navigateTo() 内部步骤</td><td>所有登录用户</td><td>同步更新面包屑</td><td>breadcrumbNameMap[pageId]</td><td>JS 常量</td><td>查表 + 拼接层级</td><td>无</td><td>Map</td><td>18 项映射</td><td>pageId 未映射时回退到「首页」</td><td>当用户切换页面时，面包屑应展示对应页面名称</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F10</span> 侧边栏激活同步（子页面 → 父级）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>navigateTo() 内部 sidebar.updateActive(pageId) 函数：根据 pageId 找到对应导航项并添加 .active 类。特殊规则：子页面（dk-report、dk-leaddetail）→ 高亮父级「排期管理」；scmapping → 高亮「SmartCode 管理」。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>JS 内置 sidebarNavMap，处理子页面→父级映射关系。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>查找规则：</strong>先精确匹配，找不到再查子页面映射表</li>
+        <li><strong>唯一激活：</strong>同时仅一个导航项处于激活态</li>
+        <li><strong>动效：</strong>激活态切换 200ms 过渡</li>
+        <li><strong>权限联动：</strong>当前激活项被权限隐藏时，激活态自动取消并回退工作台</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>侧边栏激活</td><td>navigateTo() 内部步骤</td><td>所有登录用户</td><td>同步侧边栏高亮</td><td>pageId</td><td>sidebarNavMap</td><td>子页面映射父级</td><td>无</td><td>Map</td><td>2 项子页面映射</td><td>无匹配时全部非激活</td><td>当用户进入排期报表子页时，侧边栏「排期管理」应处于激活态</td></tr></tbody></table></div></details>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F11</span> 页面初始化回调（8 个 init 函数）</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>navigateTo() 最后一步：触发对应页面的初始化回调函数，从 pageInitMap[pageId]?.() 中查找并执行。原型含 8 个 init 函数：initCityTree()（城市管理）、initRegionTree()（品牌区域）、filterSupplierList()（开发者管理）、renderScheduleTable()（排期管理）、initInterceptPage()（拦截规则）、initColumnSettings()（线索列表）、switchCustomFieldTab()（自定义字段）、switchSmartCodeTab()（SmartCode 管理）。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>JS 内置 pageInitMap 对象，按 pageId 映射初始化函数。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul>
+        <li><strong>触发时机：</strong>每次进入对应页面时执行（navigateTo 同页面也会触发）</li>
+        <li><strong>幂等性：</strong>init 函数需保证可重复执行不报错</li>
+        <li><strong>数据请求：</strong>部分 init 函数会触发对应页面的首次数据请求</li>
+        <li><strong>清理：</strong>离开页面前不强制清理，依赖 GC 回收</li>
+      </ul>
+    </div>
+    <details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>初始化回调</td><td>navigateTo() 最后一步</td><td>所有登录用户</td><td>触发页面 init 函数</td><td>pageInitMap[pageId]</td><td>JS 常量</td><td>查表 + 执行</td><td>可能触发首屏数据请求</td><td>Map</td><td>8 项映射</td><td>无对应 init 时静默跳过</td><td>当用户进入城市管理页时，应自动调用 initCityTree() 初始化树结构</td></tr></tbody></table></div></details>
+  </div>
+</section>
+<section class="section" id="tab-fw-other">
+  <div class="section-title">五. 其他说明</div>
+  <div id="tab-fw-permission">
+    <div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">权限矩阵</div>
+    <div class="table-wrap"><table><thead><tr><th>角色</th><th>可见菜单范围</th><th>导航权限说明</th></tr></thead><tbody>
+      <tr><td>总部超级管理员</td><td>全部 18 个菜单</td><td>所有导航项均可见可点</td></tr>
+      <tr><td>品牌运营</td><td>工作台 + 基础数据 + 线索管理（部分）</td><td>系统管理类菜单（帐号/权限/角色）隐藏</td></tr>
+      <tr><td>经销商坐席</td><td>工作台 + 线索列表 + 自定义字段</td><td>仅看线索相关菜单，其他全部隐藏</td></tr>
+      <tr><td>开发者</td><td>工作台 + 开发者管理（仅自有）</td><td>仅看开发者管理和工作台</td></tr>
+    </tbody></table></div>
+  </div>
+  <div id="tab-fw-pending">
+    <div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div>
+    <div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th><th>备注</th></tr></thead><tbody>
+      <tr><td>【待确认：接口地址-通知列表】</td><td>通知中心数据获取</td><td>GET /api/notifications 路径需后端确认</td></tr>
+      <tr><td>【待确认：接口地址-当前用户信息】</td><td>用户头像/名称/角色展示</td><td>当前硬编码，需对接用户中心</td></tr>
+      <tr><td>【待确认：接口地址-退出登录】</td><td>会话销毁和 token 失效</td><td>POST /api/auth/logout 路径</td></tr>
+      <tr><td>【待确认：业务口径-侧边栏权限控制】</td><td>不同角色看到的导航项</td><td>当前所有角色看到全部菜单</td></tr>
+      <tr><td>【待确认：业务口径-角标轮询策略】</td><td>前端性能和服务端压力</td><td>是否全量轮询还是按角色订阅</td></tr>
+      <tr><td>【待确认：业务口径-多租户 Logo】</td><td>登录页和顶部 Logo</td><td>是否需要按租户切换品牌资源</td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+</div>
+
+<!-- ====== TAB 0: 工作台 ====== -->
+<div class="tab-panel active" id="tab-panel-0">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-0-scope">项目范围</a><a href="#tab-0-logic">逻辑说明</a><a href="#tab-0-api">接口清单</a><a href="#tab-0-feature">功能说明</a><a href="#tab-0-permission">权限矩阵</a><a href="#tab-0-exception">异常规则</a><a href="#tab-0-pending">待确认项</a></div></nav>
+<section class="section" id="tab-0-scope">
+  <div class="section-title">一. 项目范围</div>
+  <div class="section-desc">工作台模块的项目范围定义</div>
+  <div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>工作台</td><td>数据概览仪表盘：统计卡片(今日新增线索/已下发/A级意向/成交)、线索趋势柱状图、开发者分布进度条、快捷操作入口、待处理事项列表</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-0-logic">
+  <div class="section-title">二. 逻辑说明</div>
+  <div class="section-desc">工作台页面的流程和跳转关系</div>
+  <div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>快捷入口-线索列表</td><td>页面内导航 navigateTo('leads')</td></tr><tr><td>快捷入口-仅接收线索</td><td>navigateToLeadStatus('5')</td></tr><tr><td>快捷入口-拦截规则</td><td>navigateTo('lead-intercept')</td></tr><tr><td>快捷入口-黑名单</td><td>navigateToLeadInterceptTab('blacklist')</td></tr><tr><td>快捷入口-门店管理</td><td>navigateTo('store')</td></tr><tr><td>快捷入口-开发者管理</td><td>navigateTo('supplier')</td></tr><tr><td>快捷入口-自定义字段</td><td>navigateTo('custom-fields')</td></tr><tr><td>快捷入口-排期管理</td><td>navigateTo('schedule')</td></tr><tr><td>待处理事项-立即处理</td><td>navigateTo('leads')</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-0-api">
+  <div class="section-title">三. 接口清单</div>
+  <div class="section-desc">工作台数据相关的接口列表</div>
+  <div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>7</td><td>3</td><td><span class="badge badge-warn">无</span> 仅查询</td><td><span class="badge badge-info">是</span> 按角色展示数据</td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">3</span> 接口地址待确认</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>请求参数</th><th>响应字段</th><th>成功处理</th><th>失败处理</th></tr></thead><tbody>
+    <tr><td>获取工作台概览数据</td><td>GET</td><td><span class="badge badge-muted">待确认</span></td><td>无</td><td>todayNewLeads, todayDispatched, aLevelLeads, todayDeals</td><td>渲染4个统计卡片</td><td>卡片显示"—"</td></tr>
+    <tr><td>获取线索趋势</td><td>GET</td><td><span class="badge badge-muted">待确认</span></td><td>days=7</td><td>date[], count[]</td><td>渲染柱状图</td><td>图表区域显示空状态</td></tr>
+    <tr><td>获取开发者分布</td><td>GET</td><td><span class="badge badge-muted">待确认</span></td><td>无</td><td>supplierName[], leadCount[], percentage[]</td><td>渲染进度条</td><td>显示"暂无数据"</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="tab-0-feature">
+  <div class="section-title">四. 功能说明</div>
+  <div class="section-desc">工作台各功能点的详细说明</div>
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F1</span> 数据概览统计卡片</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>页面顶部展示4个统计卡片：今日新增线索、今日已下发、A级高意向、今日成交。每张卡片含图标、数值、趋势百分比。卡片hover时轻微上浮动画。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>GET接口获取实时统计数据，页面加载时请求一次。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul><li><strong>统计口径：</strong>按当天00:00至当前时间的线索数据统计</li><li><strong>趋势计算：</strong>同比上一周期(昨日同时段)的变化百分比</li><li><strong>刷新时机：</strong>页面初始化加载，无自动刷新</li></ul>
+    </div>
+  </div>
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F2</span> 线索趋势柱状图</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>展示近7天每日线索数量柱状图，X轴为日期，Y轴为线索数量。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>GET接口，参数 days=7，返回日期和数量数组。</p>
+      <p><strong>4）逻辑说明</strong></p>
+      <ul><li><strong>时间范围：</strong>近7个自然日(含当天)</li><li><strong>空数据处理：</strong>数据为0时柱子高度为0，不显示"暂无数据"</li></ul>
+    </div>
+  </div>
+  <div class="feature-card">
+    <div class="fc-title"><span class="badge badge-info">F3</span> 快捷操作导航</div>
+    <div class="fc-body">
+      <p><strong>2）交互说明</strong></p>
+      <p>8个快捷操作卡片：线索列表、仅接收线索、拦截规则、黑名单、门店管理、开发者管理、自定义字段、排期管理。点击卡片跳转到对应功能页面。</p>
+      <p><strong>3）数据来源</strong></p>
+      <p>纯前端导航，无需接口。</p>
+    </div>
+  </div>
+</section>
+<section class="section" id="tab-0-other">
+  <div class="section-title">五. 其他说明</div>
+  <div id="tab-0-permission"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">权限矩阵</div><div class="table-wrap"><table><thead><tr><th>角色</th><th>可见范围</th></tr></thead><tbody><tr><td>超级管理员</td><td>全部数据</td></tr><tr><td>品牌运营</td><td>所属品牌数据</td></tr><tr><td>经销商坐席</td><td>本门店数据</td></tr></tbody></table></div></div>
+  <div id="tab-0-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th><th>备注</th></tr></thead><tbody><tr><td>【待确认：接口地址-工作台概览】</td><td>前端数据获取和后端接口开发</td><td>3个接口路径均需确认</td></tr></tbody></table></div></div>
+</section>
+</div>
+
+<!-- ====== TAB 1: 品牌管理 ====== -->
+<div class="tab-panel" id="tab-panel-1">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-1-scope">项目范围</a><a href="#tab-1-logic">逻辑说明</a><a href="#tab-1-api">接口清单</a><a href="#tab-1-feature">功能说明</a><a href="#tab-1-permission">权限矩阵</a><a href="#tab-1-pending">待确认项</a></div></nav>
+<section class="section" id="tab-1-scope">
+  <div class="section-title">一. 项目范围</div>
+  <div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>基础数据 / 品牌管理</td><td>品牌数据的CRUD管理：品牌列表展示(ID/名称/编码/Logo/车系/门店数/状态)、新增/编辑品牌弹窗、停用/启用、删除(校验关联数据)、筛选(名称/编码/状态)</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-1-logic">
+  <div class="section-title">二. 逻辑说明</div>
+  <div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>品牌删除校验</td><td>校验关联车系数、关联门店数，关联数据>0时弹窗警告</td></tr><tr><td>品牌编码唯一性</td><td>新增时可输入，编辑时编码只读不可修改</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-1-api">
+  <div class="section-title">三. 接口清单</div>
+  <div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>5</td><td>4</td><td><span class="badge badge-warn">是</span> 新增/编辑/删除/状态切换</td><td><span class="badge badge-info">是</span> 角色权限控制</td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">4</span> 接口地址待确认</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>请求参数</th><th>响应字段</th><th>成功处理</th><th>失败处理</th></tr></thead><tbody>
+    <tr><td>获取品牌列表</td><td>GET</td><td><span class="badge badge-muted">待确认</span></td><td>name?, code?, status?, page, pageSize</td><td>id, name, code, logoUrl, seriesCount, storeCount, status, sort</td><td>渲染表格，更新分页信息</td><td>Toast"加载失败，请重试"</td></tr>
+    <tr><td>新增品牌</td><td>POST</td><td><span class="badge badge-muted">待确认</span></td><td>name*, code*, logoFile?, sort, status</td><td>id</td><td>关闭弹窗，刷新列表，Toast"创建成功"</td><td>名称/编码重复时Toast对应错误</td></tr>
+    <tr><td>编辑品牌</td><td>PUT</td><td><span class="badge badge-muted">待确认</span></td><td>id*, name*, logoFile?, sort, status</td><td>—</td><td>关闭弹窗，刷新列表，Toast"更新成功"</td><td>名称重复时Toast对应错误</td></tr>
+    <tr><td>删除品牌</td><td>DELETE</td><td><span class="badge badge-muted">待确认</span></td><td>id*</td><td>—</td><td>关闭确认弹窗，刷新列表，Toast"删除成功"</td><td>关联数据>0时返回错误码</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="tab-1-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 品牌列表展示与筛选区</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>表格8列：ID / 品牌名称（加粗）/ 品牌编码（code样式灰色背景）/ 品牌Logo（Emoji图标24px）/ 车系列表（显示「X 个车系」）/ 门店数量（显示「X 家门店」）/ 状态（绿色badge=启用，灰色badge=停用）/ 操作。顶部筛选区：品牌名称搜索框（200px，输入实时过滤）+ 品牌编码搜索框（200px）+ 状态下拉（全部/启用/停用）+ 重置按钮。分隔线后为「+ 新增数据」按钮。底部分页：显示「共 N 条数据」+ 翻页按钮。无全选checkbox、无批量导入、无导出。</p><p><strong>3）数据来源</strong></p><p>GET 接口分页获取品牌列表，前端 JS filterBrandList() 实时筛选。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>分页：</strong>每页固定条数，底部显示「共 N 条数据」</li><li><strong>状态标签：</strong>启用=绿色(status-active)，停用=灰色(status-inactive)</li><li><strong>操作列3按钮：</strong>编辑/停启用/删除</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>品牌列表</td><td>侧边栏→基础数据→品牌管理</td><td>超级管理员/品牌运营</td><td>进入页面自动加载品牌表格，支持按名称/编码/状态筛选</td><td>ID/品牌名称/品牌编码/品牌Logo/车系列表/门店数量/状态/操作</td><td>GET 品牌列表接口</td><td>分页查询，前端实时筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>加载失败Toast提示</td><td>当用户进入品牌管理时，应展示8列完整表格且状态标签颜色正确</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 新增/编辑品牌弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗，标题动态「新增品牌」/「编辑品牌」。5个字段：①品牌名称（text必填，placeholder「请输入品牌名称，如：理想汽车」）②品牌编码（text必填，placeholder「请输入品牌编码，如：LIXIANG」，提示「大写英文，创建后不可修改」，编辑时只读）③品牌Logo（file上传，非必填，accept=image/*，提示「JPG、PNG，200x200」）④排序值（number，默认255，min=0 step=1，JS强制只允许数字）⑤状态（select必填，默认启用）。底部：取消 + 确认创建/确认保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openBrandModal('edit', {name,code,sort,status}) 回填数据。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>编码规则：</strong>大写英文，创建后不可修改</li><li><strong>排序：</strong>数值越小越靠前，默认255</li><li><strong>新增Toast：</strong>「品牌创建成功」</li><li><strong>编辑Toast：</strong>「品牌保存成功」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>品牌名称</td><td>品牌管理→新增/编辑弹窗</td><td>超级管理员/品牌运营</td><td>输入品牌名称，必填</td><td>name*(text)</td><td>用户输入</td><td>—</td><td>POST/PUT</td><td>String</td><td>—</td><td>名称重复Toast错误</td><td>当用户未输入名称点击确认时，应提示必填</td></tr><tr><td>品牌编码</td><td>品牌管理→新增/编辑弹窗</td><td>超级管理员/品牌运营</td><td>输入品牌编码，必填，创建后不可修改</td><td>code*(text)</td><td>用户输入</td><td>大写英文</td><td>POST/PUT</td><td>String</td><td>—</td><td>编码重复Toast错误</td><td>当用户编辑品牌时，编码字段应只读</td></tr><tr><td>排序值</td><td>品牌管理→新增/编辑弹窗</td><td>超级管理员/品牌运营</td><td>输入排序数字，非必填</td><td>sort(number)</td><td>用户输入</td><td>越小越靠前</td><td>POST/PUT</td><td>Integer</td><td>255</td><td>非数字自动过滤</td><td>当用户输入非数字时，应自动过滤</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 品牌删除确认弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>点击删除调用 deleteBrand(id, name, series, stores, leads)，打开确认弹窗，标题「确认删除品牌」。当 series>0 或 stores>0 时显示黄色警告：「该品牌下共有 X 个车系」「该品牌下共有 X 家门店」+ 红色「删除后将同步停用以上关联数据，此操作不可恢复！」。底部：取消 + 确认删除。</p><p><strong>3）数据来源</strong></p><p>DELETE 接口，删除前校验关联数据。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>关联校验：</strong>series>0 或 stores>0 时显示警告</li><li><strong>删除Toast：</strong>「品牌删除成功」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>品牌删除</td><td>品牌管理→操作列→删除</td><td>超级管理员</td><td>点击删除→确认弹窗→确认</td><td>id*(DELETE)</td><td>品牌列表</td><td>校验关联数据</td><td>DELETE</td><td>—</td><td>—</td><td>关联数据>0显示警告</td><td>当品牌下有3个车系时，删除弹窗应显示「该品牌下共有3个车系」</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 品牌状态切换</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>停用：弹 showConfirmDialog「该品牌下共有 X 个车系、X 家门店，停用将同步停用，是否确认？」，确认后状态变停用，Toast「品牌'XX'已停用」(warning)。启用：直接切换，Toast「品牌'XX'已启用」(success)。</p><p><strong>3）数据来源</strong></p><p>PUT 接口切换状态。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>停用需确认：</strong>显示关联数据数量</li><li><strong>启用无需确认：</strong>直接切换</li><li><strong>枚举：</strong>启用(1)/停用(0)</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>停用品牌</td><td>品牌管理→操作列→停用</td><td>超级管理员</td><td>点击停用→确认弹窗→确认</td><td>id*, status=0</td><td>品牌列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户停用品牌时，应弹出确认框显示关联车系和门店数</td></tr><tr><td>启用品牌</td><td>品牌管理→操作列→启用</td><td>超级管理员</td><td>点击启用→直接切换</td><td>id*, status=1</td><td>品牌列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户启用品牌时，应直接切换并Toast成功</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-1-other">
+  <div class="section-title">五. 其他说明</div>
+  <div id="tab-1-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th><th>备注</th></tr></thead><tbody><tr><td>【待确认：接口地址-品牌管理全部接口】</td><td>前端调用和后端开发</td><td>4个接口路径均需确认</td></tr><tr><td>【待确认：权限码-品牌新增/编辑/删除】</td><td>按钮显隐和接口鉴权</td><td>—</td></tr></tbody></table></div></div>
+</section>
+</div>
+
+<!-- ====== TAB 2-15: 车系管理 ====== -->
+<div class="tab-panel" id="tab-panel-2">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-2-scope">项目范围</a><a href="#tab-2-logic">逻辑说明</a><a href="#tab-2-api">接口清单</a><a href="#tab-2-feature">功能说明</a><a href="#tab-2-permission">权限矩阵</a><a href="#tab-2-pending">待确认项</a></div></nav>
+<section class="section" id="tab-2-scope">
+  <div class="section-title">一. 项目范围</div>
+  <div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>基础数据 / 车系管理</td><td>车系数据的CRUD管理：10列表格(图片/名称/品牌/能源类型/指导价/门店/状态等)、新增/编辑抽屉面板(含车系信息/图片上传/关联专营店多选)、查看详情抽屉、停用/启用、删除(校验关联门店)、批量导入(三步流程)、导出数据、多维筛选(名称/品牌/能源/状态)、分页、模板下载</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-2-logic">
+  <div class="section-title">二. 逻辑说明</div>
+  <div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>车系删除校验</td><td>校验关联门店数量，>0时弹窗警告显示门店信息</td></tr><tr><td>批量导入流程</td><td>上传文件→数据预览(校验结果) →导入完成，支持模板下载</td></tr><tr><td>能源类型选项</td><td>纯电BEV/燃油/插混PHEV/增程EREV/混动HEV</td></tr></tbody></table></div>
+</section>
+<section class="section" id="tab-2-api">
+  <div class="section-title">三. 接口清单</div>
+  <div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>10</td><td>7</td><td><span class="badge badge-warn">是</span> 新增/编辑/删除/导入/状态切换</td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-info">是</span> 导出数据</td><td><span class="badge badge-danger">7</span> 接口地址待确认</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>请求参数</th><th>响应字段</th><th>成功处理</th><th>失败处理</th></tr></thead><tbody>
+    <tr><td>获取车系列表</td><td>GET</td><td><span class="badge badge-muted">待确认</span></td><td>name?,brand?,energyType?,status?,page,pageSize</td><td>list[id,name,image,brand,energyType,priceMin,priceMax,sort,storeCount,status]</td><td>渲染表格+分页</td><td>Toast"加载失败"</td></tr>
+    <tr><td>新增车系</td><td>POST</td><td><span class="badge badge-muted">待确认</span></td><td>name*,code*,brandId*,energyType*,priceMin,priceMax,image,storeIds[],description,remark,sort,status</td><td>id</td><td>关闭抽屉，刷新列表</td><td>编码重复/必填缺失Toast错误</td></tr>
+    <tr><td>编辑车系</td><td>PUT</td><td><span class="badge badge-muted">待确认</span></td><td>id*,name*,brandId*,energyType*,priceMin,priceMax,...</td><td>—</td><td>关闭抽屉，刷新列表</td><td>Toast对应错误信息</td></tr>
+    <tr><td>删除车系</td><td>DELETE</td><td><span class="badge badge-muted">待确认</span></td><td>id*</td><td>—</td><td>关闭确认弹窗，刷新列表</td><td>关联门店>0时返回错误</td></tr>
+    <tr><td>批量导入车系</td><td>POST</td><td><span class="badge badge-muted">待确认</span></td><td>file*(multipart)</td><td>successCount, failCount, errors[]</td><td>显示导入完成统计</td><td>预览阶段显示校验错误行</td></tr>
+    <tr><td>导出车系数据</td><td>GET</td><td><span class="badge badge-muted">待确认</span></td><td>应用当前筛选条件</td><td>文件流</td><td>浏览器下载文件</td><td>无数据时Toast"暂无数据"</td></tr>
+    <tr><td>切换车系状态</td><td>PUT</td><td><span class="badge badge-muted">待确认</span></td><td>id*, status*</td><td>—</td><td>更新行内状态标签</td><td>Toast"操作失败"</td></tr>
+  </tbody></table></div>
+</section>
+<section class="section" id="tab-2-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 车系列表与多维筛选区</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>表格10列：ID / 车型图片（60x45px缩略图）/ 车系名称（加粗+副标题灰色小字）/ 所属品牌 / 能源类型（标签：纯电BEV/燃油/插混PHEV/增程EREV/混动HEV）/ 指导价区间(万)（格式「xx.xx~xx.xx」）/ 排序值 / 关联专营店（「X 家门店」）/ 状态 / 操作。筛选4个：搜索名称(200px)+品牌下拉+能源类型下拉+状态下拉+重置。分隔线后：批量导入+导出数据+新增数据。分页「共27条数据」。操作列4按钮：查看/编辑/停启用/删除。</p><p><strong>3）数据来源</strong></p><p>GET 接口分页获取，filterSeriesList() 前端实时筛选。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>无全选checkbox</strong></li><li><strong>能源类型标签：</strong>不同类型标签样式区分</li><li><strong>指导价区间：</strong>显示为「xx.xx~xx.xx万」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>车系列表</td><td>侧边栏→基础数据→车系管理</td><td>超级管理员/品牌运营</td><td>进入页面自动加载车系表格，支持4维筛选</td><td>ID/图片/名称/品牌/能源/指导价/排序/门店/状态/操作</td><td>GET 车系列表接口</td><td>分页查询+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>加载失败Toast</td><td>当用户进入车系管理时，应展示10列完整表格</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 新增/编辑车系抽屉</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>右侧抽屉面板，标题动态切换。双列grid布局，11个字段：①车系名称（text必填）②车系编码（text必填，大写英文+下划线，创建后不可修改）③所属品牌（select必填，4选项，选择后onVehicleBrandChange()过滤专营店）④能源类型（select必填，5选项）⑤指导价区间（双number，最低~最高，step=0.01）⑥排序值（number，默认255）⑦车系图片（拖拽上传，预览+删除）⑧车系介绍（textarea rows=3）⑨关联专营店（复合选择器：已选标签区+搜索框+省/市下拉+全选+列表+清空，品牌联动过滤）⑩备注（textarea rows=2）⑪状态（select必填，默认启用）。底部：取消 + 确认创建/确认保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openVehicleModal('edit', {...}) 回填。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>品牌联动：</strong>选择品牌后专营店列表自动过滤</li><li><strong>编码规则：</strong>大写英文+下划线，创建后不可修改</li><li><strong>新增Toast：</strong>「车系创建成功」</li><li><strong>编辑Toast：</strong>「车系保存成功」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>车系名称</td><td>车系管理→新增/编辑抽屉</td><td>超级管理员/品牌运营</td><td>输入车系名称，必填</td><td>name*(text)</td><td>用户输入</td><td>—</td><td>POST/PUT</td><td>String</td><td>—</td><td>—</td><td>当用户未输入名称时，应提示必填</td></tr><tr><td>关联专营店选择器</td><td>车系管理→新增/编辑抽屉</td><td>超级管理员/品牌运营</td><td>选择品牌后专营店列表自动过滤，支持搜索和全选</td><td>storeIds[](多选)</td><td>门店管理数据，按品牌过滤</td><td>品牌→专营店联动</td><td>POST/PUT</td><td>Array</td><td>空数组</td><td>无匹配显示空状态</td><td>当用户选择品牌「理想汽车」时，专营店列表应仅显示理想汽车门店</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 车系详情抽屉</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>右侧抽屉面板，标题「车系详情 - XX」。5个区块：①顶部概览（图片160x120px+名称18px加粗+副标题+标签组：品牌/能源/状态）②基本信息（编码/指导价/排序值/创建时间）③车系介绍（段落）④关联专营店（标题「(共X家)」+标签列表）⑤备注说明（有则显示，无则隐藏）。底部：关闭。</p><p><strong>3）数据来源</strong></p><p>GET 车系详情，openVehicleDetailModal(id, name) 调用。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>只读展示，无编辑</strong></li><li><strong>专营店标签：</strong>灰色圆角小标签</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>车系详情</td><td>车系管理→操作列→查看</td><td>超级管理员/品牌运营/经销商坐席</td><td>点击查看打开详情抽屉</td><td>id</td><td>GET 车系详情接口</td><td>—</td><td>读取</td><td>JSON</td><td>—</td><td>—</td><td>当用户点击查看时，应展示5个区块完整信息</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 车系删除确认弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>点击删除调用 deleteSeries(id, name, stores)，打开确认弹窗。当 stores>0 时显示黄色警告：「该车系下共有 X 家门店」+ 红色「删除后将同步停用以上关联数据，此操作不可恢复！」。底部：取消 + 确认删除。</p><p><strong>3）数据来源</strong></p><p>DELETE 接口，校验关联门店。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>关联校验：</strong>stores>0 时显示警告</li><li><strong>删除Toast：</strong>「车系删除成功」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>车系删除</td><td>车系管理→操作列→删除</td><td>超级管理员</td><td>点击删除→确认弹窗→确认</td><td>id*(DELETE)</td><td>车系列表</td><td>校验关联门店</td><td>DELETE</td><td>—</td><td>—</td><td>关联门店>0显示警告</td><td>当车系下有5家门店时，弹窗应显示「该车系下共有5家门店」</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> 车系状态切换</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>停用：弹确认框「该车系下共有 X 家门店，停用将同步停用，是否确认？」，Toast「车系'XX'已停用」(warning)。启用：直接切换，Toast「车系'XX'已启用」(success)。</p><p><strong>3）数据来源</strong></p><p>PUT 接口切换状态。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>停用需确认</strong></li><li><strong>启用无需确认</strong></li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>停用车系</td><td>车系管理→操作列→停用</td><td>超级管理员</td><td>点击停用→确认弹窗→确认</td><td>id*, status=0</td><td>车系列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户停用车系时，应弹出确认框显示关联门店数</td></tr><tr><td>启用车系</td><td>车系管理→操作列→启用</td><td>超级管理员</td><td>点击启用→直接切换</td><td>id*, status=1</td><td>车系列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户启用车系时，应直接切换并Toast成功</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F6</span> 批量导入车系流程</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>三步式弹窗（宽800px）。步骤1-上传文件：操作说明4条 + 下载模板（CSV，列头：车系名称/所属品牌/能源类型/指导价最低/指导价最高/排序值/状态）+ 拖拽上传区（.xlsx/.xls/.csv）。步骤2-数据预览：统计「共X条」+ 错误数(红) + 成功数(绿) + 预览表格（7列：行号/车系名称/所属品牌/能源类型/指导价区间/状态/校验结果）+ 黄色提示「导入将覆盖已有数据」。步骤3-导入完成：勾号 + 结果 + 继续导入/完成。</p><p><strong>3）数据来源</strong></p><p>POST 接口上传文件。downloadSeriesTemplate() 下载模板。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>模板格式：</strong>CSV UTF-8 BOM</li><li><strong>预览校验：</strong>每行显示校验结果</li><li><strong>覆盖逻辑：</strong>导入覆盖已有数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>批量导入车系</td><td>车系管理→批量导入按钮</td><td>超级管理员/品牌运营</td><td>下载模板→填写→上传→预览校验→确认导入</td><td>file*(multipart)</td><td>用户上传Excel/CSV</td><td>三步式流程</td><td>POST 批量导入</td><td>file</td><td>—</td><td>预览显示校验错误行</td><td>当用户上传含错误数据的文件时，预览表格应标红显示错误行</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F7</span> 导出车系数据</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>导出按钮调用 exportSeriesData()。异步导出带进度条：20%「正在收集车系数据...」→50%「正在整理车系信息...」→80%「正在处理导出格式...」→95%「即将完成...」。文件名「车系管理_YYYY-MM-DD.csv」，CSV UTF-8 BOM。导出列：ID/车系名称/所属品牌/能源类型/指导价区间/排序值/关联门店/状态。导出应用当前筛选条件。</p><p><strong>3）数据来源</strong></p><p>前端导出，doAsyncExport() 异步流程。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>文件格式：</strong>CSV UTF-8 BOM</li><li><strong>命名：</strong>车系管理_YYYY-MM-DD.csv</li><li><strong>筛选联动：</strong>导出筛选后数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>导出车系数据</td><td>车系管理→导出数据按钮</td><td>超级管理员/品牌运营</td><td>点击导出→进度条→下载文件</td><td>应用当前筛选条件</td><td>当前页面表格数据</td><td>导出可见行</td><td>读取</td><td>CSV</td><td>—</td><td>无数据不生成文件</td><td>当用户筛选品牌为「理想汽车」后导出，文件应仅含理想品牌车系</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-2-other">
+  <div class="section-title">五. 其他说明</div>
+  <div id="tab-2-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th><th>备注</th></tr></thead><tbody><tr><td>【待确认：接口地址-车系管理全部接口】</td><td>前端调用和后端开发</td><td>7个接口路径均需确认</td></tr><tr><td>【待确认：导出格式-车系导出】</td><td>导出文件名/Sheet名/列范围</td><td>—</td></tr></tbody></table></div></div>
+</section>
+</div>
+
+<!-- ====== TAB 3: 城市管理 ====== -->
+<div class="tab-panel" id="tab-panel-3">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-3-scope">项目范围</a><a href="#tab-3-logic">逻辑说明</a><a href="#tab-3-api">接口清单</a><a href="#tab-3-feature">功能说明</a><a href="#tab-3-permission">权限矩阵</a><a href="#tab-3-pending">待确认项</a></div></nav>
+<section class="section" id="tab-3-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>基础数据 / 城市管理</td><td>省/市/区三级树形结构管理：树节点展示、新增/编辑省市区弹窗、删除节点、批量导入(三步流程)、导出数据、搜索过滤、展开/收起全部</td></tr></tbody></table></div></section>
+<section class="section" id="tab-3-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>节点层级关系</td><td>省份→城市→区县，三级树形结构，子节点挂在父节点下</td></tr><tr><td>节点操作权限</td><td>省份节点可新增城市；城市节点可新增区县；区县节点仅有编辑/删除</td></tr><tr><td>批量导入格式</td><td>省份/城市/区县/编码 四列Excel格式</td></tr></tbody></table></div></section>
+<section class="section" id="tab-3-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>7</td><td>5</td><td><span class="badge badge-warn">是</span> 新增/编辑/删除/导入</td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-info">是</span> 导出</td><td><span class="badge badge-danger">5</span> 接口待确认</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>请求参数</th><th>响应字段</th><th>成功处理</th><th>失败处理</th></tr></thead><tbody>
+    <tr><td>获取城市树</td><td>GET</td><td><span class="badge badge-muted">待确认</span></td><td>无</td><td>tree[province{city{district}}]</td><td>渲染树形结构</td><td>显示空树</td></tr>
+    <tr><td>新增节点</td><td>POST</td><td><span class="badge badge-muted">待确认</span></td><td>type*, name*, code*, parentId?</td><td>id</td><td>刷新树，选中新节点</td><td>编码重复Toast错误</td></tr>
+  </tbody></table></div></section>
+<section class="section" id="tab-3-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 城市树结构与详情面板</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>左右分栏：左侧320px三级树形列表（最大高度600px可滚动），右侧详情面板。树形层级：省份（🏠，计数「X市」）→城市（🏙️，计数「X区」）→区县（📍）。每节点可展开/收起（▶切换），hover显示操作按钮：省份[+新增城市/✎编辑/×删除]、城市[+新增区县/✎编辑/×删除]、区县[✎编辑/×删除]。点击节点高亮选中，右侧显示详情。默认全部展开。无分页、无全选、无状态标签。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取城市树，initCityTree() 初始化。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>省份详情：</strong>类型/编码/下辖城市数/下辖区县数</li><li><strong>城市详情：</strong>类型/所属省份/编码/下辖区县数</li><li><strong>区县详情：</strong>类型/编码/所属城市/所属省份</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>城市树展示</td><td>侧边栏→基础数据→城市管理</td><td>超级管理员</td><td>进入页面自动加载三级树形结构</td><td>省份→城市→区县三级</td><td>GET 城市树接口</td><td>树形递归渲染</td><td>读取</td><td>JSON树</td><td>默认展开全部</td><td>空树显示空状态</td><td>当用户进入城市管理时，应展示三级树形结构且可展开收起</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 搜索与工具栏</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>顶部工具栏：搜索框（placeholder「搜索省/市/区名称」，200px，filterCityTree()）+ 展开全部按钮 + 收起全部按钮 + 批量导入按钮 + 导出数据按钮 + 新增省份按钮（btn-primary）。</p><p><strong>3）数据来源</strong></p><p>前端 JS 搜索过滤、展开/收起。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>搜索：</strong>按名称过滤树节点</li><li><strong>展开/收起：</strong>批量操作所有节点</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>搜索城市</td><td>城市管理→搜索框</td><td>超级管理员</td><td>输入名称实时过滤树节点</td><td>keyword(text)</td><td>前端树数据</td><td>名称匹配过滤</td><td>无</td><td>—</td><td>—</td><td>无匹配时节点隐藏</td><td>当用户输入「深圳」时，树应仅显示匹配节点</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 新增/编辑节点弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗，标题动态：「新增省份」/「编辑省份」/「新增城市」/「编辑城市」/「新增区县」/「编辑区县」。字段：①名称（text必填，label动态变化，placeholder「请输入名称，如：广东省」）②编码（text必填，placeholder「请输入编码，如：440000」，区县编辑时隐藏必填标记）③所属上级（text只读，省份时隐藏，城市/区县时显示上级名称）。底部：取消 + 保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openCityTreeModal('province'/'city'/'district') 动态显示字段。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>动态字段：</strong>根据type参数显示/隐藏</li><li><strong>编码校验：</strong>重复时Toast错误</li><li><strong>新增后：</strong>刷新树，选中新节点</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>新增省份</td><td>城市管理→新增省份按钮</td><td>超级管理员</td><td>点击新增省份→弹窗→输入名称和编码→保存</td><td>name*, code*</td><td>用户输入</td><td>—</td><td>POST 新增</td><td>JSON</td><td>—</td><td>编码重复Toast错误</td><td>当用户新增省份保存后，树应刷新并选中新节点</td></tr><tr><td>新增城市</td><td>城市管理→省份节点→+新增城市</td><td>超级管理员</td><td>在省份下新增城市</td><td>name*, code*, parentId</td><td>用户输入+父节点</td><td>挂载到选中省份下</td><td>POST 新增</td><td>JSON</td><td>—</td><td>—</td><td>当用户新增城市后，城市节点应出现在对应省份下</td></tr><tr><td>新增区县</td><td>城市管理→城市节点→+新增区县</td><td>超级管理员</td><td>在城市下新增区县</td><td>name*, code*, parentId</td><td>用户输入+父节点</td><td>挂载到选中城市下</td><td>POST 新增</td><td>JSON</td><td>—</td><td>—</td><td>当用户新增区县后，区县节点应出现在对应城市下</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 批量导入城市流程</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>三步式弹窗。步骤1-上传文件：操作说明4步 + 下载模板（downloadCityTemplate()）+ 拖拽上传区（.xlsx/.xls/.csv）。步骤2-数据预览：统计「共X条」+ 通过/失败数量 + 预览表格（6列：行号/省份/城市/区县/编码/校验结果）+ 黄色提示。步骤3-导入完成：勾号 + 结果 + 继续导入/完成。</p><p><strong>3）数据来源</strong></p><p>POST 接口上传文件。模板列：省份/城市/区县/编码。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>模板列：</strong>省份/城市/区县/编码</li><li><strong>覆盖逻辑：</strong>导入覆盖已有数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>批量导入城市</td><td>城市管理→批量导入按钮</td><td>超级管理员</td><td>下载模板→填写→上传→预览→导入</td><td>file*(multipart)</td><td>用户上传Excel</td><td>三步式流程</td><td>POST 批量导入</td><td>file</td><td>—</td><td>预览显示校验错误</td><td>当用户上传文件后，预览应显示6列含校验结果</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> 导出城市数据</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>导出按钮调用 exportCityData()，导出城市树数据为文件。</p><p><strong>3）数据来源</strong></p><p>前端导出全量数据。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>导出范围：</strong>全部城市树数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>导出城市数据</td><td>城市管理→导出数据按钮</td><td>超级管理员</td><td>点击导出→下载文件</td><td>无</td><td>城市树数据</td><td>全量导出</td><td>读取</td><td>CSV/Excel</td><td>—</td><td>—</td><td>当用户点击导出时，应下载含省市区三级数据的文件</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-3-other"><div id="tab-3-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th><th>备注</th></tr></thead><tbody><tr><td>【待确认：接口地址-城市管理全部接口】</td><td>前端调用和后端开发</td><td>5个接口路径待确认</td></tr></tbody></table></div></div></section>
+</div>
+
+<!-- ====== TAB 4: 品牌区域 ====== -->
+<div class="tab-panel" id="tab-panel-4">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-4-scope">项目范围</a><a href="#tab-4-logic">逻辑说明</a><a href="#tab-4-api">接口清单</a><a href="#tab-4-feature">功能说明</a><a href="#tab-4-pending">待确认项</a></div></nav>
+<section class="section" id="tab-4-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>基础数据 / 品牌区域</td><td>品牌/大区/小区三级树形管理：树节点展示、新增/编辑品牌/大区/小区弹窗(含关联城市多选)、删除节点、批量导入(三步流程)、导出数据、搜索过滤、展开/收起、右侧详情面板</td></tr></tbody></table></div></section>
+<section class="section" id="tab-4-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>品牌来源</td><td>新增品牌时从品牌管理下拉选择已有品牌</td></tr><tr><td>小区关联城市</td><td>省市联动下拉+城市多选+全选/清空</td></tr></tbody></table></div></section>
+<section class="section" id="tab-4-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>8</td><td>5</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-danger">5</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-4-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 品牌区域树结构与详情面板</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>左右分栏：左侧320px三级树形列表，右侧详情面板。树形层级：品牌（🏢，计数「X区」）→大区（📍，计数「X小区」）→小区（🏪）。每节点可展开/收起，hover显示操作按钮：品牌[+新增大区/✎编辑/×删除]、大区[+新增小区/✎编辑/×删除]、小区[✎编辑/×删除]。点击节点高亮，右侧显示详情。默认全部展开。无分页、无全选、无状态标签。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取品牌区域树，initRegionTree() 初始化。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>品牌详情：</strong>类型/编码/下辖大区数/下辖小区数</li><li><strong>大区详情：</strong>类型/所属品牌/编码/下辖小区数</li><li><strong>小区详情：</strong>类型/所属大区/所属品牌/关联城市列表</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>品牌区域树展示</td><td>侧边栏→基础数据→品牌区域</td><td>超级管理员</td><td>进入页面自动加载三级树形结构</td><td>品牌→大区→小区三级</td><td>GET 品牌区域树接口</td><td>树形递归渲染</td><td>读取</td><td>JSON树</td><td>默认展开全部</td><td>空树显示空状态</td><td>当用户进入品牌区域时，应展示三级树形结构</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 搜索与工具栏</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>顶部工具栏：搜索框（placeholder「搜索品牌/大区/小区名称」，200px，filterRegionTree()）+ 展开全部按钮 + 收起全部按钮 + 批量导入按钮 + 导出数据按钮 + 新增品牌按钮（btn-primary）。</p><p><strong>3）数据来源</strong></p><p>前端 JS 搜索过滤、展开/收起。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>搜索：</strong>按名称过滤树节点</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>搜索品牌区域</td><td>品牌区域→搜索框</td><td>超级管理员</td><td>输入名称实时过滤树节点</td><td>keyword(text)</td><td>前端树数据</td><td>名称匹配过滤</td><td>无</td><td>—</td><td>—</td><td>—</td><td>当用户输入「理想」时，树应仅显示匹配节点</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 新增/编辑弹窗（含关联城市选择器）</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗（max-width 640px），标题动态变化。字段：①品牌名称/大区名称/小区名称（新增品牌时为下拉选择从品牌管理数据中排除已存在，编辑品牌时只读text，大区/小区为可编辑text，必填）②编码（text必填，品牌和大区显示，小区隐藏；新增品牌时选择品牌后自动填充只读，编辑时只读）③所属上级（text只读，大区/小区显示上级名称）④关联城市（仅小区新增/编辑时显示：省份下拉联动+搜索城市text+全选按钮+清空按钮+已选计数+城市多选列表+已选标签区）。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openRegionModal('brand'/'region'/'area') 动态显示字段。品牌选择→自动填充编码；省份选择→联动城市列表。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>品牌联动：</strong>新增品牌时从品牌管理下拉选择，编码自动填充</li><li><strong>关联城市：</strong>省→市联动+多选+全选/清空</li><li><strong>门店联动：</strong>门店管理中大区/小区下拉来源于此页面数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>新增品牌节点</td><td>品牌区域→新增品牌按钮</td><td>超级管理员</td><td>从品牌管理下拉选择已有品牌，编码自动填充</td><td>brandId*(select), code(auto)</td><td>品牌管理数据</td><td>排除已存在的品牌</td><td>POST 新增</td><td>JSON</td><td>—</td><td>品牌已存在时不可选</td><td>当用户新增品牌节点时，下拉应排除已添加的品牌</td></tr><tr><td>新增小区（含关联城市）</td><td>品牌区域→大区节点→+新增小区</td><td>超级管理员</td><td>输入小区名称→选择省份→勾选城市→保存</td><td>name*, parentId, cityIds[]</td><td>用户输入+城市管理数据</td><td>省→市联动，多选城市</td><td>POST 新增</td><td>JSON</td><td>—</td><td>—</td><td>当用户选择省份「广东省」时，城市列表应仅显示广东城市</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 批量导入品牌区域流程</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>三步式弹窗。步骤1-上传文件：操作说明 + 下载模板（downloadRegionTemplate()）+ 拖拽上传区。步骤2-数据预览：统计「共X条」+ 通过/失败 + 预览表格（7列：行号/品牌名称/品牌编码/大区名称/大区编码/小区名称/校验结果）+ 黄色提示「重复的品牌/大区将覆盖已有数据」。步骤3-导入完成：勾号 + 结果 + 继续导入/完成。</p><p><strong>3）数据来源</strong></p><p>POST 接口上传文件。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>模板列：</strong>品牌名称/品牌编码/大区名称/大区编码/小区名称</li><li><strong>覆盖逻辑：</strong>重复的品牌/大区覆盖已有</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>批量导入品牌区域</td><td>品牌区域→批量导入按钮</td><td>超级管理员</td><td>下载模板→填写→上传→预览→导入</td><td>file*(multipart)</td><td>用户上传Excel</td><td>三步式流程</td><td>POST 批量导入</td><td>file</td><td>—</td><td>预览显示校验错误</td><td>当用户上传文件后，预览应显示7列含校验结果</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> 导出品牌区域数据</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>导出按钮调用 exportRegionData()，导出品牌区域树数据为文件。</p><p><strong>3）数据来源</strong></p><p>前端导出全量数据。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>导出范围：</strong>全部品牌区域树数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>导出品牌区域数据</td><td>品牌区域→导出数据按钮</td><td>超级管理员</td><td>点击导出→下载文件</td><td>无</td><td>品牌区域树数据</td><td>全量导出</td><td>读取</td><td>CSV/Excel</td><td>—</td><td>—</td><td>当用户点击导出时，应下载含品牌/大区/小区三级数据的文件</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-4-other"><div id="tab-4-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-品牌区域全部接口】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<!-- ====== TAB 5: 门店管理 ====== -->
+<div class="tab-panel" id="tab-panel-5">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-5-scope">项目范围</a><a href="#tab-5-logic">逻辑说明</a><a href="#tab-5-api">接口清单</a><a href="#tab-5-feature">功能说明</a><a href="#tab-5-pending">待确认项</a></div></nav>
+<section class="section" id="tab-5-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>基础数据 / 门店管理</td><td>门店全生命周期管理：9列表格(checkbox/名称/编码/品牌/城市/类型/电话/状态/操作)、新增/编辑抽屉面板(含三级地区联动、品牌大区小区联动、关联车系多选、地图选址)、查看详情、停用/启用、删除、批量启用/停用、批量导入、导出、多维筛选、分页</td></tr></tbody></table></div></section>
+<section class="section" id="tab-5-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>地区三级联动</td><td>省份→城市→区县，级联加载，上一级变更时清空下级</td></tr><tr><td>品牌大区小区联动</td><td>选择品牌后加载对应大区，选择大区后加载对应小区</td></tr><tr><td>地图选址</td><td>打开地图弹窗→搜索地址→定位→确认经纬度回填</td></tr></tbody></table></div></section>
+<section class="section" id="tab-5-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>10</td><td>8</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-danger">8</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-5-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 门店列表与筛选区</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>表格9列：checkbox（全选） / 经销商名称（加粗）/ 经销商编码（code样式）/ 所属品牌 / 所属城市（精确到区级）/ 类型（标签：一网店/二网店）/ 售后电话 / 状态（绿色=启用）/ 操作。筛选3个：搜索名称/编码 + 品牌下拉 + 城市下拉 + 类型下拉 + 重置。分隔线后：批量导入 + 导出数据 + 新增数据。分页显示「已选 X/Y 条，共 Z 条数据」+ 翻页按钮。底部批量操作：批量启用/批量停用。操作列4按钮：查看/编辑/停启用/删除。</p><p><strong>3）数据来源</strong></p><p>GET 接口分页获取，filterStoreList() 前端实时筛选。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>有全选checkbox</strong></li><li><strong>批量操作：</strong>选中行后可批量启用/停用</li><li><strong>选中计数：</strong>「已选 X / Y 条，共 Z 条数据」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>门店列表</td><td>侧边栏→基础数据→门店管理</td><td>超级管理员/品牌运营</td><td>进入页面自动加载门店表格，支持3维筛选+全选+批量操作</td><td>checkbox/名称/编码/品牌/城市/类型/电话/状态/操作</td><td>GET 门店列表接口</td><td>分页查询+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>加载失败Toast</td><td>当用户进入门店管理时，应展示9列表格且全选checkbox可用</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 新增/编辑门店抽屉</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>右侧抽屉面板，标题动态「新增门店」/「编辑门店」/「查看门店」。4个区块13+字段：①基本信息（经销商名称text必填/经销商编码text必填编辑时只读/门店类型select必填一网店二网店/状态select必填默认启用）②所属信息（所属品牌select必填触发联动/所在地区三级联动省→市→区必填/所属品牌大区select联动/所属品牌小区select联动/关联车系多选标签选择器必填含搜索+全选+品牌联动）③联系信息（售后电话text/邮箱email）④地址与经纬度（详细地址text/经度text/纬度text/地图选址按钮）。底部：取消 + 确认保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openStoreModal(id) 调用。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>品牌→大区→小区三级联动</strong></li><li><strong>省→市→区三级联动</strong></li><li><strong>品牌→车系列表联动</strong></li><li><strong>编码规则：</strong>全局唯一，编辑时只读</li><li><strong>关联车系选择器：</strong>搜索+全选+品牌联动过滤</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>经销商名称</td><td>门店管理→新增/编辑抽屉</td><td>超级管理员/品牌运营</td><td>输入经销商名称，必填</td><td>name*(text)</td><td>用户输入</td><td>—</td><td>POST/PUT</td><td>String</td><td>—</td><td>—</td><td>当用户未输入名称时，应提示必填</td></tr><tr><td>所在地区三级联动</td><td>门店管理→新增/编辑抽屉</td><td>超级管理员/品牌运营</td><td>选择省份→城市→区县，级联加载</td><td>province*, city*, district*</td><td>城市管理数据</td><td>省→市→区级联，上级变更清空下级</td><td>POST/PUT</td><td>String</td><td>—</td><td>—</td><td>当用户选择省份后，城市下拉应自动加载该省城市</td></tr><tr><td>关联车系多选选择器</td><td>门店管理→新增/编辑抽屉</td><td>超级管理员/品牌运营</td><td>选择品牌后车系列表自动过滤，支持搜索和全选</td><td>seriesIds[](多选)</td><td>车系管理数据，按品牌过滤</td><td>品牌→车系联动</td><td>POST/PUT</td><td>Array</td><td>空数组</td><td>无匹配显示「未找到匹配的车系」</td><td>当用户选择品牌「理想汽车」时，车系列表应仅显示理想车系</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 门店详情（查看模式）</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>点击「查看」复用编辑弹窗以只读方式展示，标题改为「查看门店」。所有输入框readOnly背景变灰，下拉框disabled，车系选择器禁用，隐藏车系标签删除按钮，隐藏地图选址按钮。底部仅显示「关闭」按钮。展示字段与编辑弹窗完全一致。</p><p><strong>3）数据来源</strong></p><p>GET 门店详情。viewStoreDetail(id) 调用。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>完全只读</strong></li><li><strong>隐藏编辑功能：</strong>删除按钮、选址按钮等</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>门店详情查看</td><td>门店管理→操作列→查看</td><td>超级管理员/品牌运营/经销商坐席</td><td>点击查看→弹窗只读展示</td><td>id</td><td>GET 门店详情接口</td><td>—</td><td>读取</td><td>JSON</td><td>—</td><td>—</td><td>当用户点击查看时，所有字段应只读且底部仅显示关闭按钮</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 地图选址弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>弹窗标题「📍 地图选址」。搜索栏：地址搜索输入框 + [搜索]按钮。左侧搜索结果列表（280px宽）。右侧模拟地图区域（SVG网格含道路/建筑/绿地/水系），中心红色标记可点击选点。选中后显示地址和坐标信息。[确认选址]按钮回填经纬度到抽屉表单。查看模式隐藏选址按钮。</p><p><strong>3）数据来源</strong></p><p>前端模拟地图，openMapPicker() 调用。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>搜索定位：</strong>输入地址搜索→选择结果→确认</li><li><strong>坐标回填：</strong>确认后经纬度自动填入抽屉</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>地图选址</td><td>门店管理→新增/编辑抽屉→地图选址按钮</td><td>超级管理员/品牌运营</td><td>点击地图选址→搜索地址→选择位置→确认选址</td><td>address, lng, lat</td><td>地图服务</td><td>搜索→选点→回填</td><td>无（回填表单）</td><td>String</td><td>—</td><td>搜索无结果时列表为空</td><td>当用户搜索「深圳南山」并选择结果后，经纬度应自动回填</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> 门店删除确认弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>点击删除调用 confirmDeleteStore(id, '门店名称')，打开确认弹窗。内容：⚠️图标 + 「确定要删除该门店吗？」+ 门店名称。红色警告框「⚠️ 删除后无法恢复，请谨慎操作」。底部：取消 + 确认删除。</p><p><strong>3）数据来源</strong></p><p>DELETE 接口删除门店。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>删除Toast：</strong>「门店删除成功」</li><li><strong>删除后：</strong>移除表格行，更新分页信息</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>门店删除</td><td>门店管理→操作列→删除</td><td>超级管理员</td><td>点击删除→确认弹窗→确认</td><td>id*(DELETE)</td><td>门店列表</td><td>—</td><td>DELETE</td><td>—</td><td>—</td><td>—</td><td>当用户确认删除后，表格行应移除并Toast成功</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F6</span> 门店状态切换与批量操作</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>单条切换：操作列「停用」/「启用」按钮，toggleStatus() 调用。批量操作：选中行后点击底部「批量启用」/「批量停用」按钮，batchToggleStoreStatus('enable'/'disable') 调用。全选checkbox：toggleSelectAllStoreRows()，单行checkbox：updateStoreSelectionInfo() 更新选中计数。</p><p><strong>3）数据来源</strong></p><p>PUT 接口切换状态（单条/批量）。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>批量操作：</strong>选中行后可批量启用/停用</li><li><strong>选中计数：</strong>「已选 X / Y 条，共 Z 条数据」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>单条状态切换</td><td>门店管理→操作列→停用/启用</td><td>超级管理员</td><td>点击停用/启用按钮切换状态</td><td>id*, status</td><td>门店列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户点击停用时，状态标签应变灰</td></tr><tr><td>批量启用/停用</td><td>门店管理→底部→批量启用/停用</td><td>超级管理员</td><td>勾选多行→点击批量启用/停用</td><td>ids[], status</td><td>选中行</td><td>—</td><td>PUT 批量</td><td>Array</td><td>—</td><td>未选中时按钮禁用</td><td>当用户勾选3行后点击批量停用，3行状态应全部变为停用</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F7</span> 批量导入门店流程</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>三步式弹窗。步骤1-上传文件：操作说明 + 下载模板（downloadStoreTemplate()）+ 拖拽上传区。步骤2-数据预览：统计「共X条」+ 预览表格（表头动态生成）+ 黄色提示。步骤3-导入完成：勾号 + 结果 + 继续导入/完成。</p><p><strong>3）数据来源</strong></p><p>POST 接口上传文件。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>三步式：</strong>上传→预览→完成</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>批量导入门店</td><td>门店管理→批量导入按钮</td><td>超级管理员/品牌运营</td><td>下载模板→填写→上传→预览→导入</td><td>file*(multipart)</td><td>用户上传Excel</td><td>三步式流程</td><td>POST 批量导入</td><td>file</td><td>—</td><td>预览显示校验结果</td><td>当用户上传文件后，预览表格应显示数据</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F8</span> 导出门店数据</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>导出按钮调用 exportStoreData()，导出门店数据为文件。</p><p><strong>3）数据来源</strong></p><p>前端导出。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>导出范围：</strong>当前筛选条件下的门店数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>导出门店数据</td><td>门店管理→导出数据按钮</td><td>超级管理员/品牌运营</td><td>点击导出→下载文件</td><td>应用当前筛选条件</td><td>门店列表数据</td><td>按筛选导出</td><td>读取</td><td>CSV/Excel</td><td>—</td><td>—</td><td>当用户点击导出时，应下载门店数据文件</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-5-other"><div id="tab-5-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-门店管理全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<!-- ====== TAB 6: 开发者管理 ====== -->
+<div class="tab-panel" id="tab-panel-6">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-6-scope">项目范围</a><a href="#tab-6-logic">逻辑说明</a><a href="#tab-6-api">接口清单</a><a href="#tab-6-feature">功能说明</a><a href="#tab-6-pending">待确认项</a></div></nav>
+<section class="section" id="tab-6-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>基础数据 / 开发者管理</td><td>开发者账号管理：11列表格(ID/名称/简称/编码/类型/授权品牌/接口清单/APIKey/今日推送/状态/操作)、新增/编辑弹窗(含接口清单矩阵配置)、查看详情、停用/启用、重置API Key(二次确认)、筛选(名称/编码/类型)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-6-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>API Key签名</td><td>HmacSHA256签名，请求头：X-Api-Key/X-Timestamp/X-Nonce/X-Signature</td></tr><tr><td>重置Key流程</td><td>二次确认→生成新Key+Secret→旧Key立即失效</td></tr><tr><td>接口清单矩阵</td><td>按接口能力(线索接收/线索查询/线索更新)勾选支持品牌</td></tr></tbody></table></div></section>
+<section class="section" id="tab-6-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>6</td><td>5</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">5</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-6-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 开发者列表与筛选区</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>表格11列：ID / 账号名称（加粗）/ 帐号简称（code样式）/ 账号编码（code样式，格式DEV+YYMMDD+序号）/ 类型（标签：平台方/媒体方/供应商）/ 授权品牌 / 接口清单（按品牌分行展示矩阵）/ API Key（code样式截断显示）/ 今日推送（数字+「条」）/ 状态 / 操作。筛选：搜索框（placeholder「搜索账号名称/帐号编码」）+ 开发者类型下拉（全部/平台方/媒体方/供应商）+ 重置 + 新增数据。操作列4按钮：查看/编辑/停启用/重置Key。无导入、无导出。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取列表，filterSupplierList() 前端筛选。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>类型标签：</strong>平台方/媒体方/供应商不同颜色</li><li><strong>接口清单列：</strong>矩阵形式按品牌分行</li><li><strong>API Key：</strong>截断显示</li><li><strong>无删除按钮</strong></li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>开发者列表</td><td>侧边栏→基础数据→开发者管理</td><td>超级管理员</td><td>进入页面自动加载开发者表格，支持按名称/编码/类型筛选</td><td>ID/名称/简称/编码/类型/授权品牌/接口清单/APIKey/今日推送/状态/操作</td><td>GET 开发者列表接口</td><td>分页查询+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>加载失败Toast</td><td>当用户进入开发者管理时，应展示11列表格含接口清单矩阵</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 新增/编辑开发者弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗，标题动态「新增开发者」/「编辑开发者」。9个字段：①账号名称（text必填）②帐号编码（text只读，自动生成DEV+YYMMDD+序号）③帐号简称（text必填）④开发者类型（select必填：平台方/媒体方/供应商）⑤状态（select必填，默认启用）⑥对接联系人姓名（text非必填）⑦联系人手机号（tel，maxlength=11）⑧授权品牌（checkbox多选：理想/问界/小鹏/比亚迪/东风日产，勾选后联动接口清单矩阵）⑨接口清单（矩阵表格：6行接口能力×5列品牌checkbox，仅授权品牌可勾选，6种接口能力：线索接收/品牌查询/车系查询/城市查询/区域查询/门店查询）。底部：取消 + 确认保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openSupplierModal(id) 调用。syncSupplierInterfaceBrandAvailability() 联动矩阵。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>编码自动生成：</strong>DEV+YYMMDD+序号(3位)，创建后不可修改</li><li><strong>授权品牌联动：</strong>勾选品牌后矩阵中该品牌列可勾选</li><li><strong>接口能力6种：</strong>线索接收/品牌查询/车系查询/城市查询/区域查询/门店查询</li><li><strong>矩阵hint：</strong>「未在授权品牌中勾选的品牌不可授权接口」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>帐号编码</td><td>开发者管理→新增/编辑弹窗</td><td>超级管理员</td><td>系统自动生成，创建后不可修改</td><td>code(auto, readonly)</td><td>系统生成</td><td>DEV+YYMMDD+序号(3位)</td><td>POST/PUT</td><td>String</td><td>自动生成</td><td>—</td><td>当用户新增开发者时，编码应自动生成且只读</td></tr><tr><td>接口清单矩阵</td><td>开发者管理→新增/编辑弹窗</td><td>超级管理员</td><td>勾选授权品牌后，在矩阵中勾选各品牌支持的接口能力</td><td>interfaces[brand][capability]</td><td>用户勾选</td><td>授权品牌联动矩阵可勾选</td><td>POST/PUT</td><td>Matrix</td><td>全部未勾选</td><td>未授权品牌的列disabled</td><td>当用户取消品牌「理想」的授权时，矩阵中理想列应变为disabled</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 开发者详情弹窗（只读）</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>独立查看弹窗（supplierViewModal），标题「查看开发者」。字段与编辑弹窗一致（含API Key和今日推送量），但全部只读。底部仅一个「关闭」按钮。</p><p><strong>3）数据来源</strong></p><p>GET 开发者详情。openSupplierViewModal(id) 调用。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>完全只读</strong></li><li><strong>额外显示：</strong>API Key和今日推送量</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>开发者详情查看</td><td>开发者管理→操作列→查看</td><td>超级管理员</td><td>点击查看→弹窗只读展示</td><td>id</td><td>GET 开发者详情接口</td><td>—</td><td>读取</td><td>JSON</td><td>—</td><td>—</td><td>当用户点击查看时，所有字段应只读且含API Key和推送量</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 重置 API Key 流程</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>点击「重置Key」调用 resetApiKey(id, name)，弹出确认弹窗「确定要重置「{name}」的 API Key 吗？重置后旧 Key 立即失效，请同步更新对接方配置。」。确认后 doResetApiKey()：生成新API Key（dk_+24位随机字符）和新API Secret（32位随机字符）。显示重置成功弹窗：展示新API Key（明文）+ API Secret（默认掩码，点击「点击显示」可查看）+ 警告「请妥善保管，Secret 仅显示一次」+ 按钮：复制Key / 我已知晓。</p><p><strong>3）数据来源</strong></p><p>POST 接口重置Key。旧Key立即失效。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>二次确认：</strong>需确认才执行</li><li><strong>Key格式：</strong>dk_+24位随机字符</li><li><strong>Secret格式：</strong>32位随机字符</li><li><strong>安全提示：</strong>Secret仅显示一次</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>重置API Key</td><td>开发者管理→操作列→重置Key</td><td>超级管理员</td><td>点击重置Key→确认弹窗→确认→展示新Key和Secret</td><td>id*</td><td>系统生成</td><td>生成新Key+Secret，旧Key失效</td><td>POST 重置</td><td>String</td><td>—</td><td>—</td><td>当用户确认重置后，应展示新Key明文和Secret掩码，且旧Key立即失效</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> 开发者状态切换</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>停用：弹确认框「停用账号后，该账号 API 调用立即返回 401。是否确认？」，Toast「开发者已停用」(warning)。启用：直接切换，Toast「开发者已启用」(success)。</p><p><strong>3）数据来源</strong></p><p>PUT 接口切换状态。toggleSupplierStatusById(id) 调用。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>停用需确认：</strong>提示API调用将返回401</li><li><strong>启用无需确认</strong></li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>停用开发者</td><td>开发者管理→操作列→停用</td><td>超级管理员</td><td>点击停用→确认弹窗→确认</td><td>id*, status=0</td><td>开发者列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户停用开发者时，应提示API调用将返回401</td></tr><tr><td>启用开发者</td><td>开发者管理→操作列→启用</td><td>超级管理员</td><td>点击启用→直接切换</td><td>id*, status=1</td><td>开发者列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户启用开发者时，应直接切换并Toast成功</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-6-other"><div id="tab-6-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-开发者管理全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<!-- ====== TAB 7: 排期管理 ====== -->
+<div class="tab-panel" id="tab-panel-7">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-7-scope">项目范围</a><a href="#tab-7-logic">逻辑说明</a><a href="#tab-7-api">接口清单</a><a href="#tab-7-feature">功能说明</a><a href="#tab-7-permission">权限矩阵</a><a href="#tab-7-status">状态枚举</a><a href="#tab-7-exception">异常规则</a><a href="#tab-7-pending">待确认项</a></div></nav>
+
+<section class="section" id="tab-7-scope">
+<div class="section-title">一. 项目范围</div>
+<div class="section-desc">本模块涉及的系统、板块及功能范围概览。</div>
+<div class="table-wrap"><table>
+<thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead>
+<tbody><tr><td>D客连</td><td>D客连 / 排期管理</td><td>线索投放排期全流程管理：排期列表（品牌Tab分组 + 名称/状态筛选 + 7列表格 + 查看/编辑/报表/明细4操作）；新增/编辑/查看排期全屏抽屉（基础信息6字段 + 关联车系多选 + 供应商配置含多供应商Tab、帐号与预算、SMARTCODE、CPL/CPS结算价、专营店分配）；查看报表子页面（按排期·账号·区域·专营店层级的预算消耗与转化14列树表）；线索明细子页面（27列明细 + 多维筛选 + 角色字段权限 + 电话脱敏 + 导出）</td></tr></tbody>
+</table></div>
+</section>
+
+<section class="section" id="tab-7-logic">
+<div class="section-title">二. 逻辑说明</div>
+<div class="section-desc">功能相关流程、页面跳转与跨模块依赖。</div>
+<div class="table-wrap"><table>
+<thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead>
+<tbody>
+<tr><td>品牌Tab切换</td><td>全部品牌(设计中) / 理想汽车(设计中) / 问界(设计中) / 小鹏汽车(设计中) / 东风日产(可用，默认激活)；非可用Tab点击提示"产品设计阶段"</td></tr>
+<tr><td>列表筛选</td><td>按排期名称(模糊) + 状态(全部/启用/禁用) + 品牌Tab 三条件组合过滤</td></tr>
+<tr><td>新增排期</td><td>列表「新增数据」→ openScheduleModal('add') 打开右侧全屏抽屉</td></tr>
+<tr><td>编辑排期</td><td>列表「编辑」→ openScheduleModal('edit', id) 打开抽屉并回填</td></tr>
+<tr><td>查看排期</td><td>列表「查看」→ openScheduleModal('view', id) 只读抽屉，底部显示「编辑排期」</td></tr>
+<tr><td>查看报表</td><td>列表「查看报表」→ navigateTo('dk-report') 子页面，侧边栏高亮父级「排期管理」</td></tr>
+<tr><td>线索明细</td><td>列表「线索明细」→ navigateTo('dk-leaddetail') 子页面</td></tr>
+<tr><td>供应商配置</td><td>排期内添加多供应商：帐号选择 → 分配预算 → SMARTCODE → 结算方式(CPL/CPS) → 结算价 → 关联专营店</td></tr>
+<tr><td>预算汇总</td><td>抽屉顶部/底部实时计算：已选车系数 · 供应商数 · 专营店数 · 已分配预算/总预算</td></tr>
+<tr><td>结算方式切换</td><td>CPL 显示商机成本价/商机销售价；CPS 显示交车成本价/交车销售价</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section class="section" id="tab-7-api">
+<div class="section-title">三. 接口清单</div>
+<div class="section-desc">开发速览与接口明细。路径为基于原型的建议路径，最终以后端确认为准。</div>
+<div class="table-wrap" style="margin-bottom:18px"><table>
+<thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead>
+<tbody><tr><td>8</td><td>7</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-danger">7</span></td></tr></tbody>
+</table></div>
+<div class="table-wrap"><table>
+<thead><tr><th>接口名称</th><th>请求方式</th><th>接口路径</th><th>请求参数</th><th>响应字段</th><th>成功处理</th><th>失败处理</th></tr></thead>
+<tbody>
+<tr><td>排期列表查询</td><td>GET</td><td>/api/dk/schedule/list【建议路径】</td><td>brandTab, name, status, page, pageSize</td><td>list[{id,name,startTime,endTime,totalBudget,status,brandNames[]}], total</td><td>渲染7列表格 + 分页"共X条"</td><td>Toast"加载失败"或空状态"暂无排期数据"</td></tr>
+<tr><td>排期详情</td><td>GET</td><td>/api/dk/schedule/{id}【建议路径】</td><td>id</td><td>id,name,startTime,endTime,totalBudget,status,baseSeries[],suppliers[]</td><td>回填抽屉基础信息/车系/供应商各字段</td><td>Toast"加载失败"</td></tr>
+<tr><td>新增排期</td><td>POST</td><td>/api/dk/schedule【建议路径】</td><td>name,startTime,endTime,totalBudget,status,baseSeries[],suppliers[]</td><td>id</td><td>Toast"排期创建成功" + 关闭抽屉 + 刷新列表</td><td>按校验规则 Toast 对应错误（见 F2/F4）</td></tr>
+<tr><td>编辑排期</td><td>PUT</td><td>/api/dk/schedule/{id}【建议路径】</td><td>同新增 + id</td><td>—</td><td>Toast"排期保存成功" + 关闭抽屉 + 刷新列表</td><td>同新增校验</td></tr>
+<tr><td>报表数据查询</td><td>GET</td><td>/api/dk/schedule/report【建议路径】</td><td>scheduleId, dateFrom, dateTo, page, pageSize</td><td>tree[{id,parent,level,排期名称,账号简称,大区,小区,专营店,分配预算,预算消耗,消耗进度,有效线索量,到店量,交车量,线索有效率,线索转化率}], total</td><td>渲染14列树表，按层级展开</td><td>空状态"请先选择创建时间，点击查询加载数据"</td></tr>
+<tr><td>线索明细列表</td><td>GET</td><td>/api/dk/schedule/leads【建议路径】</td><td>编码/姓名/电话/车系/时间范围/门店/SmartCode/来源ID/线索状态/帐号ID/排序字段/排序方式/page/pageSize</td><td>list[{27列字段}], total</td><td>渲染27列明细表 + 按角色隐藏字段 + 电话脱敏</td><td>空状态"暂无线索数据"</td></tr>
+<tr><td>线索明细导出</td><td>GET</td><td>/api/dk/schedule/leads/export【建议路径】</td><td>同列表查询条件</td><td>文件流(二进制)</td><td>Toast"正在导出数据" + 触发下载</td><td>Toast"导出失败"</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section class="section" id="tab-7-feature">
+<div class="section-title">四. 功能说明</div>
+<div class="section-desc">按页面/弹窗/子页面拆分的完整功能点，每个功能点含交互说明、数据来源、逻辑说明及 12 列功能明细。</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F1</span> 排期列表与筛选</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>顶部品牌Tab（5个：全部品牌 / 理想汽车 / 问界 / 小鹏汽车 / 东风日产），仅东风日产可用且默认激活，其余标注"设计中"，点击提示"产品设计阶段"。筛选区：搜索排期名称（200px，输入或回车触发 filterScheduleList）+ 状态下拉（全部 / 启用 / 禁用）+ 「重置」（清空名称、状态、品牌Tab回东风日产）+ 「新增数据」按钮。表格7列：序号 / 关联品牌 / 排期名称(加粗) / 排期时间(开始～结束) / 总预算(¥千分位) / 状态(启用绿 / 禁用灰) / 操作。操作列4按钮：查看 / 编辑 / 查看报表 / 线索明细。分页：共 X 条 + ‹ 1 ›。</p>
+<p><strong>3）数据来源</strong></p>
+<p>GET 排期列表接口，按品牌Tab + 名称 + 状态三条件组合过滤，renderScheduleTable 渲染。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>品牌Tab：</strong>5个，仅东风日产 ready=true，其余设计中</li>
+<li><strong>筛选联动：</strong>名称(模糊) + 状态 + 品牌Tab 组合过滤</li>
+<li><strong>空状态：</strong>无数据"📭 暂无排期数据，请点击「新增数据」创建排期"；筛选无结果"暂无匹配的排期数据"</li>
+<li><strong>操作列：</strong>查看/编辑打开抽屉；查看报表/线索明细 navigateTo 跳转子页面</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>排期列表</td><td>侧边栏→D客连→排期管理</td><td>超级管理员/品牌运营</td><td>选品牌Tab→查看列表→按名称/状态筛选→可重置</td><td>brandTab,name,status,page,pageSize</td><td>GET 排期列表接口</td><td>品牌Tab+名称模糊+状态三条件组合过滤</td><td>读取</td><td>JSON数组</td><td>品牌Tab=东风日产</td><td>加载失败Toast；无数据空状态</td><td>当选择「东风日产」Tab时应展示该品牌排期；当无数据时应展示"暂无排期数据"空状态；当筛选无结果时应展示"暂无匹配的排期数据"</td></tr>
+<tr><td>列表筛选区</td><td>排期列表顶部</td><td>超级管理员/品牌运营</td><td>输入名称/选状态→实时或回车过滤→重置清空</td><td>name,status</td><td>前端过滤+接口</td><td>名称模糊匹配；状态精确匹配</td><td>读取</td><td>—</td><td>名称空、状态全部</td><td>—</td><td>当输入名称回车时应触发筛选；当点重置时名称/状态/品牌Tab应恢复默认</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F2</span> 新增/编辑排期抽屉 - 基础信息区</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>右侧全屏抽屉，标题动态「新增排期 / 编辑排期 / 查看排期」，副标题"排期管理 / xxx"。顶部汇总栏5项实时同步：排期名称(未填写) / 时间范围(未选择) / 总预算(¥0) / 已分配预算(¥0) / 配置规模(0车系·0供应商)。基础信息区6字段：①主键ID（只读，新增显示"系统自动生成"）②排期名称（text，必填）③状态（select必填：启用/禁用，默认启用）④总预算（number必填，min=0 step=0.01）⑤开始时间（datetime-local必填）⑥结束时间（datetime-local必填）。底部「确认保存」+「取消」。</p>
+<p><strong>3）数据来源</strong></p>
+<p>新增 POST / 编辑 PUT；编辑/查看时 GET 详情回填。bindScheduleSummaryInputs 实时同步汇总栏。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>汇总栏实时同步：</strong>输入名称/时间/预算时顶部5项实时更新</li>
+<li><strong>查看模式：</strong>所有字段 disabled，底部「编辑排期」按钮替换「确认保存」</li>
+<li><strong>保存校验：</strong>名称空/时间空/预算0 分别 Toast 拦截</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>基础信息</td><td>排期列表「新增数据/编辑」→抽屉</td><td>超级管理员/品牌运营</td><td>填写6项基础字段，汇总栏实时同步</td><td>name,status,totalBudget,startTime,endTime</td><td>POST/PUT 排期接口</td><td>保存时逐项校验</td><td>写入</td><td>JSON</td><td>状态=启用</td><td>见验收</td><td>当名称空时应 Toast"请填写排期名称"；当时间空时 Toast"请选择排期时间"；当预算为0时 Toast"请填写总预算"</td></tr>
+<tr><td>主键ID</td><td>抽屉基础信息区</td><td>—</td><td>只读展示</td><td>id</td><td>系统自动生成</td><td>新增"系统自动生成"，编辑回填</td><td>读取</td><td>String</td><td>系统自动生成</td><td>—</td><td>当新增时应显示"系统自动生成"；当编辑时应回填真实ID</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F3</span> 排期抽屉 - 关联车系区</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>关联车系多选。内联选择器：左侧先选品牌（多选 checkbox，显示车系计数）→ 右侧车系列表（搜索名称/编码 + 「全选当前」+「清空已选」）。已选车系以 tag 展示，placeholder"暂未选择关联车系"。</p>
+<p><strong>3）数据来源</strong></p>
+<p>车系数据来自车系管理（carSeriesData / getAllManagedCarSeries），按所选品牌过滤。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>品牌未选：</strong>列表提示"请先勾选左侧品牌"</li>
+<li><strong>搜索无匹配：</strong>"暂无匹配车系"</li>
+<li><strong>取消品牌勾选：</strong>自动移除该品牌下已选车系</li>
+<li><strong>计数：</strong>"已选 X / 当前 Y"</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>关联车系</td><td>抽屉关联车系区</td><td>超级管理员/品牌运营</td><td>选品牌→勾选车系→支持搜索/全选/清空</td><td>brandIds[],seriesIds[]</td><td>车系管理数据</td><td>按品牌过滤 + 名称/编码关键词搜索</td><td>写入(baseSeries)</td><td>JSON数组</td><td>空</td><td>未选品牌提示"请先勾选左侧品牌"</td><td>当未选车系点保存时应 Toast"请选择至少一个关联车系"；当取消品牌勾选时应自动移除该品牌下已选车系</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F4</span> 排期抽屉 - 供应商配置区</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>「＋ 添加供应商」可添加多条，空状态"暂无供应商信息，请点击「＋ 添加供应商」"。供应商以 Tab 切换，Tab 显示帐号名 + meta（¥预算 · 结算方式 · X家店 · SMARTCODE）。每个供应商面板3区块：①账号与预算：帐号ID（必填，搜索选择器，联动回填全称/简称）、帐号全称（只读）、帐号简称（只读）、分配预算（必填 number）、SMARTCODE（必填 text）、结算方式（必填 select CPL/CPS）；②结算价格：CPL→商机成本价 + 商机销售价（必填）；CPS→交车成本价 + 交车销售价（必填）；③关联专营店：多选 picker（搜索编码/名称 + 省份下拉 + 城市下拉 + 全选 + 清空已选），按所属品牌过滤。删除供应商：仅剩1条时 Toast"至少保留一条供应商信息"(warning)；否则 confirm"确定删除该供应商配置吗？"。</p>
+<p><strong>3）数据来源</strong></p>
+<p>帐号来自报表权限帐号数据；专营店来自门店管理（vehicleStoreData），按品牌过滤。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>结算方式切换：</strong>CPL 显示商机成本/销售价必填；CPS 显示交车成本/销售价必填</li>
+<li><strong>唯一性校验：</strong>同一排期内帐号ID不可重复、SMARTCODE不可重复</li>
+<li><strong>汇总实时计算：</strong>已分配预算/总预算、车系/供应商/专营店数</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>供应商配置</td><td>抽屉供应商配置区</td><td>超级管理员/品牌运营</td><td>添加供应商→填账号/预算/SMARTCODE/结算→选专营店</td><td>suppliers[]:{accountId,accountName,accountShort,budget,smartcode,settlement,costPrice,salePrice,deliveryCost,deliverySale,storeIds}</td><td>帐号数据+门店数据</td><td>帐号搜索回填全称/简称；专营店按所属品牌过滤</td><td>写入(suppliers)</td><td>JSON数组</td><td>空</td><td>帐号/SMARTCODE重复拦截；CPL/CPS必填拦截</td><td>当无供应商时 Toast"请至少添加一条供应商信息"；当帐号ID重复时 Toast"同一排期内帐号ID不可重复：X"；当SMARTCODE重复时 Toast"同一排期内SMARTCODE不可重复：X"；当CPL未填价时 Toast"CPL结算需填写商机成本价和商机销售价"；当CPS未填价时 Toast"CPS结算需填写交车成本价和交车销售价"</td></tr>
+<tr><td>关联专营店</td><td>供应商面板内专营店picker</td><td>超级管理员/品牌运营</td><td>搜索/省份/城市筛选→勾选专营店→全选/清空</td><td>storeIds[]</td><td>门店管理(vehicleStoreData)</td><td>按所属品牌过滤 + 编码/名称搜索 + 省市级联</td><td>写入(storeIds)</td><td>String[]</td><td>空</td><td>无匹配时列表空</td><td>当选择品牌后专营店列表应仅显示该品牌门店；当点全选时应勾选当前筛选结果</td></tr>
+<tr><td>供应商增删</td><td>供应商Tab区</td><td>超级管理员/品牌运营</td><td>添加供应商Tab/删除供应商</td><td>—</td><td>前端状态</td><td>删除仅剩1条时阻止</td><td>前端变更</td><td>—</td><td>—</td><td>仅1条时 Toast"至少保留一条供应商信息"</td><td>当仅剩1条供应商点删除时应 Toast"至少保留一条供应商信息"且不删除；当多于1条时应 confirm 后删除</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F5</span> 排期查看模式</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>列表「查看」→ openScheduleModal('view', id)。抽屉标题"查看排期"，所有 input/select/textarea、车系选择器按钮/输入、专营店 picker、添加供应商按钮均 disabled，隐藏「确认保存」、显示「编辑排期」按钮（点击转 edit 模式）。</p>
+<p><strong>3）数据来源</strong></p>
+<p>GET 排期详情，只读回填全部字段。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>只读：</strong>仅展示不编辑，可一键转编辑</li>
+<li><strong>模式切换：</strong>setSchedulePageMode('view') 统一禁用控件</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>查看模式</td><td>列表「查看」</td><td>超级管理员/品牌运营/查看者</td><td>查看排期完整配置(只读)→可转编辑</td><td>id</td><td>GET 排期详情</td><td>详情回填并只读</td><td>读取</td><td>JSON</td><td>—</td><td>加载失败Toast</td><td>当进入查看模式时所有字段应只读且底部显示「编辑排期」按钮；当点「编辑排期」时应切换为可编辑模式</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F6</span> 查看报表（子页面 dk-report）</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>navigateTo('dk-report')。标题"查看报表"+副标题"按排期、账号、区域、专营店层级查看预算消耗、线索质量与转化数据"+「返回列表」。筛选：创建时间（必填）+ 快捷（今天/昨天/近7天/近30天/本月）+ datetime-local 范围 + 「重置」+「查询」。报表列表14列：排期名称 / 账号简称 / 大区 / 小区 / 专营店 / 分配预算 / 预算消耗 / 消耗进度 / 有效线索量 / 到店量 / 交车量 / 线索有效率 / 线索转化率 / 操作。数据按 总部→大区→小区→专营店 树形展开/收起。分页：默认不加载数据。</p>
+<p><strong>3）数据来源</strong></p>
+<p>GET 报表数据接口（reportRawData，树形结构 level/parent/expanded）。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>默认不加载：</strong>需选时间 + 点查询</li>
+<li><strong>空状态：</strong>"请先选择创建时间，点击查询加载数据"</li>
+<li><strong>树形层级：</strong>4级展开/收起</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>查看报表</td><td>列表「查看报表」→ dk-report</td><td>超级管理员/品牌运营</td><td>选创建时间→查询→树形展开查看</td><td>scheduleId,dateFrom,dateTo,page,pageSize</td><td>GET 报表接口</td><td>树形聚合(总部→大区→小区→专营店)</td><td>读取</td><td>JSON树</td><td>时间默认近7天</td><td>空状态提示</td><td>当未查询时应显示"请先选择创建时间，点击查询加载数据"；当查询有数据时应按4级层级树形展示；当点快捷按钮时应自动填充对应时间范围</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F7</span> 线索明细 - 筛选与列表（子页面 dk-leaddetail）</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>navigateTo('dk-leaddetail')。标题"线索明细"+副标题"查看排期下的线索明细数据（来源排期：高德地图）"+「返回列表」。字段权限提示条：总部可看全部；供应商隐藏帐号简称/商机销售价/交车销售价/利润；专营店隐藏金额成本类；电话脱敏 138****8000。主筛选：线索系统编码 / 客户姓名 / 电话号码 / 意向车系(下拉) / 创建时间(必填 date 范围) + 查询/重置。更多筛选（折叠）：意向门店 / SmartCode / 来源线索ID / 线索状态(待解析/已解析/已下发) / 帐号ID(搜索选择器)。列表27列（编码/来源ID/姓名/电话脱敏/意向车系/意向专营店/SmartCode/系统状态/排期名称/帐号全称/帐号简称/重复线索/空号线索/有效线索/线索状态/是否到店/成交车系/普通店交车/交车专营店/已锁单/商机成本价/商机销售价/交车成本价/交车销售价/预算消耗/利润/创建时间）。排序：字段下拉(创建时间/预算消耗/线索状态) + 方式(降序/升序) +「字段显示」。</p>
+<p><strong>3）数据来源</strong></p>
+<p>GET 线索明细列表接口。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>角色字段权限：</strong>按角色隐藏对应列</li>
+<li><strong>电话脱敏：</strong>138****8000 格式</li>
+<li><strong>更多筛选：</strong>可折叠展开</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>线索明细列表</td><td>列表「线索明细」→ dk-leaddetail</td><td>总部/供应商/专营店(按角色控制字段)</td><td>多维筛选→查询→查看27列明细</td><td>编码/姓名/电话/车系/时间范围/门店/SmartCode/来源ID/线索状态/帐号ID/排序字段/排序方式/page/pageSize</td><td>GET 线索明细接口</td><td>按角色隐藏字段 + 电话脱敏 + 排序</td><td>读取</td><td>JSON数组</td><td>—</td><td>加载失败Toast；空状态</td><td>当供应商角色查看时应隐藏帐号简称/商机销售价/交车销售价/利润列；当专营店角色查看时应隐藏金额成本类列；当电话号码展示时应为138****8000脱敏格式</td></tr>
+<tr><td>线索明细筛选</td><td>明细列表顶部</td><td>同上</td><td>主筛选+更多筛选(折叠)→查询/重置</td><td>同上</td><td>接口</td><td>多条件组合</td><td>读取</td><td>—</td><td>创建时间必填</td><td>时间未选拦截</td><td>当未填创建时间点查询时应提示必填；当点「更多筛选」时应展开折叠区</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+<div class="feature-card">
+<div class="fc-title"><span class="badge badge-info">F8</span> 线索明细 - 导出与字段显示</div>
+<div class="fc-body">
+<p><strong>2）交互说明</strong></p>
+<p>列表区「导出数据」→ Toast"正在导出数据"(info) + 触发下载；「字段显示」→ Toast"字段显示配置已打开"(info)，用于配置列显隐。</p>
+<p><strong>3）数据来源</strong></p>
+<p>GET 线索明细导出接口（文件流），按当前筛选条件导出。</p>
+<p><strong>4）逻辑说明</strong></p>
+<ul>
+<li><strong>导出范围：</strong>按当前筛选条件</li>
+<li><strong>字段显示：</strong>配置列显隐，影响列表与导出列范围</li>
+</ul>
+</div>
+<details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table>
+<thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead>
+<tbody>
+<tr><td>线索明细导出</td><td>明细列表区「导出数据」</td><td>超级管理员/品牌运营</td><td>点导出→按筛选条件下载</td><td>同列表查询条件</td><td>GET 导出接口</td><td>按当前筛选导出</td><td>写入(下载)</td><td>文件流</td><td>—</td><td>导出失败Toast</td><td>当点击导出时应 Toast"正在导出数据"并按当前筛选下载文件；当无数据时应提示且不生成空文件【待确认】</td></tr>
+<tr><td>字段显示配置</td><td>明细列表区「字段显示」</td><td>超级管理员/品牌运营</td><td>打开字段显示配置→勾选列</td><td>columnVisibility</td><td>前端配置</td><td>控制列显隐</td><td>前端变更</td><td>—</td><td>—</td><td>—</td><td>当点「字段显示」时应 Toast"字段显示配置已打开"并弹出列配置</td></tr>
+</tbody>
+</table></div></details>
+</div>
+
+</section>
+
+<section class="section" id="tab-7-other">
+<div class="section-title">五. 其他说明</div>
+<div class="section-desc">权限矩阵、状态枚举、全局异常规则与待确认项。</div>
+
+<div class="feature-card" id="tab-7-permission">
+<div class="fc-title"><span class="badge badge-warn">权限矩阵</span></div>
+<div class="fc-body"><div class="table-wrap"><table>
+<thead><tr><th>角色</th><th>查看排期</th><th>新增/编辑</th><th>查看报表</th><th>线索明细</th><th>导出</th></tr></thead>
+<tbody>
+<tr><td>超级管理员</td><td>是</td><td>是</td><td>是</td><td>全部字段</td><td>是</td></tr>
+<tr><td>品牌运营</td><td>是</td><td>是</td><td>是</td><td>全部字段</td><td>是</td></tr>
+<tr><td>查看者</td><td>是</td><td>否</td><td>是</td><td>受限字段</td><td>否</td></tr>
+<tr><td>供应商</td><td>否</td><td>否</td><td>否</td><td>隐藏帐号简称/商机销售价/交车销售价/利润</td><td>否</td></tr>
+<tr><td>专营店</td><td>否</td><td>否</td><td>否</td><td>隐藏金额成本类字段</td><td>否</td></tr>
+</tbody></table></div></div>
+</div>
+
+<div class="feature-card" id="tab-7-status">
+<div class="fc-title"><span class="badge badge-info">状态枚举</span></div>
+<div class="fc-body"><div class="table-wrap"><table>
+<thead><tr><th>字段</th><th>枚举值</th><th>展示文本</th><th>徽章样式</th></tr></thead>
+<tbody>
+<tr><td>排期状态</td><td>1 / 0</td><td>启用 / 禁用</td><td>绿色 status-active / 灰色 status-inactive</td></tr>
+<tr><td>线索系统状态</td><td>—</td><td>已解析 / 待解析</td><td>绿色 status-active / 灰色 status-inactive</td></tr>
+<tr><td>线索状态</td><td>—</td><td>待解析 / 已解析 / 已下发</td><td>—</td></tr>
+<tr><td>重复线索 / 空号线索 / 有效线索</td><td>—</td><td>是 / 否</td><td>是=绿色 / 否=红色</td></tr>
+<tr><td>是否到店 / 已锁单</td><td>—</td><td>是 / 否</td><td>是=绿色 / 否=红色</td></tr>
+<tr><td>结算方式</td><td>CPL / CPS</td><td>CPL / CPS</td><td>—</td></tr>
+</tbody></table></div></div>
+</div>
+
+<div class="feature-card" id="tab-7-exception">
+<div class="fc-title"><span class="badge badge-danger">全局异常规则</span></div>
+<div class="fc-body"><div class="table-wrap"><table>
+<thead><tr><th>异常场景</th><th>处理策略</th></tr></thead>
+<tbody>
+<tr><td>接口加载失败</td><td>Toast 错误提示，列表保持空状态占位</td></tr>
+<tr><td>列表无数据</td><td>展示"📭 暂无排期数据，请点击「新增数据」创建排期"</td></tr>
+<tr><td>筛选无结果</td><td>展示"暂无匹配的排期数据"</td></tr>
+<tr><td>表单校验失败</td><td>Toast 对应错误原文，不提交（见 F2/F4 验收）</td></tr>
+<tr><td>供应商仅剩1条点删除</td><td>Toast"至少保留一条供应商信息"(warning)，阻止删除</td></tr>
+<tr><td>非可用品牌Tab点击</td><td>Toast"产品设计阶段"(info)</td></tr>
+<tr><td>报表未查询</td><td>展示"请先选择创建时间，点击查询加载数据"</td></tr>
+</tbody></table></div></div>
+</div>
+
+<div class="feature-card" id="tab-7-pending">
+<div class="fc-title"><span class="badge badge-warn">待确认项汇总（共 7 项）</span></div>
+<div class="fc-body"><div class="table-wrap"><table>
+<thead><tr><th>待确认项</th><th>影响范围</th></tr></thead>
+<tbody>
+<tr><td>【待确认：接口地址-排期管理全部接口(7个)，建议路径待后端确认】</td><td>前端调用与后端鉴权</td></tr>
+<tr><td>【待确认：权限码-排期管理查看/新增/编辑/导出】</td><td>按钮显隐与接口鉴权</td></tr>
+<tr><td>【待确认：业务口径-报表指标(消耗进度/线索有效率/线索转化率)计算公式】</td><td>报表数据准确性</td></tr>
+<tr><td>【待确认：业务口径-线索明细角色字段权限(供应商/专营店隐藏字段清单)】</td><td>列表列展示</td></tr>
+<tr><td>【待确认：业务口径-电话号码脱敏规则(138****8000)及是否可解密】</td><td>明细展示与导出</td></tr>
+<tr><td>【待确认：业务口径-排期启用/禁用对线索下发的影响】</td><td>排期生效逻辑</td></tr>
+<tr><td>【待确认：导出格式-线索明细导出(文件名/列范围/脱敏规则/空数据处理)】</td><td>导出文件生成</td></tr>
+</tbody></table></div></div>
+</div>
+
+</section>
+</div>
+
+<!-- ====== TAB 8-15: 剩余菜单(简洁版) ====== -->
+<div class="tab-panel" id="tab-panel-8">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-8-scope">项目范围</a><a href="#tab-8-logic">逻辑说明</a><a href="#tab-8-api">接口清单</a><a href="#tab-8-feature">功能说明</a><a href="#tab-8-pending">待确认项</a></div></nav>
+<section class="section" id="tab-8-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>D客连 / 报表权限</td><td>帐号权限管理：3张概览统计卡片(总数/启用/近7天更新)、帐号列表(序号/ID/全称/简称/类型/状态/更新时间/操作者/操作)、新增/编辑弹窗(含帐号ID搜索选择器)、删除、多维筛选(5个条件)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-8-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>帐号ID选择器</td><td>搜索下拉选择已有帐号，单选模式，清除后重新搜索</td></tr></tbody></table></div></section>
+<section class="section" id="tab-8-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>5</td><td>4</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">4</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-8-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 概览统计卡片</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>顶部3张统计卡片：①帐号总数（示例值2）②启用帐号（示例值2）③近7天更新（示例值1）。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取统计数据。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>3张卡片：</strong>帐号总数/启用帐号/近7天更新</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>概览统计</td><td>侧边栏→D客连→报表权限</td><td>超级管理员/品牌运营</td><td>进入页面自动展示3张统计卡片</td><td>total/active/recent7days</td><td>GET 统计接口</td><td>聚合计算</td><td>读取</td><td>Integer</td><td>—</td><td>—</td><td>当用户进入报表权限时，应展示3张统计卡片</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 帐号列表与筛选区</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>表格9列：序号/帐号ID/帐号全称/帐号简称/帐号类型（标签）/状态（启用=绿色）/更新时间/更新操作者/操作。筛选5个：搜索帐号ID（200px）+ 搜索帐号全称（200px）+ 搜索帐号简称（200px）+ 帐号类型下拉（全部/总部/经销商/供应商）+ 状态下拉（全部/启用/禁用）+ 重置。分隔线后：新增数据。操作列2按钮：编辑/删除。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取列表。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>3个搜索框：</strong>帐号ID/全称/简称</li><li><strong>帐号类型标签：</strong>总部/经销商/供应商</li><li><strong>操作列2按钮：</strong>编辑/删除</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>报表权限帐号列表</td><td>侧边栏→D客连→报表权限</td><td>超级管理员/品牌运营</td><td>进入页面自动加载帐号表格，支持5维筛选</td><td>序号/帐号ID/全称/简称/类型/状态/更新时间/操作者/操作</td><td>GET 帐号列表接口</td><td>分页查询+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>加载失败Toast</td><td>当用户进入报表权限时，应展示9列表格且5个筛选条件可用</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 新增/编辑帐号弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗（max-width 640px），标题动态「新增帐号」/「编辑帐号」。6个字段：①帐号ID（帐号选择器：hidden+搜索列表，搜索「帐号ID/名称」，单选，列表max-height 220px，hint「从账号数据中单选一个帐号」）②帐号类型（select必填，默认总部，选项：总部/经销商/供应商）③帐号全称（text必填）④帐号简称（text必填）⑤排序值（number，默认255，min=0 step=1，JS过滤非数字，hint「数值越小展示越靠前」）⑥状态（select必填，默认启用：启用/禁用）。底部：取消 + 确认创建。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openDkAccountModal('add'/'edit', {...}) 调用。saveDkAccount() 保存。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>帐号ID选择器：</strong>搜索下拉单选</li><li><strong>排序默认255</strong></li><li><strong>新增Toast：</strong>成功提示</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>帐号ID选择器</td><td>报表权限→新增/编辑弹窗</td><td>超级管理员/品牌运营</td><td>搜索帐号ID/名称→单选→自动填充</td><td>accountId*(select)</td><td>帐号管理数据</td><td>搜索→单选</td><td>POST/PUT</td><td>String</td><td>—</td><td>无匹配时列表为空</td><td>当用户搜索帐号ID时，应显示匹配的帐号列表供单选</td></tr><tr><td>帐号类型</td><td>报表权限→新增/编辑弹窗</td><td>超级管理员/品牌运营</td><td>选择帐号类型</td><td>type*(select)</td><td>枚举</td><td>—</td><td>POST/PUT</td><td>String</td><td>总部</td><td>—</td><td>当用户打开新增弹窗时，帐号类型应默认选中「总部」</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 帐号删除</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>点击删除直接执行，Toast「已删除」(success)。无二次确认弹窗。</p><p><strong>3）数据来源</strong></p><p>DELETE 接口删除。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>无二次确认：</strong>直接删除</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>帐号删除</td><td>报表权限→操作列→删除</td><td>超级管理员</td><td>点击删除→直接删除</td><td>id*(DELETE)</td><td>帐号列表</td><td>—</td><td>DELETE</td><td>—</td><td>—</td><td>—</td><td>当用户点击删除时，应直接删除并Toast成功</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-8-other"><div id="tab-8-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-报表权限全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<div class="tab-panel" id="tab-panel-9">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-9-scope">项目范围</a><a href="#tab-9-logic">逻辑说明</a><a href="#tab-9-api">接口清单</a><a href="#tab-9-feature">功能说明</a><a href="#tab-9-pending">待确认项</a></div></nav>
+<section class="section" id="tab-9-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>D客连 / SmartCode管理</td><td>两个Tab：SmartCode维护(列表/新增编辑/删除/批量导入/搜索) + SmartCode映射(映射列表/新增编辑抽屉含车系关联+排期+新SC+分配比例/搜索)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-9-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>Tab切换</td><td>SmartCode维护 / SmartCode映射</td></tr><tr><td>映射创建</td><td>原SmartCode→选择关联车系(浮层搜索)→选择排期名称→选择新SmartCode→设置分配比例</td></tr></tbody></table></div></section>
+<section class="section" id="tab-9-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>8</td><td>5</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">5</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-9-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> SmartCode维护-列表与筛选</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>Tab1「SmartCode维护」（默认激活）。筛选区：搜索SmartCode（200px）+ 重置 + 批量导入 + 新增数据。表格5列：序号/SmartCode/更新时间/更新操作者/操作。操作列2按钮：编辑/删除。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取列表。switchSmartCodeTab('maintain') 切换。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>5列表格</strong></li><li><strong>操作2按钮：</strong>编辑/删除</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>SmartCode维护列表</td><td>侧边栏→D客连→SmartCode管理→维护Tab</td><td>超级管理员/品牌运营</td><td>进入Tab自动加载SmartCode列表，支持搜索</td><td>序号/SmartCode/更新时间/更新操作者/操作</td><td>GET SmartCode列表接口</td><td>分页查询+搜索</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户进入SmartCode维护Tab时，应展示5列表格</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> SmartCode维护-新增/编辑弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗（max-width 640px），标题动态「新增SmartCode」/「编辑SmartCode」。2个字段：①SmartCode（text必填，placeholder「请输入SmartCode」）②备注说明（textarea rows=4，placeholder「请输入备注说明」）。底部：取消 + 确认保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openSmartCodeMaintainModal('add'/'edit', {code, remark}) 调用。保存后Toast「已保存」。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>2个字段：</strong>SmartCode + 备注</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>新增SmartCode</td><td>SmartCode维护→新增数据按钮</td><td>超级管理员/品牌运营</td><td>输入SmartCode和备注→保存</td><td>code*(text), remark(textarea)</td><td>用户输入</td><td>—</td><td>POST 新增</td><td>JSON</td><td>—</td><td>—</td><td>当用户输入SmartCode并保存后，应Toast成功并刷新列表</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> SmartCode维护-批量导入</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>三步式弹窗（importSCMaintainModal，宽800px）。步骤1-上传文件：操作说明 + 下载模板 + 拖拽上传区（.xlsx/.xls/.csv）。步骤2-数据预览：统计「共X条」+ 预览表格（4列：行号/SmartCode/备注说明/校验结果）。步骤3-导入完成：勾号 + 结果 + 继续导入/完成。</p><p><strong>3）数据来源</strong></p><p>POST 接口上传文件。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>模板列：</strong>SmartCode/备注说明</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>批量导入SmartCode</td><td>SmartCode维护→批量导入按钮</td><td>超级管理员/品牌运营</td><td>下载模板→填写→上传→预览→导入</td><td>file*(multipart)</td><td>用户上传Excel</td><td>三步式流程</td><td>POST 批量导入</td><td>file</td><td>—</td><td>预览显示校验结果</td><td>当用户上传文件后，预览应显示4列含校验结果</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> SmartCode映射-列表与筛选</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>Tab2「SmartCode映射」。筛选区：搜索原SmartCode（200px）+ 搜索意向车系（200px）+ 重置 + 新增数据。表格6列：序号/原SmartCode/意向车系/更新时间/更新操作者/操作。操作列2按钮：编辑/删除。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取映射列表。switchSmartCodeTab('mapping') 切换。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>2个搜索框：</strong>原SmartCode/意向车系</li><li><strong>6列表格</strong></li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>SmartCode映射列表</td><td>SmartCode管理→映射Tab</td><td>超级管理员/品牌运营</td><td>进入Tab自动加载映射列表，支持按原SC和车系搜索</td><td>序号/原SmartCode/意向车系/更新时间/更新操作者/操作</td><td>GET 映射列表接口</td><td>分页查询+搜索</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户进入映射Tab时，应展示6列表格</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> SmartCode映射-新增/编辑抽屉</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>右侧抽屉面板（drawer），标题动态「新增映射」/「编辑映射」。区域一-基本信息：①主键ID（只读，系统自动生成）②原SmartCode（text必填，placeholder「请输入原SmartCode」，示例112233）。区域二-映射信息（可添加多行表格）：表格6列：#（序号）/关联车系（点击展开选择器，placeholder「请选择关联车系」，toggleScMappingRowExpand()）/排期名称（select必填，选项如「2233: 十月份促销推广」）/新SmartCode（select必填，选项如「112233」「445566」）/分配比例（number必填，width 70px）/操作（删除按钮）。可点击「＋ 添加」新增映射行，每行可独立删除。底部：取消 + 保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openScMappingModal(true) 编辑模式。保存后Toast「保存成功」。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>多行映射：</strong>可添加多行映射配置</li><li><strong>车系选择器：</strong>点击展开浮层选择</li><li><strong>排期/新SC下拉：</strong>从已有数据加载</li><li><strong>分配比例：</strong>数字输入</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>映射信息-关联车系</td><td>SmartCode映射→新增/编辑抽屉→映射信息</td><td>超级管理员/品牌运营</td><td>点击关联车系单元格→展开选择器→选择车系</td><td>seriesId*(select)</td><td>车系管理数据</td><td>浮层搜索选择</td><td>POST/PUT</td><td>String</td><td>—</td><td>—</td><td>当用户点击关联车系单元格时，应展开选择器供选择</td></tr><tr><td>映射信息-排期与新SC</td><td>SmartCode映射→新增/编辑抽屉→映射信息</td><td>超级管理员/品牌运营</td><td>选择排期名称→选择新SmartCode→输入分配比例</td><td>scheduleId*(select), newSmartCode*(select), ratio*(number)</td><td>排期管理+SmartCode维护数据</td><td>下拉选择</td><td>POST/PUT</td><td>JSON</td><td>—</td><td>—</td><td>当用户选择排期后，新SmartCode下拉应加载可选值</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-9-other"><div id="tab-9-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-SmartCode全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<div class="tab-panel" id="tab-panel-10">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-10-scope">项目范围</a><a href="#tab-10-logic">逻辑说明</a><a href="#tab-10-api">接口清单</a><a href="#tab-10-feature">功能说明</a><a href="#tab-10-pending">待确认项</a></div></nav>
+<section class="section" id="tab-10-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>拦截管理 / 拦截规则</td><td>三个Tab：规则配置(9列规则列表/新增编辑弹窗含品牌+来源条件+作用域+去重维度+时间窗口+动作+优先级/停启用/删除/导出/筛选)、拦截记录(4统计卡片+6列记录列表+刷新+筛选)、黑名单(4统计卡片+9列列表/新增编辑弹窗/移出/批量导入/导出/筛选)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-10-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>作用域规则</td><td>跨来源拦截：不同来源的相同线索视为重复；单来源去重：同一来源内去重</td></tr><tr><td>拦截动作</td><td>拒绝入库(返回409，不入线索库)；追加标记(线索正常入库但追加"疑似重复"标记)</td></tr><tr><td>时间窗口</td><td>小时/天/永久 三种粒度，与去重维度组合生效</td></tr><tr><td>黑名单类型</td><td>外呼/营销/投诉/全业务，不同类型拦截范围不同</td></tr></tbody></table></div></section>
+<section class="section" id="tab-10-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>16</td><td>10</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-danger">10</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-10-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 规则配置-列表与筛选</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>Tab1「规则配置」。筛选区：作用域下拉（全部/跨来源拦截/单来源内去重）+ 状态下拉（全部/启用/停用）+ 重置 + 导出数据 + 新增数据。表格9列：规则名称/作用域（标签：跨来源拦截/单来源去重/未启用）/去重维度（标签：仅手机号/手机号+品牌/手机号+车系/手机号+品牌+车系）/渠道范围/时间窗口（如「7天」或「永久」）/拦截动作（标签：拒绝入库红色/追加标记橙色）/优先级（数字居中）/状态/操作。操作列3按钮：编辑/停启用/删除。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取规则列表。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>9列表格</strong></li><li><strong>拦截动作标签：</strong>拒绝入库=红色，追加标记=橙色</li><li><strong>作用域标签：</strong>跨来源拦截/单来源去重</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>拦截规则列表</td><td>侧边栏→拦截管理→拦截规则→规则配置Tab</td><td>超级管理员</td><td>进入Tab自动加载规则列表，支持按作用域/状态筛选</td><td>规则名称/作用域/去重维度/渠道范围/时间窗口/拦截动作/优先级/状态/操作</td><td>GET 拦截规则列表接口</td><td>分页查询+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户进入规则配置Tab时，应展示9列规则表格</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 规则配置-新增/编辑弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>弹窗标题动态「新增拦截规则」/「编辑拦截规则」。8个字段：①规则名称（text必填，placeholder「如：懂车帝×汽车之家跨渠道去重」）②关联品牌（select非必填，默认「全品牌通用」，选项从brandRegionData动态加载）③来源组合命中条件（toggle开关，默认关闭；开启后显示子字段：规则作用域select必填[跨来源拦截/单来源内去重]+来源渠道checkbox多选必填[10个渠道：懂车帝/汽车之家/易车/易车网/爱卡汽车/懂车帝CPC/400电话/官网留资/微信小程序/车展扫码]）④去重维度（select必填，默认手机号+品牌，4选项：仅手机号/手机号+品牌/手机号+车系/手机号+品牌+车系）⑤时间窗口（select+number组合：小时/天/永久，默认天+7）⑥拦截动作（select必填：拒绝入库返回409/追加标记疑似重复）⑦优先级（number，默认255，min=1 max=9999，hint「数值越小越先命中」）⑧备注（textarea rows=3）。底部：取消 + 保存规则。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。saveInterceptRule() 保存。onInterceptScopeChange() 联动来源渠道选择模式。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>来源组合开关：</strong>默认关闭，关闭时不限定来源渠道</li><li><strong>跨来源：</strong>可勾选多渠道做交集去重</li><li><strong>单来源：</strong>选择单一渠道</li><li><strong>时间窗口：</strong>小时/天/永久三种粒度</li><li><strong>拦截动作：</strong>拒绝入库(409)或追加标记</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>规则名称</td><td>拦截规则→新增/编辑弹窗</td><td>超级管理员</td><td>输入规则名称，必填</td><td>name*(text)</td><td>用户输入</td><td>—</td><td>POST/PUT</td><td>String</td><td>—</td><td>—</td><td>当用户未输入规则名称时，应提示必填</td></tr><tr><td>来源组合命中条件</td><td>拦截规则→新增/编辑弹窗</td><td>超级管理员</td><td>开启开关→选择作用域→勾选来源渠道</td><td>scope*(select), channels[](checkbox[])</td><td>sourceLeadOptions(10个渠道)</td><td>跨来源多选/单来源单选</td><td>POST/PUT</td><td>JSON</td><td>开关关闭</td><td>—</td><td>当用户开启来源组合开关并选择「跨来源拦截」时，来源渠道应支持多选</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 规则配置-删除确认弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>点击删除调用 deleteInterceptRule(id)，弹出确认弹窗（interceptDeleteModal），标题「确认删除规则」，显示规则名称（蓝色高亮），警告「删除后将同步停用数据，此操作不可恢复！」。底部：取消 + 确认删除。</p><p><strong>3）数据来源</strong></p><p>DELETE 接口删除规则。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>不可恢复：</strong>删除后同步停用数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>删除拦截规则</td><td>规则配置→操作列→删除</td><td>超级管理员</td><td>点击删除→确认弹窗→确认</td><td>id*(DELETE)</td><td>规则列表</td><td>—</td><td>DELETE</td><td>—</td><td>—</td><td>—</td><td>当用户确认删除后，规则应从列表移除并Toast「规则已删除」</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 拦截记录-统计卡片</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>Tab2「拦截记录」。4张统计卡片：①今日拦截（当日拦截记录总数，主题蓝#2563eb）②累计拒绝（action=1的记录数，绿色#16a34a）③累计标记（action=2的记录数，橙色#d97706）④拦截率（拦截记录数/(拦截记录数+20)*100%，紫色#a855f7）。刷新统计按钮。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取统计数据。refreshInterceptStats() 刷新。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>4张卡片：</strong>今日拦截/累计拒绝/累计标记/拦截率</li><li><strong>拦截率计算：</strong>拦截记录数/(拦截记录数+20)*100%</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>拦截统计</td><td>拦截规则→拦截记录Tab</td><td>超级管理员</td><td>进入Tab自动展示4张统计卡片，可点击刷新</td><td>today/totalRejects/totalMarks/rate</td><td>GET 拦截统计接口</td><td>今日=按日期过滤，拒绝=action=1，标记=action=2</td><td>读取</td><td>Integer</td><td>—</td><td>—</td><td>当用户进入拦截记录Tab时，应展示4张统计卡片且数值正确</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> 拦截记录-记录列表与筛选</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>筛选区：规则下拉（全部规则/各规则名称）+ 动作下拉（全部/拒绝入库/追加标记）+ 刷新统计按钮。表格6列：时间/命中规则/来源渠道/手机号（脱敏如135****6789）/拦截动作（标签）/关联线索ID。无操作按钮。空状态提示「暂无拦截记录，规则配置后将在线索推送时实时记录」。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取拦截记录。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>手机号脱敏：</strong>如135****6789</li><li><strong>无操作按钮</strong></li><li><strong>空状态提示</strong></li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>拦截记录列表</td><td>拦截规则→拦截记录Tab</td><td>超级管理员</td><td>进入Tab自动加载拦截记录，支持按规则/动作筛选</td><td>时间/命中规则/来源渠道/手机号/拦截动作/关联线索ID</td><td>GET 拦截记录接口</td><td>分页查询+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>空状态提示</td><td>当无拦截记录时，应显示「暂无拦截记录」空状态</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F6</span> 黑名单-统计卡片与列表</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>Tab3「黑名单」。4张统计卡片：①黑名单总数（主题蓝）②外呼黑名单（红色#dc2626）③营销黑名单（橙色#d97706）④拦截中（status=1，绿色#16a34a）。筛选区：类型下拉（全部/外呼/营销/投诉/全业务）+ 状态下拉（全部/启用/停用）+ 来源下拉（全部/人工添加/外呼系统同步/API导入）+ 重置 + 批量导入 + 导出数据 + 新增数据。表格9列：手机号（脱敏code样式）/黑名单类型（标签：外呼红/营销橙/投诉红/全业务灰）/来源渠道/标签备注/加入方式（标签：人工添加/外呼系统同步/API导入）/加入时间/失效时间（或「永久有效」）/状态/操作。操作列3按钮：编辑/停启用/移出。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取黑名单列表。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>4张统计卡片</strong></li><li><strong>黑名单类型4种：</strong>外呼/营销/投诉/全业务</li><li><strong>加入方式3种：</strong>人工添加/外呼系统同步/API导入</li><li><strong>手机号脱敏：</strong>如135****6789</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>黑名单列表</td><td>拦截规则→黑名单Tab</td><td>超级管理员</td><td>进入Tab自动展示4张统计卡片和9列黑名单表格</td><td>手机号/类型/来源/备注/加入方式/加入时间/失效时间/状态/操作</td><td>GET 黑名单列表接口</td><td>分页查询+3维筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户进入黑名单Tab时，应展示4张统计卡片和9列表格</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F7</span> 黑名单-新增/编辑弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>弹窗标题动态「新增黑名单」/「编辑黑名单」。5个字段：①手机号（text必填，maxlength=11，hint「仅支持11位中国大陆手机号，保存后自动脱敏显示」）②黑名单类型（select必填，4选项：外呼黑名单/营销黑名单/投诉黑名单/全业务黑名单，hint说明各类型含义）③来源渠道（select非必填，默认「全渠道」，10个渠道选项）④标签/备注（text非必填，placeholder「如：外呼多次未接、用户明确拒绝」）⑤失效时间（date input + 「永久有效」按钮组合，留空=永久有效，hint「到期自动移出黑名单」）。底部：取消 + 保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。handleBlacklistSubmit() 保存。syncBlacklistPermaButton() 联动按钮状态。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>手机号校验：</strong>11位中国大陆手机号</li><li><strong>失效时间：</strong>日期选择或永久有效</li><li><strong>自动脱敏：</strong>保存后手机号脱敏显示</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>新增黑名单</td><td>黑名单Tab→新增数据按钮</td><td>超级管理员</td><td>输入手机号→选择类型→选择来源渠道→输入备注→设置失效时间→保存</td><td>phone*(text,11位), type*(select), channel(select), remark(text), expireDate(date)</td><td>用户输入</td><td>—</td><td>POST 新增</td><td>JSON</td><td>channel=全渠道, expire=永久</td><td>手机号格式错误Toast</td><td>当用户输入非11位手机号时，应无法保存或提示格式错误</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F8</span> 黑名单-批量导入与导出</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>批量导入：三步式弹窗（blacklistImportModal）。步骤1-上传文件：操作说明 + 下载模板 + 拖拽上传区。步骤2-数据预览：统计「共X条」+ 预览表格（4列：手机号/黑名单类型/来源渠道/备注）+ 黄色提示。步骤3-导入完成：勾号 + 结果 + 继续导入/完成。导出：导出按钮调用 exportBlacklist()，CSV UTF-8 BOM，文件名「手机号黑名单_YYYY-MM-DD.csv」，导出列：手机号/黑名单类型/来源渠道/备注/加入方式/加入时间/失效时间/状态。导出全量数据，未应用筛选条件。拦截规则导出：Excel(.xlsx)，列：规则名称/关联品牌/作用域/去重维度/渠道范围/时间窗口/拦截动作/优先级/状态/备注，文件名「拦截规则_YYYY-MM-DD.xlsx」，全量导出。</p><p><strong>3）数据来源</strong></p><p>POST 导入；前端导出。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>黑名单导入模板列：</strong>手机号/黑名单类型/来源渠道/备注</li><li><strong>黑名单导出：</strong>CSV，全量导出不应用筛选</li><li><strong>拦截规则导出：</strong>Excel(.xlsx)，全量导出</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>批量导入黑名单</td><td>黑名单Tab→批量导入按钮</td><td>超级管理员</td><td>下载模板→填写→上传→预览→导入</td><td>file*(multipart)</td><td>用户上传Excel</td><td>三步式流程</td><td>POST 批量导入</td><td>file</td><td>—</td><td>预览显示校验结果</td><td>当用户上传文件后，预览应显示4列含数据</td></tr><tr><td>导出黑名单</td><td>黑名单Tab→导出数据按钮</td><td>超级管理员</td><td>点击导出→下载CSV文件</td><td>无</td><td>全量黑名单数据</td><td>全量导出，不应用筛选</td><td>读取</td><td>CSV UTF-8 BOM</td><td>—</td><td>—</td><td>当用户点击导出时，应下载「手机号黑名单_YYYY-MM-DD.csv」含8列数据</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-10-other"><div id="tab-10-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-拦截规则全部】</td><td>前端调用和后端开发</td></tr><tr><td>【待确认：拦截统计口径】</td><td>统计卡片计算逻辑</td></tr></tbody></table></div></div></section>
+</div>
+
+<div class="tab-panel" id="tab-panel-11">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-11-scope">项目范围</a><a href="#tab-11-logic">逻辑说明</a><a href="#tab-11-api">接口清单</a><a href="#tab-11-feature">功能说明</a><a href="#tab-11-pending">待确认项</a></div></nav>
+<section class="section" id="tab-11-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>线索管理 / 线索列表</td><td>线索全生命周期管理：6状态Tab筛选(全部/待处理/处理中/已下发/下发失败/仅接收)、10列表格含列设置(可隐藏5列)、8维组合筛选、详情弹窗(4Tab:基本信息/拓展信息/意向信息/操作日志)、重新下发(仅失败状态)、导出数据、分页</td></tr></tbody></table></div></section>
+<section class="section" id="tab-11-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>线索状态流转</td><td>待处理→处理中→已下发(成功)/下发失败(失败)；仅接收：被黑名单/拦截规则拦截，不入正常流程</td></tr><tr><td>线索等级</td><td>A级(高意向黄)/B级(中意向蓝)/C级(低意向灰)/D级(无意向灰)</td></tr><tr><td>仅接收线索</td><td>黑名单命中显示"黑名单命中"，拦截规则命中显示"拦截规则命中"</td></tr></tbody></table></div></section>
+<section class="section" id="tab-11-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>8</td><td>5</td><td><span class="badge badge-warn">是</span> 重新下发</td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-danger">5</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-11-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 状态Tab切换与多维筛选</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>6个状态Tab（含数量Badge）：全部(128,灰色)/待处理(12,黄色)/处理中(35,蓝色)/已下发(48,黄色)/下发失败(18,灰色)/仅接收(2,红色)。搜索框（placeholder「客户姓名/电话号码/线索编号」，回车触发）。5个下拉筛选：线索状态/线索等级(A/B/C/D)/API Key/品牌/意向车系。重置 + 导出数据。筛选即时生效。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取线索列表。filterByStatus(this, statusValue) 切换Tab。filterClueList() 筛选。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>6个状态Tab：</strong>含数量Badge，不同颜色</li><li><strong>等级枚举：</strong>A级(高意向黄)/B级(中意向蓝)/C级(低意向灰)/D级(无意向灰)</li><li><strong>仅接收：</strong>黑名单命中(红色)或拦截规则命中(黄色)</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>线索状态Tab切换</td><td>侧边栏→线索管理→线索列表</td><td>超级管理员/品牌运营/经销商坐席</td><td>点击状态Tab切换显示对应状态线索</td><td>status(全部/待处理/处理中/已下发/下发失败/仅接收)</td><td>GET 线索列表接口</td><td>按状态过滤+分页查询</td><td>读取</td><td>JSON数组</td><td>全部</td><td>—</td><td>当用户点击「待处理」Tab时，应仅显示待处理线索且Badge数量正确</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 列设置功能</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>齿轮图标按钮「列设置」触发下拉面板。6个可选列（复选框默认选中）：意向品牌/意向车系/意向等级/API Key/意向门店/接收时间。4个必选列（复选框禁用）：线索编号/客户信息/线索状态/操作。设置存储到localStorage(leadColumnSettings)，刷新后保持。</p><p><strong>3）数据来源</strong></p><p>前端JS管理列可见性，localStorage持久化。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>6可选列+4必选列</strong></li><li><strong>localStorage持久化</strong></li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>列设置</td><td>线索列表→列设置按钮</td><td>超级管理员/品牌运营/经销商坐席</td><td>点击列设置→勾选/取消可选列→表格实时更新</td><td>leadColumnSettings(localStorage)</td><td>用户设置</td><td>—</td><td>无（前端）</td><td>JSON</td><td>全部显示</td><td>—</td><td>当用户取消「意向品牌」列后，表格应隐藏该列且刷新后仍保持隐藏</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 线索列表表格</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>表格10列：线索编号/客户信息（姓名加粗+脱敏手机号如138****8888）/意向品牌/意向车系/意向等级（Badge：A黄/B蓝/C灰/D浅灰）/API Key/意向门店/线索状态（标签：待处理灰/处理中灰/已下发灰/下发失败红/仅接收红或黄）/接收时间/操作。操作列：所有行「详情」按钮(btn-primary)，下发失败行额外「重新下发」按钮(btn-warning)。分页「共6条数据」+7页翻页。</p><p><strong>3）数据来源</strong></p><p>GET 接口分页获取。exportClueData() 导出。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>客户信息复合列：</strong>姓名+脱敏手机号</li><li><strong>等级Badge颜色：</strong>A=黄底棕字/B=蓝底蓝字/C=灰/D=浅灰</li><li><strong>仅接收状态：</strong>黑名单命中红色+「黑名单命中」说明，拦截规则命中黄色+「拦截规则命中」说明</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>线索列表表格</td><td>线索列表→表格区</td><td>超级管理员/品牌运营/经销商坐席</td><td>展示10列线索数据，支持列设置调整可见列</td><td>编号/客户信息/品牌/车系/等级/APIKey/门店/状态/时间/操作</td><td>GET 线索列表接口</td><td>分页查询+状态Tab+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>加载失败Toast</td><td>当线索为仅接收(黑名单命中)时，状态标签应为红色并显示「黑名单命中」</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 线索详情弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>弹窗标题「线索详情 - LD2026051400001」。4个Pills风格Tab：①基本信息（5区块：客户信息[姓名/电话/性别/地区]/来源信息[APIKey/来源线索ID/等级/接收时间]/意向车型[品牌/车系/预算/购车时间]/状态信息[状态/门店]/接收校验[接收结果/下发决策/黑名单校验/拦截规则校验/处理说明]）②拓展信息（动态渲染品牌独立接收字段，匹配_customFieldData中scope=brand且启用的字段）③意向信息（意向车型[品牌/车系/预算/购车时间/用途/颜色偏好]+对比车型列表）④操作日志（表格3列：时间/操作人/操作内容，默认3条日志：线索接入→黑名单/拦截校验→下发决策）。底部：关闭。</p><p><strong>3）数据来源</strong></p><p>GET 线索详情。openLeadDetail(type) 调用。拓展信息Tab动态渲染自定义字段。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>4个Tab：</strong>基本信息/拓展信息/意向信息/操作日志</li><li><strong>拓展信息动态渲染：</strong>根据品牌匹配自定义字段</li><li><strong>操作日志：</strong>3列表格，默认3条日志</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>线索详情-基本信息</td><td>线索列表→操作列→详情→基本信息Tab</td><td>超级管理员/品牌运营/经销商坐席</td><td>展示5个区块的客户/来源/意向/状态/校验信息</td><td>姓名/电话/性别/地区/APIKey/来源ID/等级/接收时间/品牌/车系/预算/购车时间/状态/门店/接收结果/下发决策/黑名单校验/拦截校验/处理说明</td><td>GET 线索详情接口</td><td>—</td><td>读取</td><td>JSON</td><td>—</td><td>—</td><td>当用户点击详情时，基本信息Tab应展示5个区块完整信息</td></tr><tr><td>线索详情-操作日志</td><td>线索列表→详情→操作日志Tab</td><td>超级管理员/品牌运营/经销商坐席</td><td>展示线索操作日志表格</td><td>时间/操作人/操作内容</td><td>GET 操作日志接口</td><td>按时间倒序</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户查看操作日志时，应展示3列表格含至少3条日志</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F5</span> 重新下发功能</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>仅「下发失败」状态行显示「重新下发」按钮(btn-warning)。点击reDispatchLead(code)弹出确认对话框，标题「确认重新下发」，内容「确定要重新下发线索 {leadCode} 吗？」。底部：取消 + 确认下发。确认后Toast「线索 {leadCode} 重新下发成功」。</p><p><strong>3）数据来源</strong></p><p>POST 接口重新下发。reDispatchLead(code) 调用。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>仅下发失败状态可见</strong></li><li><strong>二次确认：</strong>弹窗确认</li><li><strong>成功Toast：</strong>「线索 {code} 重新下发成功」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>重新下发</td><td>线索列表→下发失败行→重新下发</td><td>超级管理员/品牌运营</td><td>点击重新下发→确认弹窗→确认</td><td>leadCode*</td><td>线索列表</td><td>—</td><td>POST 重新下发</td><td>—</td><td>—</td><td>—</td><td>当用户确认重新下发后，应Toast成功且线索状态更新</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F6</span> 导出线索数据</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>导出按钮调用 exportClueData()。异步导出带进度条：收集线索数据→整理客户信息→处理导出格式→即将完成。文件名「线索数据_YYYY-M-D.xlsx」。导出应用当前筛选条件，只导出当前可见列（读取localStorage中的leadColumnSettings），跳过隐藏行。</p><p><strong>3）数据来源</strong></p><p>前端导出，应用筛选和列设置。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>文件格式：</strong>Excel(.xlsx)</li><li><strong>命名：</strong>线索数据_YYYY-M-D.xlsx</li><li><strong>筛选联动：</strong>应用当前筛选条件</li><li><strong>列设置联动：</strong>只导出可见列</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>导出线索数据</td><td>线索列表→导出数据按钮</td><td>超级管理员/品牌运营</td><td>点击导出→进度条→下载文件</td><td>应用当前筛选+列设置</td><td>当前页面可见行+可见列</td><td>导出筛选后可见数据</td><td>读取</td><td>Excel</td><td>—</td><td>无数据不生成文件</td><td>当用户筛选状态为「待处理」并隐藏「意向品牌」列后导出，文件应仅含待处理线索且不含意向品牌列</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-11-other"><div id="tab-11-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-线索列表全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<div class="tab-panel" id="tab-panel-12">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-12-scope">项目范围</a><a href="#tab-12-logic">逻辑说明</a><a href="#tab-12-api">接口清单</a><a href="#tab-12-feature">功能说明</a><a href="#tab-12-pending">待确认项</a></div></nav>
+<section class="section" id="tab-12-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>线索管理 / 自定义字段</td><td>两个Tab：线索接收字段(左右分栏-字段列表+表单预览/新增编辑弹窗含9种字段类型+枚举值/作用域+品牌关联/必填开关/停启用删除/类型筛选) + 线索下发字段(映射列表/新增编辑弹窗含3种映射方式+枚举映射表+必传开关/品牌筛选)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-12-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>字段类型</td><td>文本/数字/日期/单选/多选/图片/长文本/手机号 共9种</td></tr><tr><td>作用域</td><td>公共字段(所有品牌通用)/品牌字段(关联特定品牌)</td></tr><tr><td>映射方式</td><td>直接映射(原值传递)/固定值(统一填充)/枚举值映射(源值→目标值对照表)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-12-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>8</td><td>6</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">6</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-12-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 线索接收字段-列表与表单预览</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>Tab1「线索接收字段」。左侧8列表格：排序/字段名称/字段Key/字段类型/作用域/必填/状态/操作。操作列：编辑/停启用/删除。右侧表单预览卡片：作用域筛选（全部/公共字段/品牌字段）+选择品牌字段后出现关联品牌下拉+下方动态渲染表单预览。顶部：字段类型下拉筛选（全部/文本/数字/日期/单选/多选/图片/长文本/手机号）+ 新增字段按钮。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取字段列表。switchCustomFieldTab('receive') 切换Tab。表单预览按作用域+品牌筛选实时渲染。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>8列表格</strong></li><li><strong>左右分栏：</strong>左列表右预览</li><li><strong>预览联动：</strong>作用域+品牌筛选实时预览</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>字段列表与预览</td><td>侧边栏→线索管理→自定义字段→接收字段Tab</td><td>超级管理员</td><td>进入Tab自动加载字段列表，右侧实时预览表单效果</td><td>排序/字段名称/字段Key/字段类型/作用域/必填/状态/操作</td><td>GET 字段列表接口</td><td>分页查询+类型筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户选择「品牌字段」并选择「理想」时，预览应显示理想的品牌字段</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 线索接收字段-新增/编辑弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>弹窗标题动态「新增字段」/「编辑字段」。10个字段：①字段名称（text必填，最多30字符，输入时onFieldNameInput()自动生成Key）②字段Key（text必填，小写英文+下划线，编辑时readOnly，校验/^[a-z][a-z0-9_]*$/）③字段类型（select必填，8种：文本/数字/日期/单选/多选/图片/长文本/手机号）④作用域（select必填：公共字段global/品牌字段brand）⑤关联品牌（select条件必填，仅作用域=品牌字段时显示：理想/问界/小鹏/比亚迪/东风日产）⑥必填（toggle开关，默认关）⑦默认值（text，placeholder随类型变化）⑧枚举值（tag input，仅单选/多选时显示，回车添加，点击x删除）⑨提示文字（text，最多50字符）⑩字段描述（text）。底部：取消 + 确认保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。校验：名称/Key不可为空，Key格式校验，单选/多选至少1个枚举值，品牌字段需选关联品牌，Key不可重复。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>Key自动生成：</strong>输入名称时自动生成Key</li><li><strong>Key校验：</strong>小写字母开头，仅含小写字母/数字/下划线</li><li><strong>枚举值：</strong>仅单选/多选显示，动态添加/删除</li><li><strong>作用域联动：</strong>品牌字段时显示关联品牌下拉</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>字段名称与Key</td><td>接收字段→新增/编辑弹窗</td><td>超级管理员</td><td>输入字段名称→自动生成Key→选择类型→设置作用域</td><td>name*(text,30字符), key*(text,正则校验)</td><td>用户输入</td><td>名称→Key自动生成</td><td>POST/PUT</td><td>JSON</td><td>—</td><td>Key重复Toast错误</td><td>当用户输入字段名称「试驾意向」时，Key应自动生成如test_drive_intent</td></tr><tr><td>枚举值配置</td><td>接收字段→新增/编辑弹窗</td><td>超级管理员</td><td>选择单选/多选类型→输入枚举值→回车添加</td><td>options[](tag input)</td><td>用户输入</td><td>仅单选/多选显示</td><td>POST/PUT</td><td>Array</td><td>空数组</td><td>至少1个枚举值</td><td>当用户选择「单选」类型但未添加枚举值时，应提示至少添加一个枚举值</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 线索下发字段-映射列表</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>Tab2「线索下发字段」。品牌选择器下拉（请选择品牌/理想/问界/小鹏/比亚迪/东风日产，未选择时提示「请先选择目标品牌」）。8列映射表格：排序/源字段/源Key/目标字段名/映射方式（标签：直接映射/固定值/枚举值映射）/必传/状态/操作。操作列：编辑/停启用/删除。顶部：新增数据按钮。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取映射列表，按品牌筛选。switchCustomFieldTab('dispatch') 切换Tab。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>品牌选择器：</strong>必须先选择品牌才显示表格</li><li><strong>映射方式3种：</strong>直接映射/固定值/枚举值映射</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>下发字段映射列表</td><td>自定义字段→下发字段Tab</td><td>超级管理员</td><td>选择品牌→查看映射列表→支持新增/编辑/删除</td><td>排序/源字段/源Key/目标字段名/映射方式/必传/状态/操作</td><td>GET 映射列表接口</td><td>按品牌筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>未选品牌时提示</td><td>当用户未选择品牌时，应显示「请先选择目标品牌」提示</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F4</span> 线索下发字段-新增/编辑映射弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>弹窗标题动态「新增下发字段映射」/「编辑下发字段映射」。8个字段：①源字段（select必填，从_customFieldData动态加载）②目标字段名（text必填，最多50字符，建议英文+下划线）③映射方式（select必填：直接映射1/固定值2/枚举值映射3）④固定值（text条件必填，仅映射方式=固定值时显示）⑤枚举值映射（表格条件显示，仅映射方式=枚举值映射时显示，两列：源枚举值→目标枚举值）⑥是否必传（toggle开关）⑦排序（number，默认1，min=1 max=99）⑧备注说明（text，最多100字符）。底部：取消 + 确认保存。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。映射方式联动显示不同字段。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>映射方式联动：</strong>直接映射→无额外字段；固定值→显示固定值输入框；枚举值映射→显示映射表格</li><li><strong>源字段来源：</strong>从接收字段数据动态加载</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>新增下发字段映射</td><td>下发字段→新增数据按钮</td><td>超级管理员</td><td>选择源字段→输入目标字段名→选择映射方式→配置→保存</td><td>sourceField*, targetName*, mappingType*, fixedValue?, enumMappings?, required, sort, remark</td><td>用户输入+接收字段数据</td><td>映射方式联动字段</td><td>POST 新增</td><td>JSON</td><td>sort=1, required=false</td><td>—</td><td>当用户选择「枚举值映射」时，应显示源→目标映射表格</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-12-other"><div id="tab-12-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-自定义字段全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<div class="tab-panel" id="tab-panel-13">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-13-scope">项目范围</a><a href="#tab-13-logic">逻辑说明</a><a href="#tab-13-api">接口清单</a><a href="#tab-13-feature">功能说明</a><a href="#tab-13-pending">待确认项</a></div></nav>
+<section class="section" id="tab-13-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>系统 / 帐号管理</td><td>系统用户帐号管理：8列表格(帐号/姓名/手机号/角色/开发者/最后登录/状态/操作)、新增/编辑弹窗(含业务参数：SMARTCODE/售价/有效率保底/转化率保底/交车成本保底/排序)、停用/启用、多维筛选(帐号/姓名/手机号/角色/状态)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-13-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>角色标签</td><td>超级管理员(黄)/品牌运营(蓝)/经销商坐席(灰)</td></tr><tr><td>业务参数</td><td>线索售价/有效率保底%/转化率保底%/交车成本保底，用于结算计算</td></tr></tbody></table></div></section>
+<section class="section" id="tab-13-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>4</td><td>4</td><td><span class="badge badge-warn">是</span></td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">4</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-13-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 帐号列表与筛选区</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>表格8列：帐号/姓名/手机号/角色（标签：超级管理员黄/品牌运营蓝/经销商坐席灰）/开发者（灰色标签如「懂车帝」「汽车之家」）/最后登录/状态（启用=绿色/停用=红色）/操作。筛选：搜索框（placeholder「搜索帐号/姓名/手机号」，240px）+ 角色下拉（全部/超级管理员/品牌运营/开发者管理员/经销商坐席）+ 状态下拉（全部/启用/停用）+ 重置 + 新增帐号。操作列2按钮：编辑/停用(红色文字)/启用(绿色文字)。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取列表。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>角色标签颜色：</strong>超级管理员=黄底棕字，品牌运营=蓝底蓝字，经销商坐席=灰底灰字</li><li><strong>状态标签：</strong>启用=绿色，停用=红色</li><li><strong>操作2按钮：</strong>编辑/停启用</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>帐号列表</td><td>侧边栏→系统→帐号管理</td><td>超级管理员</td><td>进入页面自动加载帐号表格，支持按帐号/姓名/手机号/角色/状态筛选</td><td>帐号/姓名/手机号/角色/开发者/最后登录/状态/操作</td><td>GET 帐号列表接口</td><td>分页查询+筛选</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户进入帐号管理时，应展示8列表格且角色标签颜色正确</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 新增/编辑帐号弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗（max-width 560px），标题动态「新增帐号」/「编辑帐号」。13个字段分2组：基础信息7个：①帐号（text必填）②姓名（text必填）③手机号（tel必填，maxlength=11）④角色（select必填：超级管理员/品牌运营/开发者管理员/经销商坐席）⑤开发者（select非必填，placeholder「请选择开发者（可选）」）⑥登录密码（password必填，编辑模式label变化）⑦状态（select必填，默认启用）。业务参数6个：⑧SMARTCODE（text非必填，placeholder「多个SMARTCODE用逗号分隔」）⑨线索售价（元）（number，min=0 step=0.01）⑩线索有效率保底（%）（number，min=0 max=100 step=0.01）⑪线索转化率保底（%）（number，min=0 max=100 step=0.01）⑫交车成本保底（元）（number，min=0 step=0.01）⑬排序序号（number，默认0，min=0，「升序排序，越小越靠前」）。底部：取消 + 确认创建。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。openAccountModal() 调用。saveAccount() 保存。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>2组字段：</strong>基础信息7个+业务参数6个</li><li><strong>业务参数：</strong>用于结算计算（售价/保底值）</li><li><strong>密码字段：</strong>编辑模式label变化</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>帐号基础信息</td><td>帐号管理→新增/编辑弹窗</td><td>超级管理员</td><td>输入帐号/姓名/手机号/角色/开发者/密码/状态</td><td>account*, name*, phone*, role*, developerId, password*, status*</td><td>用户输入</td><td>—</td><td>POST/PUT</td><td>JSON</td><td>status=启用</td><td>—</td><td>当用户未输入帐号或姓名时，应提示必填</td></tr><tr><td>业务参数</td><td>帐号管理→新增/编辑弹窗</td><td>超级管理员</td><td>输入SMARTCODE/售价/有效率保底/转化率保底/交车成本保底/排序序号</td><td>smartcode, price, efficiencyRate, conversionRate, deliveryCost, sort</td><td>用户输入</td><td>用于结算计算</td><td>POST/PUT</td><td>Number/String</td><td>sort=0</td><td>—</td><td>当用户输入有效率保底120%时，应不允许保存（max=100）</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 帐号状态切换</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>操作列「停用」(红色文字)或「启用」(绿色文字)按钮切换状态。</p><p><strong>3）数据来源</strong></p><p>PUT 接口切换状态。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>状态枚举：</strong>启用(1)/停用(0)</li><li><strong>标签颜色：</strong>启用=绿色，停用=红色</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>帐号状态切换</td><td>帐号管理→操作列→停用/启用</td><td>超级管理员</td><td>点击停用/启用按钮切换状态</td><td>id*, status</td><td>帐号列表</td><td>—</td><td>PUT</td><td>—</td><td>—</td><td>—</td><td>当用户点击停用时，状态标签应变红</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-13-other"><div id="tab-13-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-帐号管理全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+<div class="tab-panel" id="tab-panel-14">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-14-scope">项目范围</a><a href="#tab-14-logic">逻辑说明</a><a href="#tab-14-api">接口清单</a><a href="#tab-14-feature">功能说明</a><a href="#tab-14-pending">待确认项</a></div></nav>
+<section class="section" id="tab-14-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>系统 / 权限管理</td><td>系统权限体系说明：功能权限点列表(品牌/车系/线索/系统4模块9个权限点，含菜单/操作类型)、角色权限绑定表(4角色×菜单权限×操作权限×数据范围)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-14-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>权限类型</td><td>菜单(控制页面可见性)/操作(控制按钮和接口)</td></tr><tr><td>数据范围</td><td>全部数据/所属品牌数据/仅自己数据/本门店数据</td></tr></tbody></table></div></section>
+<section class="section" id="tab-14-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>3</td><td>1</td><td><span class="badge badge-muted">无</span> 仅查询</td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">1</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-14-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 功能权限点列表</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>6列表格：权限模块/权限标识/权限名称/描述/类型/操作。9条权限点分4模块：品牌管理(brand:view/brand:create/brand:edit)、车系管理(series:view/series:import)、线索管理(clue:view/clue:assign)、系统管理(system:account/system:role)。类型标签：菜单=黄底棕字(#fef3c7/#92400e)，操作=蓝底蓝字(#dbeafe/#1e40af)。操作列：全部「系统内置」，不可编辑/删除。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取权限点列表（原型为静态数据）。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>9条权限点：</strong>4模块×权限点</li><li><strong>类型2种：</strong>菜单(黄)/操作(蓝)</li><li><strong>全部系统内置：</strong>不可编辑/删除</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>功能权限点列表</td><td>侧边栏→系统→权限管理</td><td>超级管理员</td><td>进入页面展示9条权限点，按4模块分组</td><td>权限模块/权限标识/权限名称/描述/类型/操作</td><td>GET 权限点列表接口</td><td>—</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户进入权限管理时，应展示9条权限点且类型标签颜色正确</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 角色权限绑定表</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>4列表格：角色/菜单权限/操作权限/数据范围。4种角色绑定关系：超级管理员(全部菜单/全部操作/全部数据)、品牌运营(品牌/车系/城市/区域/门店/线索菜单 + 品牌操作/线索分配操作 + 所属品牌数据)、开发者管理员(自定义字段菜单 + 字段配置操作 + 仅自己数据)、经销商坐席(线索跟进菜单 + 线索状态更新操作 + 本门店数据)。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取角色权限绑定（原型为静态数据）。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>4种角色：</strong>超级管理员/品牌运营/开发者管理员/经销商坐席</li><li><strong>数据范围4种：</strong>全部数据/所属品牌数据/仅自己数据/本门店数据</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>角色权限绑定表</td><td>权限管理→角色权限绑定表</td><td>超级管理员</td><td>展示4种角色的菜单/操作/数据范围权限</td><td>角色/菜单权限/操作权限/数据范围</td><td>GET 角色权限接口</td><td>—</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户查看权限绑定时，应展示4种角色的完整权限关系</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 权限类型与数据范围说明</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>权限类型2种：菜单权限（控制页面可见性）和操作权限（控制按钮和接口）。数据范围4种：全部数据/所属品牌数据/仅自己数据/本门店数据。当前为静态展示，原型中无增删改操作。</p><p><strong>3）数据来源</strong></p><p>—</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>菜单权限：</strong>控制页面可见性</li><li><strong>操作权限：</strong>控制按钮和接口</li><li><strong>数据范围4种：</strong>全部/所属品牌/仅自己/本门店</li><li><strong>待确认：</strong>是否支持动态配置</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>权限体系说明</td><td>权限管理→说明区域</td><td>超级管理员</td><td>查看权限类型和数据范围说明</td><td>—</td><td>—</td><td>—</td><td>无</td><td>—</td><td>—</td><td>—</td><td>当用户查看说明时，应清晰了解权限类型和数据范围的定义</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-14-other"><div id="tab-14-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：权限管理是否支持动态配置】</td><td>功能设计方向</td></tr></tbody></table></div></div></section>
+</div>
+
+<div class="tab-panel" id="tab-panel-15">
+<nav class="toc" aria-label="目录"><div class="toc-title">目录</div><div class="toc-links"><a href="#tab-15-scope">项目范围</a><a href="#tab-15-logic">逻辑说明</a><a href="#tab-15-api">接口清单</a><a href="#tab-15-feature">功能说明</a><a href="#tab-15-pending">待确认项</a></div></nav>
+<section class="section" id="tab-15-scope"><div class="section-title">一. 项目范围</div><div class="table-wrap"><table><thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th></tr></thead><tbody><tr><td>D客连</td><td>系统 / 角色管理</td><td>系统角色管理：6列角色表格(名称/编码/成员数/描述/状态/操作)、新增/编辑弹窗(名称/编码/描述/状态)、角色权限说明卡片(4种预置角色)</td></tr></tbody></table></div></section>
+<section class="section" id="tab-15-logic"><div class="section-title">二. 逻辑说明</div><div class="table-wrap"><table><thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead><tbody><tr><td>预置角色</td><td>超级管理员(2人)/品牌运营(8人)/开发者管理员(5人)/经销商坐席(45人)</td></tr><tr><td>角色编码</td><td>系统内置编码如super_admin/brand_operator，创建后不可修改</td></tr></tbody></table></div></section>
+<section class="section" id="tab-15-api"><div class="section-title">三. 接口清单</div><div class="table-wrap" style="margin-bottom:18px"><table><thead><tr><th>功能数量</th><th>涉及接口数</th><th>是否涉及写操作</th><th>是否涉及权限</th><th>是否涉及导出</th><th>待确认项</th></tr></thead><tbody><tr><td>3</td><td>3</td><td><span class="badge badge-warn">是</span> 新增/编辑</td><td><span class="badge badge-info">是</span></td><td><span class="badge badge-muted">无</span></td><td><span class="badge badge-danger">3</span></td></tr></tbody></table></div></section>
+<section class="section" id="tab-15-feature"><div class="section-title">四. 功能说明</div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F1</span> 角色列表</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>6列表格：角色名称/角色编码/成员数量/描述/状态/操作。4个预置角色：超级管理员(super_admin, 2人, 全部权限)/品牌运营(brand_operator, 8人, 品牌数据+线索)/开发者管理员(supplier_admin, 5人, 自定义字段)/经销商坐席(dealer_agent, 45人, 线索跟进)。所有角色状态=启用(绿色)。操作列：每角色仅「编辑」按钮，无删除/停用。</p><p><strong>3）数据来源</strong></p><p>GET 接口获取角色列表（原型为静态数据）。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>4个预置角色</strong></li><li><strong>成员数量：</strong>超级管理员2/品牌运营8/开发者管理员5/经销商坐席45</li><li><strong>操作仅编辑：</strong>无删除/停用</li><li><strong>编码不可修改：</strong>如super_admin/brand_operator</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>角色列表</td><td>侧边栏→系统→角色管理</td><td>超级管理员</td><td>进入页面展示4个预置角色</td><td>角色名称/角色编码/成员数量/描述/状态/操作</td><td>GET 角色列表接口</td><td>—</td><td>读取</td><td>JSON数组</td><td>—</td><td>—</td><td>当用户进入角色管理时，应展示4个预置角色且状态均为启用</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F2</span> 新增/编辑角色弹窗</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>居中弹窗（max-width 560px），标题动态「新增角色」/「编辑角色」。4个字段：①角色名称（text必填，placeholder「请输入角色名称，如：品牌运营」）②角色编码（text必填，placeholder「请输入角色编码，如：brand_operator」，hint「小写英文+下划线，创建后不可修改」，校验/^[a-z_][a-z0-9_]*$/）③描述（textarea rows=3，placeholder「请输入角色描述」）④状态（select必填，默认启用：启用/停用）。底部：取消 + 确认创建/保存修改。</p><p><strong>3）数据来源</strong></p><p>新增：POST；编辑：PUT。saveRole() 保存。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>编码校验：</strong>小写英文+下划线，创建后不可修改</li><li><strong>新增按钮文字：</strong>「确认创建」</li><li><strong>编辑按钮文字：</strong>「保存修改」</li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>角色名称</td><td>角色管理→新增/编辑弹窗</td><td>超级管理员</td><td>输入角色名称，必填</td><td>name*(text)</td><td>用户输入</td><td>—</td><td>POST/PUT</td><td>String</td><td>—</td><td>—</td><td>当用户未输入角色名称时，应提示必填</td></tr><tr><td>角色编码</td><td>角色管理→新增/编辑弹窗</td><td>超级管理员</td><td>输入角色编码，必填，创建后不可修改</td><td>code*(text)</td><td>用户输入</td><td>小写英文+下划线，正则校验</td><td>POST/PUT</td><td>String</td><td>—</td><td>编码格式错误Toast</td><td>当用户输入大写字母时，应提示编码格式错误</td></tr></tbody></table></div></details></div><div class="feature-card"><div class="fc-title"><span class="badge badge-info">F3</span> 角色权限说明卡片</div><div class="fc-body"><p><strong>2）交互说明</strong></p><p>4列网格卡片，展示4种预置角色的权限范围：超级管理员→全部功能权限、品牌运营→品牌数据+线索管理、开发者管理员→自定义字段管理、经销商坐席→线索跟进。</p><p><strong>3）数据来源</strong></p><p>静态展示。</p><p><strong>4）逻辑说明</strong></p><ul><li><strong>4张卡片：</strong>对应4种角色</li><li><strong>权限范围简要说明</strong></li></ul></div><details><summary>功能明细（12 列完整规格）</summary><div class="table-wrap"><table><thead><tr><th>功能名称</th><th>页面入口</th><th>适用角色</th><th>操作说明</th><th>字段/参数</th><th>数据来源</th><th>取值逻辑</th><th>接口/数据变更</th><th>数据格式</th><th>默认值</th><th>异常处理</th><th>验收标准</th></tr></thead><tbody><tr><td>角色权限说明</td><td>角色管理→权限说明卡片</td><td>超级管理员</td><td>查看4种角色的权限范围</td><td>—</td><td>—</td><td>—</td><td>无</td><td>—</td><td>—</td><td>—</td><td>当用户查看权限说明时，应展示4种角色的权限范围</td></tr></tbody></table></div></details></div></section>
+<section class="section" id="tab-15-other"><div id="tab-15-pending"><div style="font-size:15px;font-weight:700;margin:14px 0 6px;color:#111827">待确认项</div><div class="table-wrap"><table><thead><tr><th>待确认项</th><th>影响范围</th></tr></thead><tbody><tr><td>【待确认：接口地址-角色管理全部】</td><td>前端调用和后端开发</td></tr></tbody></table></div></div></section>
+</div>
+
+</div><!-- /.page -->
+
+<script>
+(function(){
+  var btns = document.querySelectorAll('.doc-header-tab-btn');
+  var panels = document.querySelectorAll('.tab-panel');
+  function switchTab(idx) {
+    btns.forEach(function(b,i){ b.classList.toggle('active', i===idx); });
+    panels.forEach(function(p,i){ p.classList.toggle('active', i===idx); });
+  }
+  btns.forEach(function(btn,i){
+    btn.addEventListener('click', function(){ switchTab(i); });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      var active = Array.from(btns).findIndex(function(b){ return b.classList.contains('active'); });
+      if (active === -1) return;
+      var next = e.key === 'ArrowRight' ? (active + 1) % btns.length : (active - 1 + btns.length) % btns.length;
+      switchTab(next);
+      btns[next].focus();
+    }
+  });
+})();
+</script>
+</body>
+</html>
