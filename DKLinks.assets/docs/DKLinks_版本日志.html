@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D客连 — 版本日志</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #faf8ff;
+  --panel: #ffffff;
+  --text: #191b23;
+  --muted: #434654;
+  --border: #c3c6d6;
+  --accent: #003594;
+  --accent-soft: #dbe1ff;
+  --success: #22c55e;
+  --success-soft: #dcfce7;
+  --warning: #f59e0b;
+  --warning-soft: #fef3c7;
+  --danger: #ef4444;
+  --danger-soft: #fee2e2;
+  --info: #0ea5e9;
+  --info-soft: #e0f2fe;
+  --depr: #6b7280;
+  --depr-soft: #f3f4f6;
+  --surface-muted: #f8fafc;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-full: 9999px;
+  --shadow: 0 1px 2px rgba(0,0,0,0.06);
+  --header-gradient: linear-gradient(135deg, #00174b 0%, #003594 50%, #004ac6 100%);
+}
+
+/* ═══ Reset ═══ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.page { max-width: 1180px; margin: 0 auto; padding: 20px 0 80px; }
+
+/* ═══ Header ═══ */
+.doc-header {
+  background: var(--header-gradient);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  padding: 28px 32px 20px;
+  margin-bottom: 18px;
+  color: #fff;
+}
+.doc-header .doc-type-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  backdrop-filter: blur(4px);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.doc-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+.doc-header .doc-subtitle {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.doc-header .doc-meta-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 16px;
+}
+.doc-header .doc-meta-list span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.doc-header .doc-meta-list .meta-label {
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ═══ Summary Strip ═══ */
+.summary-strip {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.summary-strip .summary-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  flex: 1;
+  min-width: 140px;
+}
+.summary-strip .summary-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.summary-strip .summary-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+.summary-strip .summary-value .value-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* ═══ Version Card ═══ */
+.version-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  padding: 0;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.version-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+}
+.version-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.3px;
+}
+.version-tag .v-label {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+.version-date {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.version-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+.status-current { background: var(--success-soft); color: var(--success); }
+.version-summary {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-muted);
+}
+.version-summary strong { color: var(--accent); }
+
+/* ═══ Change Group ═══ */
+.change-group { padding: 24px 28px 4px; }
+.change-group:last-child { padding-bottom: 24px; }
+.change-group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text);
+  line-height: 24px;
+}
+.change-type-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  line-height: 1.65;
+  letter-spacing: 0.05em;
+}
+.badge-added    { background: var(--success-soft); color: var(--success); }
+.badge-changed  { background: var(--info-soft);   color: var(--info);   }
+.badge-fixed    { background: var(--warning-soft); color: var(--warning); }
+.badge-deprecated { background: var(--depr-soft); color: var(--depr);   }
+.badge-removed  { background: var(--danger-soft); color: var(--danger); }
+.badge-security { background: var(--danger-soft); color: var(--danger); }
+
+/* ═══ Feature Card（两行式） ═══ */
+.feature-cards { display: flex; flex-direction: column; gap: 0; }
+.feature-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.feature-item:last-child { border-bottom: none; }
+.feature-item .fi-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 20px;
+}
+.feature-item .fi-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+.feature-item .fi-desc strong { color: var(--text); font-weight: 600; }
+
+/* ═══ Timeline ═══ */
+.timeline-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  padding: 24px 28px;
+  margin-bottom: 20px;
+}
+.timeline-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item { position: relative; margin-bottom: 24px; }
+.timeline-item:last-child { margin-bottom: 0; }
+.timeline-dot {
+  position: absolute;
+  left: -24px; top: 4px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--panel);
+  box-shadow: 0 0 0 2px var(--border);
+}
+.timeline-dot.dot-current { background: var(--success); }
+.timeline-item .tl-version { font-size: 15px; font-weight: 700; color: var(--text); }
+.timeline-item .tl-date { font-size: 12px; color: var(--muted); margin-left: 8px; }
+.timeline-item .tl-summary { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+/* ═══ Responsive ═══ */
+@media (max-width: 720px) {
+  .page { padding: 20px 12px 60px; }
+  .doc-header { padding: 20px 16px 18px; }
+  .doc-header h1 { font-size: 20px; }
+  .summary-strip .summary-card { min-width: 100%; }
+  .version-card-header { padding: 16px 18px; flex-wrap: wrap; }
+  .change-group { padding: 20px 18px 4px; }
+  .version-summary { padding: 16px 18px; }
+  .timeline-section { padding: 16px 18px; }
+}
+/* 与其他阅读页统一的目录和页头 */
+html { scroll-behavior: auto; }
+.page { max-width: 1680px; padding: 20px 24px 80px; }
+.doc-header { padding: 28px 32px 30px; }
+.doc-header .doc-type-badge { display: block; width: max-content; padding: 0; margin-bottom: 6px; border-radius: 0; background: none; color: #dce8ff; backdrop-filter: none; font-weight: 750; letter-spacing: .08em; }
+.doc-header .doc-subtitle { white-space: nowrap; }
+.doc-header .doc-meta-list { display: none; }
+.version-layout { display: grid; grid-template-columns: 220px minmax(0,1fr) 220px; gap: 18px; align-items: start; }
+.version-sidebar,.version-outline { position: sticky; top: 18px; max-height: calc(100vh - 36px); overflow: auto; padding: 15px; border: 1px solid var(--border); border-radius: var(--radius-md); background: #fff; box-shadow: var(--shadow); }
+.version-main { min-width: 0; }
+.version-panel-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #dce3ef; }
+.version-panel-title strong { white-space: nowrap; font-size: 16px; }
+.version-count { margin-left: 5px; padding: 2px 7px; border-radius: 999px; background: #e8efff; color: var(--accent); font-size: 11px; }
+.version-toggle { flex: none; padding: 3px 7px; border: 1px solid #cbd5e1; border-radius: 5px; background: #fff; color: #64748b; font: inherit; font-size: 11px; cursor: pointer; }
+.version-toggle:hover { border-color: #9db8f3; background: #f5f8ff; color: var(--accent); }
+.version-nav { display: grid; gap: 6px; margin-top: 12px; }
+.version-nav a { display: block; padding: 9px 11px; border: 1px solid #dce4f0; border-radius: 7px; background: #f8faff; color: #334155; text-decoration: none; font-size: 13px; }
+.version-nav a:hover,.version-nav a:focus-visible { border-color: #bad0ff; background: #edf3ff; color: var(--accent); text-decoration: none; }
+.version-nav a.current { border-color: #bad0ff; background: #edf3ff; color: var(--accent); font-weight: 700; }
+.version-outline .version-nav a { border: 0; border-left: 3px solid transparent; border-radius: 4px; background: none; }
+.version-outline .version-nav a:hover,.version-outline .version-nav a:focus-visible { border-left-color: var(--accent); background: #edf3ff; }
+.summary-strip,.version-card,.timeline-section { scroll-margin-top: 18px; }
+.summary-strip { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); margin-bottom: 18px; }
+.summary-strip .summary-card { min-width: 0; }
+.version-layout.left-collapsed { grid-template-columns: minmax(0,1fr) 220px; }
+.version-layout.left-collapsed .version-sidebar { display: none; }
+.version-layout.right-collapsed { grid-template-columns: 220px minmax(0,1fr); }
+.version-layout.right-collapsed .version-outline { display: none; }
+.version-layout.left-collapsed.right-collapsed { grid-template-columns: minmax(0,1fr); }
+.version-reopen { display: none; position: fixed; top: 132px; z-index: 20; align-items: center; min-height: 36px; padding: 0 15px; border: 1.5px solid var(--accent); border-radius: 20px; background: #fff; color: var(--accent); box-shadow: 0 4px 16px rgba(0,23,75,.2); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.version-reopen:hover { background: var(--accent); color: #fff; box-shadow: 0 6px 20px rgba(0,53,148,.3); }
+.version-reopen-left { left: 0; }.version-reopen-right { right: 0; }
+.version-layout.left-collapsed .version-reopen-left,.version-layout.right-collapsed .version-reopen-right { display: inline-flex; }
+.version-toggle:focus-visible,.version-reopen:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 1300px) { .doc-header .doc-subtitle { white-space: normal; } }
+@media (max-width: 1100px) { .version-layout,.version-layout.right-collapsed { grid-template-columns: 210px minmax(0,1fr); } .version-outline { grid-column: 2; position: static; max-height: none; } .version-layout.left-collapsed,.version-layout.left-collapsed.right-collapsed { grid-template-columns: minmax(0,1fr); } .version-layout.left-collapsed .version-outline { grid-column: 1; } .summary-strip { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 720px) { .page { padding: 12px; } .doc-header { padding: 20px 18px 22px; } .version-layout,.version-layout.left-collapsed,.version-layout.right-collapsed,.version-layout.left-collapsed.right-collapsed { grid-template-columns: 1fr; } .version-sidebar,.version-outline,.version-layout.left-collapsed .version-outline { grid-column: 1; position: static; max-height: 320px; } .version-reopen { top: 76px; } }
+/* 版本详情采用左侧索引、右侧正文 */
+.version-layout { grid-template-columns: 252px minmax(0,1fr); }
+.version-layout.left-collapsed { grid-template-columns: minmax(0,1fr); }
+.version-sidebar { padding: 14px 12px; scrollbar-gutter: stable; }
+.version-panel-title { margin-bottom: 8px; padding-bottom: 0; border-bottom: 0; }
+.version-panel-title strong { font-size: 15px; }
+.version-toggle { padding: 2px 7px; border-radius: 4px; background: transparent; }
+.version-search-label { display: block; margin: 0 0 5px; color: #434654; font-size: 12px; font-weight: 700; }
+.version-search { width: 100%; height: 36px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: var(--text); font: inherit; font-size: 13px; line-height: 20px; }
+.version-search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,53,148,.1); }
+.version-search-hint { min-height: 16px; margin-top: 4px; margin-bottom: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border); color: #64748b; font-size: 11px; line-height: 16px; }
+.version-nav { gap: 3px; margin-top: 0; padding-top: 0; border-top: 0; }
+.version-nav a { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-height: 30px; padding: 5px 8px; border: 0; border-radius: var(--radius-sm); background: #fff; color: var(--muted); font-weight: 600; }
+.version-nav a small { color: #7c879a; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.version-nav a.current { border: 0; background: var(--accent); color: #fff; }
+.version-nav a.current small { color: #dce8ff; }
+.version-nav a[hidden],.version-card[hidden],.timeline-section[hidden] { display: none !important; }
+.version-search-empty { display: none; margin: 10px 0; color: #64748b; font-size: 12px; }
+.version-search-empty.visible { display: block; }
+.version-layout { align-items: start; }
+.version-sidebar,.version-main { margin-top: 0; }
+.summary-strip { grid-template-columns: repeat(4,minmax(0,1fr)); align-items: stretch; gap: 12px; margin: 0 0 18px; }
+.summary-strip .summary-card { display: flex; flex-direction: column; justify-content: flex-start; min-width: 0; min-height: 116px; padding: 16px 20px; }
+.version-main > .version-card { margin-top: 0; }
+@media (max-width: 1100px) { .version-layout { grid-template-columns: 220px minmax(0,1fr); } .version-layout.left-collapsed { grid-template-columns: minmax(0,1fr); } .summary-strip { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 720px) { .version-layout,.version-layout.left-collapsed { grid-template-columns: 1fr; } }
+html { scrollbar-gutter: stable; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ Header ═══ -->
+  <div class="doc-header">
+    <div class="doc-type-badge">版本号日志（HTML 阅读版）</div>
+    <h1>D客连 · SaaS平台</h1>
+    <p class="doc-subtitle">全版本迭代履历与发布日志 — 完整记录系统各阶段的版本发布历程、功能演进、需求变更与架构优化，为版本交付管理、变更追溯与审计回溯提供依据。</p>
+    <div class="doc-meta-list">
+      <span><span class="meta-label">系统：</span>D客连 · SaaS平台</span>
+      <span><span class="meta-label">板块：</span>多板块</span>
+      <span><span class="meta-label">版本：</span>v1.2.1</span>
+      <span><span class="meta-label">日期：</span>2026-10-22</span>
+    </div>
+  </div>
+
+  <div class="version-layout" id="versionLayout">
+    <aside class="version-sidebar" aria-label="版本快速索引">
+      <div class="version-panel-title"><strong>版本快速索引</strong><button class="version-toggle" type="button" id="versionLeftCollapse" aria-label="收起版本快速索引">⟨ 收起侧栏</button></div>
+      <label class="version-search-label" for="versionSearch">按版本号搜索</label>
+      <input class="version-search" id="versionSearch" type="search" placeholder="例如 v1.2.1" autocomplete="off">
+      <p class="version-search-hint" id="versionSearchStatus" role="status">输入版本号，快速定位对应版本日志</p>
+      <nav class="version-nav" aria-label="选择版本"><a class="current" href="#version-121" data-version="version-121" aria-current="page"><span>v1.2.1</span><small>2026-10-22</small></a><a href="#version-120" data-version="version-120"><span>v1.2.0</span><small>2026-09-29</small></a><a href="#version-111" data-version="version-111"><span>v1.1.1</span><small>2026-07-16</small></a><a href="#version-110" data-version="version-110"><span>v1.1.0</span><small>2026-07-10</small></a></nav>
+      <p class="version-search-empty" id="versionSearchEmpty">没有匹配的版本</p>
+    </aside>
+    <main class="version-main">
+
+  <!-- ═══ Summary Strip ═══ -->
+  <div class="summary-strip" id="version-overview">
+    <div class="summary-card">
+      <div class="summary-label">当前版本</div>
+      <div class="summary-value">v1.2.1</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">原型更新日期</div>
+      <div class="summary-value">2026-10-22</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">本轮更新</div>
+      <div class="summary-value">5<span class="value-sub">组变更</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">覆盖板块</div>
+      <div class="summary-value"><span class="value-sub">培育引擎 · 线索管理 · 系统字典 · 全局交互 · 文档</span></div>
+    </div>
+  </div>
+
+<div class="version-card" id="version-121"><div class="version-card-header"><div class="version-tag"><span class="v-label">v</span>1.2.1</div><div class="version-date">2026-10-22</div><div class="version-status status-current">当前原型版本</div></div><div class="version-summary">本轮更新 AI 外呼配置、任务去重与结果处理、话单查询、线索处理进度及号码检测规则，统一交互与文档口径。<strong>此版本记录原型与方案更新；真实接口接入、后台执行及生产权限仍需联调验收。</strong></div><div class="change-group"><div class="change-group-title"><span class="change-type-badge badge-added">新增</span>培育引擎 · AI 外呼配置与话单</div><div class="feature-cards"><div class="feature-item"><div class="fi-title">四页签配置结构</div><div class="fi-desc">AI外呼配置按接入与分配、任务去重、等待与兜底、结果处理组织；共享品牌上下文，分区保存。</div></div><div class="feature-item"><div class="fi-title">系统类型与线路字典</div><div class="fi-desc">维护外呼系统、类型、品牌适用范围与场景信息；预评分区间和兜底分配仅支持AI线路。</div></div><div class="feature-item"><div class="fi-title">在途关联与完成间隔</div><div class="fi-desc">同品牌同手机号关联在途任务；冷却期复用可用结果，按新线索接收时规则独立判定。</div></div><div class="feature-item"><div class="fi-title">首条与关联线索独立等待</div><div class="fi-desc">分别设置等待期限与到期动作；失败或超时继续原流程或转人工；迟到回传不重复触发已定动作。</div></div><div class="feature-item"><div class="fi-title">系统类型范围与结果规则</div><div class="fi-desc">按外呼系统、类型、通话状态和标签匹配，动作限继续厂商下发、转人工、仅接收，并保留规则快照。</div></div><div class="feature-item"><div class="fi-title">独立列表与组合筛选</div><div class="fi-desc">按任务或线索、品牌、外呼系统、类型、任务状态与结果状态查询；返回列表保留筛选。</div></div><div class="feature-item"><div class="fi-title">任务概览字段说明</div><div class="fi-desc">任务状态、结果状态、品牌、系统、类型、来源及关联线索、创建和结束时间，支持问号弹窗说明。</div></div><div class="feature-item"><div class="fi-title">逐次通话字段与小结</div><div class="fi-desc">每次拨打独立展示通话ID、电话号码、标签、微信号、开始结束及生成时间、秒数、状态与通话小结。</div></div><div class="feature-item"><div class="fi-title">中文显示与内容收敛</div><div class="fi-desc">状态和标签显示中文；删除独立AI结果卡及技术追溯区；无单次小结显示暂无，不复制任务级结果。</div></div></div></div><div class="change-group"><div class="change-group-title"><span class="change-type-badge badge-added">变更</span>线索管理 · 详情、处理进度与人工处理</div><div class="feature-cards"><div class="feature-item"><div class="fi-title">独立详情页与处理结论</div><div class="fi-desc">详情由弹窗改为独立页面，含基本信息、处理进度、拓展信息；顶部展示结论、原因和下一步。</div></div><div class="feature-item"><div class="fi-title">七环节判断与依据</div><div class="fi-desc">鉴权字段校验、来源ID、黑名单、接收去重、号码检测、外呼处理、厂商下发；支持展开业务依据与当前环节提示。</div></div><div class="feature-item"><div class="fi-title">超时人工决定</div><div class="fi-desc">待人工处理支持填写决定及必填备注，继续厂商下发或仅接收；保留原自动判断与人工决定。</div></div><div class="feature-item"><div class="fi-title">历史事实与跨页关联</div><div class="fi-desc">任务与线索按精确ID关联，支持查看关联话单和关联线索；缺少回执不推断成功；不展示技术追溯及历史处理汇总。</div></div></div></div><div class="change-group"><div class="change-group-title"><span class="change-type-badge badge-added">变更</span>号码检测、系统字典与下发字段</div><div class="feature-cards"><div class="feature-item"><div class="fi-title">品牌检测与处理规则</div><div class="fi-desc">按品牌启停检测，逐项配置明确状态的继续或停止动作；UNKNOWN 和服务异常固定记录未知后继续。</div></div><div class="feature-item"><div class="fi-title">检测与下发映射独立</div><div class="fi-desc">无下发映射仍可启用检测；删除或停用映射不关闭检测；无有效映射时不传递检测结果字段。</div></div><div class="feature-item"><div class="fi-title">检测记录与异常说明</div><div class="fi-desc">按当时配置和执行结果记录状态；已跳过、未执行、未记录分别展示，避免按当前开关反推历史。</div></div><div class="feature-item"><div class="fi-title">数据组预评分选传</div><div class="fi-desc">有效分数供路由及下发复用，6分钟无分走兜底；厂商传分由品牌开关与映射独立控制，不补历史分数。</div></div><div class="feature-item"><div class="fi-title">AI结果字段映射</div><div class="fi-desc">支持标签、小结合并或分别映射；目标字段、长度单位及接口确认独立校验，未确认保留草稿。</div></div><div class="feature-item"><div class="fi-title">号码结果可选传递</div><div class="fi-desc">映射须使用完整枚举；是否必传由品牌接口要求决定；配置维护不依赖号码检测启停。</div></div><div class="feature-item"><div class="fi-title">外呼系统与类型维护</div><div class="fi-desc">配置外呼系统、类型及关联品牌和场景；历史任务保留创建时系统与类型快照。</div></div><div class="feature-item"><div class="fi-title">号码检测状态字典</div><div class="fi-desc">维护检测状态及启用项，品牌逐状态设置处理动作；新增明确状态未配置动作时需补齐重新启用。</div></div></div></div><div class="change-group"><div class="change-group-title"><span class="change-type-badge badge-added">优化</span>全局交互与列表样式</div><div class="feature-cards"><div class="feature-item"><div class="fi-title">按钮及关闭图标统一</div><div class="fi-desc">统一弹窗关闭按钮、帮助图标间距及详情操作区布局；删除前端业务页面中的开发过程说明。</div></div><div class="feature-item"><div class="fi-title">列表视觉一致性</div><div class="fi-desc">统一线索编号链接与列表操作的视觉表达，沿用改判和规则业务逻辑。</div></div></div></div><div class="change-group"><div class="change-group-title"><span class="change-type-badge badge-added">文档</span>六份文档同步与交付边界</div><div class="feature-cards"><div class="feature-item"><div class="fi-title">系统蓝图与流程</div><div class="fi-desc">按当前接收、检测、外呼、结果及下发链路更新；旧直连方案保留为历史参考，后链路业务状态回传不作为本期前提。</div></div><div class="feature-item"><div class="fi-title">范围与待对接</div><div class="fi-desc">2026-10-23 功能文档按详细规格修订：展开 81 张浅层功能卡，补充操作步骤、字段来源及约束、判断联动、状态异常和具体验收；其余 30 张既有详细卡保留。22 章的数据接口说明分别列明服务职责；按脚本纠正报表加载行为和排期 ID 未传递的实现差距。同步功能文档、页面交互图、业务流程图、功能点清单和版本日志；人工坐席、休眠回池、企微短信及一发三未纳入本轮。号码检测、数据组、AI服务和品牌下发接口契约待联调确认。</div></div></div></div></div>
+  <!-- ═══ Version Card: v1.2.0 ═══ -->
+  <div class="version-card" id="version-120">
+    <div class="version-card-header">
+      <div class="version-tag"><span class="v-label">v</span>1.2.0</div>
+      <div class="version-date">2026-09-29</div>
+      <div class="version-status">历史版本</div>
+    </div>
+    <div class="version-summary">
+      线索管理板块新增<strong>「锁单排查」</strong>功能模块，含锁单列表、自动排查、状态改判与规则配置共 6 项功能。系统按 5 条判断条件自动筛查疑似虚假锁单，命中即标记待排查，人工核实改判后状态锁定，锁单数据由数据室每日同步更新。
+    </div>
+
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        线索管理 · 锁单排查
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">锁单列表</div>
+          <div class="fi-desc"><strong>13 列锁单明细</strong>，覆盖线索编码、SmartCode、订单门店、五个关键时间节点与命中条件，数据由数据室<strong>每日同步</strong>更新。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">自动排查</div>
+          <div class="fi-desc">内置 <strong>R1-R5 共 5 条判断条件</strong>，规则间为「或」关系，任意一条命中即标记<strong>待排查</strong>，未命中显示正常。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">多维筛选</div>
+          <div class="fi-desc">支持<strong>线索编码/手机号/SmartCode</strong>关键字搜索，锁单状态、命中条件、订单门店组合筛选，一键重置。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">状态改判</div>
+          <div class="fi-desc">人工核实后可改判为<strong>正常或虚假锁单</strong>，排查备注必填，改判后<strong>状态锁定</strong>，规则重算不再覆盖。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">规则配置</div>
+          <div class="fi-desc">各条件<strong>阈值与启用状态</strong>可视化配置，实时显示命中锁单数，保存后立即按最新规则<strong>重新排查</strong>。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">统计角标</div>
+          <div class="fi-desc"><strong>锁单总数、待排查、已确认虚假、命中规则</strong>四卡统计，待排查数实时同步侧边栏菜单角标。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Version Card: v1.1.1 ═══ -->
+  <div class="version-card" id="version-111">
+    <div class="version-card-header">
+      <div class="version-tag"><span class="v-label">v</span>1.1.1</div>
+      <div class="version-date">2026-07-16</div>
+      <div class="version-status" style="background: var(--info-soft); color: var(--info);">历史版本</div>
+    </div>
+    <div class="version-summary">
+      D客连汽车线索管理系统首次完整原型交付。覆盖<strong>工作台、基础数据（6项）、D客连线索分发（3项）、拦截管理（3项）、线索列表与导出、自定义字段、系统管理（3项）</strong>共计 7 大板块 24 项功能。支持品牌-车系-门店-区域-城市的五层基础数据级联，线索从接收到拦截去重再到下发分发的全链路闭环，以及帐号-角色-权限的 RBAC 系统管理。
+    </div>
+
+    <!-- 板块1：工作台 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        工作台 · Dashboard
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">数据概览面板</div>
+          <div class="fi-desc">四张核心统计卡片展示<strong>今日新增线索、今日已下发、A级高意向、今日成交</strong>，每项附带<strong>环比趋势箭头</strong>与百分比浮动。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">线索趋势图</div>
+          <div class="fi-desc">近7天线索量柱状图，<strong>工作日与周末</strong>用不同配色区分，直观对比流量波动。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">开发者分布</div>
+          <div class="fi-desc">按<strong>懂车帝、汽车之家、易车</strong>三大来源展示线索占比，进度条可视化，支持快速定位主力渠道。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">快捷操作</div>
+          <div class="fi-desc">8个核心功能入口卡片一键跳转：线索列表、仅接收、拦截规则、黑名单、门店、开发者、自定义字段、排期管理。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">待处理事项</div>
+          <div class="fi-desc">动态展示<strong>待下发线索数量与来源</strong>，点击"立即处理"直接跳转线索列表页面。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块2：基础数据管理 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        基础数据 · 六层数据体系
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">品牌管理</div>
+          <div class="fi-desc">品牌与车系的<strong>级联管理</strong>，支持品牌下挂多个车系，品牌级启停控制，车系批量导入，品牌/车系独立删除确认。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">车系管理</div>
+          <div class="fi-desc">车系独立管理页面，支持<strong>车系详情弹窗</strong>查看完整参数信息，品牌筛选与搜索。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">城市管理</div>
+          <div class="fi-desc">省份-城市<strong>两级树形结构</strong>，支持新增省份与城市，城市批量导入，树节点展开/折叠交互。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">品牌区域</div>
+          <div class="fi-desc">品牌区域独立维护，支持<strong>单条新增与批量导入</strong>两种录入方式，按品牌筛选区域列表。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">门店管理</div>
+          <div class="fi-desc">门店CRUD，关联<strong>品牌、区域、城市</strong>三级数据，集成<strong>地图选址</strong>定位经纬度，支持批量导入门店数据。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">开发者管理</div>
+          <div class="fi-desc">第三方API开发者信息维护，管理<strong>懂车帝、汽车之家、易车</strong>等来源的接口凭证，支持开发者详情查看。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块3：D客连线索分发 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        D客连 · 线索分发引擎
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">排期管理</div>
+          <div class="fi-desc">品牌级投放排期CRUD，关联<strong>预算、D客账号、SmartCode、专营店</strong>四要素，一键跳转查看报表与线索明细，排期启停控制。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">报表权限</div>
+          <div class="fi-desc">D客账号管理，按<strong>品牌、排期、区域、专营店</strong>四级维度绑定数据查看权限，支持查看报表、线索明细与数据导出。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">SmartCode管理</div>
+          <div class="fi-desc">投放标识码维护，支持<strong>品牌与开发者之间的映射关系</strong>配置，批量导入SmartCode与映射数据，映射关系启用/停用。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块4：拦截管理 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        拦截管理 · 线索去重引擎
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">规则配置</div>
+          <div class="fi-desc">去重拦截规则CRUD，支持<strong>跨来源拦截与单来源去重</strong>两种作用域，按手机号/设备ID去重，配置渠道范围与时间窗口，拒绝入库/追加标记两种拦截动作，优先级排序。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">拦截记录</div>
+          <div class="fi-desc">四张统计卡片实时展示<strong>今日拦截数、累计拒绝、累计标记、累计通过</strong>，支持按规则和拦截动作筛选日志明细。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">黑名单</div>
+          <div class="fi-desc">手机号黑名单CRUD，支持<strong>单条新增与批量导入</strong>，移出黑名单需二次确认，按关联规则筛选黑名单记录。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块5：线索管理 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        线索管理 · 全生命周期
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">线索列表</div>
+          <div class="fi-desc">多维筛选器支持<strong>线索状态、等级、API Key、品牌、意向车系</strong>联动过滤，搜索框支持客户姓名/电话/编号模糊匹配，状态标签页切换全部/待处理/处理中/已下发/下发失败/仅接收，线索详情弹窗查看完整信息，线索状态流转与操作确认。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">线索导出</div>
+          <div class="fi-desc">异步CSV导出，按<strong>当前筛选条件</strong>导出线索数据，与线索列表筛选器联动，保证导出数据与视图一致。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块6：自定义字段 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        自定义字段 · 灵活扩展
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">线索接收字段</div>
+          <div class="fi-desc">8种字段类型：<strong>文本、数字、日期、单选、多选、图片、长文本、手机号</strong>，支持公共/品牌两级作用域，字段排序与必填配置，实时表单预览，字段启停控制。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">线索下发字段</div>
+          <div class="fi-desc">按品牌配置<strong>源字段到目标字段的映射关系</strong>，确保线索下发时各品牌数据字段准确对齐，支持新增下发字段映射。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块7：系统管理 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        系统管理 · RBAC权限体系
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">帐号管理</div>
+          <div class="fi-desc">系统帐号CRUD，<strong>关联角色分配</strong>，支持新增帐号时选择所属角色。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">权限管理</div>
+          <div class="fi-desc">系统级权限配置与维护，定义<strong>可分配的权限项</strong>，为角色授权提供基础权限集。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">角色管理</div>
+          <div class="fi-desc">角色CRUD与<strong>权限菜单分配</strong>，实现 RBAC 角色-权限绑定，控制不同角色可访问的功能范围。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块8：交互优化 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-changed">变更</span>
+        全局交互 · 框架层升级
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">导航体系重构</div>
+          <div class="fi-desc">侧边栏按<strong>工作台、基础数据、D客连、拦截管理、线索管理、系统</strong>六大分组组织导航，顶部导航栏集成<strong>消息通知弹窗</strong>与用户信息区域。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">表格列设置</div>
+          <div class="fi-desc">线索列表支持<strong>自定义显示列</strong>，用户可按需勾选/取消列，必选列锁定不可取消，列设置持久化到当前会话。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Version Card: v1.1.0 ═══ -->
+  <div class="version-card" id="version-110">
+    <div class="version-card-header">
+      <div class="version-tag"><span class="v-label">v</span>1.1.0</div>
+      <div class="version-date">2026-07-10</div>
+      <div class="version-status" style="background: var(--info-soft); color: var(--info);">历史版本</div>
+    </div>
+    <div class="version-summary">
+      原型初版搭建，完成<strong>登录页、基础框架布局（顶部导航+侧边栏）、工作台、线索列表、页面导航机制</strong>五大核心模块。实现单页应用 SPA 架构，<strong>navigateTo()</strong> 统一管理 18 个页面与 2 个子页面的路由切换、面包屑动态更新与侧边栏激活态同步，为后续全功能模块扩展奠定框架基础。
+    </div>
+
+    <!-- 板块1：登录页 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        登录页 · 系统入口
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">登录表单</div>
+          <div class="fi-desc"><strong>用户名+密码</strong>输入框，预设默认值，输入框焦点时蓝色外发光反馈，点击登录触发 <strong>doLogin()</strong> 模拟鉴权流程。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">品牌展示区</div>
+          <div class="fi-desc">居中卡片布局，含<strong>车辆 SVG 图标 + 系统名称「D客连 · SaaS平台」+ 副标题「企业级线索深度培育系统」</strong>，底部版权信息。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">登录交互</div>
+          <div class="fi-desc">点击登录后<strong>隐藏登录页 → 显示主应用框架 → Toast 提示「登录成功，欢迎回来！」</strong>，原型级模拟无实际鉴权。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块2：框架布局 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        基础框架 · 全局布局
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">顶部导航栏（64px）</div>
+          <div class="fi-desc">固定顶部，含<strong>系统 Logo、竖线分隔、动态面包屑导航</strong>（随页面切换更新），右侧集成<strong>通知中心</strong>（铃铛图标+红色角标+3条通知下拉弹窗）与<strong>用户信息区</strong>（头像+用户名+角色）。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">侧边栏导航（240px）</div>
+          <div class="fi-desc">固定左侧暗色主题（#15161c），按<strong>工作台、基础数据、D客连、拦截管理、线索管理、系统</strong>六大分组组织，共 18 个导航项。激活态白色文字+左侧 3px 蓝色竖条，悬停半透明白色背景，支持子菜单折叠展开，线索列表项带红色数量角标。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">通知中心</div>
+          <div class="fi-desc">铃铛图标 + 红色角标数字，点击展开<strong>通知下拉弹窗</strong>，展示 3 条通知项（黑名单策略命中、外呼标签同步、配置待审核）。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">用户信息区</div>
+          <div class="fi-desc">圆形头像（首字母）+ 用户名「管理员」+ 角色「总部超级管理员」，固定显示在导航栏右侧。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块3：页面导航机制 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        页面导航 · SPA 路由引擎
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">navigateTo() 统一路由</div>
+          <div class="fi-desc">单页应用核心路由函数，统一管理 <strong>18 个页面 + 2 个子页面</strong>（排期报表、线索明细）的显示/隐藏切换，含页面 ID 映射（scmapping→smartcode）、排期抽屉关闭、页面初始化回调触发。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">面包屑动态更新</div>
+          <div class="fi-desc">内置<strong>名称字典</strong>（18 项映射），页面切换时自动更新顶部面包屑文本，子页面显示层级路径（如「排期管理 / 查看报表」）。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">侧边栏激活态同步</div>
+          <div class="fi-desc">子页面（dk-report/dk-leaddetail）自动高亮<strong>父级导航项</strong>（排期管理），scmapping 高亮 SmartCode 管理，确保导航状态一致性。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">页面初始化回调</div>
+          <div class="fi-desc">各页面切换时触发对应初始化函数（如 <strong>initCityTree()、initRegionTree()、filterSupplierList()、renderScheduleTable()</strong> 等），实现按需加载。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块4：工作台 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        工作台 · Dashboard
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">数据统计卡片</div>
+          <div class="fi-desc">四张核心统计卡片：<strong>今日新增线索（1,284）、今日已下发（356）、A级高意向（89）、今日成交（42）</strong>，每项附带环比趋势箭头与百分比浮动，四色主题区分。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">线索趋势图</div>
+          <div class="fi-desc">近 7 天线索量<strong>柱状图</strong>，周一至周日每日数据可视化，直观对比工作日与周末流量波动。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">开发者分布</div>
+          <div class="fi-desc">进度条形式展示各来源线索占比：<strong>懂车帝 45%、汽车之家 30%、易车 15%、其他 10%</strong>。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">快捷操作</div>
+          <div class="fi-desc">8 个核心功能入口卡片一键跳转：线索列表、仅接收线索、拦截规则、黑名单、门店管理、开发者管理、自定义字段、排期管理。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">待处理事项</div>
+          <div class="fi-desc">红色角标展示待处理数量（4 项），含<strong>待下发线索详情</strong>，点击「立即处理」跳转线索列表页面。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块5：线索列表 -->
+    <div class="change-group">
+      <div class="change-group-title">
+        <span class="change-type-badge badge-added">新增</span>
+        线索列表 · 核心页面
+      </div>
+      <div class="feature-cards">
+        <div class="feature-item">
+          <div class="fi-title">状态 Tab 筛选</div>
+          <div class="fi-desc">6 个状态标签页：<strong>全部(128)、待处理(12)、处理中(35)、已下发(48)、下发失败(18)、仅接收(2)</strong>，每个 Tab 含数量角标，仅接收红色高亮，通过 <strong>filterByStatus()</strong> 切换筛选。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">多维筛选器</div>
+          <div class="fi-desc">搜索框支持<strong>客户姓名/电话号码/线索编号</strong>模糊匹配，5 个下拉筛选：线索状态、线索等级(A/B/C/D)、API Key、品牌、意向车系，支持重置。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">数据表格（10 列）</div>
+          <div class="fi-desc">表格展示：<strong>线索编号/客户信息(姓名+脱敏电话)/意向品牌/意向车系/意向等级/API Key/意向门店/线索状态/接收时间/操作</strong>，不同状态行含差异化操作按钮。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">列设置</div>
+          <div class="fi-desc">表头操作列含列设置下拉面板，支持<strong>显示/隐藏 6 个可选列</strong>（品牌/车系/等级/APIKey/门店/时间），4 个必选列锁定不可取消，配置持久化到 <strong>localStorage</strong>。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">线索详情弹窗</div>
+          <div class="fi-desc">弹窗含 <strong>4 个 Tab</strong>：基本信息（客户/来源/意向/状态）、拓展信息（品牌专属字段）、意向信息（购车用途/颜色偏好/对比车型）、操作日志（接入→校验→下发全流程）。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">重新下发</div>
+          <div class="fi-desc">仅<strong>下发失败状态</strong>的线索行显示「重新下发」按钮，通过 <strong>reDispatchLead()</strong> 触发确认弹窗，成功后更新线索状态。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">数据导出</div>
+          <div class="fi-desc">异步导出线索数据为 <strong>XLSX 格式</strong>，文件名「线索数据_时间戳.xlsx」，导出列受列设置可见性控制，含进度提示弹窗。</div>
+        </div>
+        <div class="feature-item">
+          <div class="fi-title">分页导航</div>
+          <div class="fi-desc">页码按钮 + 上一页/下一页箭头，底部显示「共 N 条数据」。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Version Timeline ═══ -->
+  <div class="timeline-section" id="version-timeline">
+    <div class="timeline-title">版本时间线</div>
+    <div class="timeline"><div class="timeline-item"><div class="timeline-dot dot-current"></div><span class="tl-version">v1.2.1</span><span class="tl-date">2026-10-22</span><p class="tl-summary">AI外呼配置与话单、七环节处理进度、人工决定、号码检测与下发映射解耦，以及六份文档同步；原型更新，接口待联调。</p></div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="tl-version">v1.2.0</span>
+        <span class="tl-date">2026-09-29</span>
+        <p class="tl-summary">线索管理新增「锁单排查」— 5条自动判断条件（或关系）+ 13列锁单明细 + 人工改判状态锁定机制 + 规则阈值可视化配置</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="tl-version">v1.1.1</span>
+        <span class="tl-date">2026-07-16</span>
+        <p class="tl-summary">D客连首次完整原型交付 — 7大板块24项功能，覆盖线索从接收→拦截→分发全链路闭环与RBAC权限体系</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="tl-version">v1.1.0</span>
+        <span class="tl-date">2026-07-10</span>
+        <p class="tl-summary">原型初版搭建 — 完成登录页、框架布局（顶部导航+侧边栏+通知中心）、SPA 路由引擎、工作台仪表盘、线索列表核心页面（6状态Tab+多维筛选+列设置+详情弹窗+导出）</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="tl-version">v1.0.0</span>
+        <span class="tl-date">2026-07-01</span>
+        <p class="tl-summary">项目启动 — 确定技术方案与产品方向，完成设计规范定义</p>
+      </div>
+    </div>
+  </div>
+    </main>
+    <button class="version-reopen version-reopen-left" type="button" id="versionLeftReopen" aria-label="展开版本目录">≡ 展开版本目录</button>
+  </div>
+</div>
+<script>
+  (function(){
+    var layout = document.getElementById('versionLayout');
+    document.getElementById('versionLeftCollapse').addEventListener('click', function(){ layout.classList.add('left-collapsed'); });
+    document.getElementById('versionLeftReopen').addEventListener('click', function(){ layout.classList.remove('left-collapsed'); });
+    var links = Array.prototype.slice.call(document.querySelectorAll('[data-version]'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.version-card[id]'));
+    var status = document.getElementById('versionSearchStatus');
+    var timeline = document.querySelector('.timeline-section');
+    function setActive(id) {
+      links.forEach(function(link) {
+        var active = link.getAttribute('data-version') === id;
+        link.classList.toggle('current', active);
+        if (active) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+    }
+    links.forEach(function(link){ link.addEventListener('click', function(event){
+      event.preventDefault();
+      var card = document.getElementById(link.getAttribute('data-version'));
+      if (!card || card.hidden) return;
+      setActive(card.id);
+      card.scrollIntoView({behavior:'smooth', block:'start'});
+    }); });
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function(entries) {
+        var visible = entries.filter(function(entry) { return entry.isIntersecting; })
+          .sort(function(a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; })[0];
+        if (visible) setActive(visible.target.id);
+      }, {rootMargin:'-15% 0px -72% 0px', threshold:0});
+      cards.forEach(function(card) { observer.observe(card); });
+    }
+    document.getElementById('versionSearch').addEventListener('input', function(){
+      var query = this.value.trim().toLowerCase();
+      var visible = 0;
+      links.forEach(function(link){
+        var match = !query || link.querySelector('span').textContent.toLowerCase().includes(query);
+        link.hidden = !match;
+        document.getElementById(link.getAttribute('data-version')).hidden = !match;
+        if (match) visible++;
+      });
+      if (timeline) timeline.hidden = !!query;
+      document.getElementById('versionSearchEmpty').classList.toggle('visible', visible === 0);
+      status.textContent = query ? (visible ? '找到 ' + visible + ' 个版本' : '未找到匹配版本') : '输入版本号，快速定位对应版本日志';
+      var firstVisible = links.find(function(link) { return !link.hidden; });
+      if (firstVisible) setActive(firstVisible.getAttribute('data-version'));
+    });
+  })();
+</script>
+</body>
+</html>
