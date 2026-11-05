@@ -1,14 +1,22 @@
 // 关联外呼线索的人工处理入口。生产环境须由服务端校验准入与任务版本，并原子更新处理状态。
 (function () {
-  var reviewed = false;
+  var reviewed = {}, selected = 'nissanLinkedManual';
 
-  window.openManualDispatchReview = function () {
-    if (reviewed) {
+  window.openManualDispatchReview = function (type) {
+    selected = type === 'brandLinkedManual' ? type : 'nissanLinkedManual';
+    if (reviewed[selected]) {
       showToast('该线索已处理，请刷新列表查看最新状态', 'info');
       return;
     }
     document.getElementById('manualDispatchReviewDecision').value = '';
     document.getElementById('manualDispatchReviewRemark').value = '';
+    var heading = document.querySelector('#manualDispatchReviewModal .modal-title');
+    if (heading) heading.textContent = '人工处理 · ' + leadDetailExamples[selected].customerName + ' · ' + leadDetailExamples[selected].code;
+    var item = leadDetailExamples[selected];
+    document.getElementById('manualReviewCustomer').textContent = item.customerName + ' / ' + item.phone;
+    document.getElementById('manualReviewTask').textContent = item.linkedTask.id;
+    document.getElementById('manualReviewOriginal').textContent = item.linkedTask.originalLeadId;
+    document.getElementById('manualReviewSource').textContent = selected === 'brandLinkedManual' ? '未归属排期；接收时品牌默认规则' : '2026年10月全国庆典促销；排期策略第1版';
     openModal('manualDispatchReviewModal');
   };
 
@@ -23,16 +31,17 @@
       showToast('请填写处理备注', 'error');
       return;
     }
-    if (reviewed) {
+    if (reviewed[selected]) {
       showToast('该线索已处理，请刷新列表查看最新状态', 'error');
       return;
     }
 
     // 原型只呈现状态流转；实际下发需由服务端复核并排队，不能从浏览器直接调用厂商接口。
-    reviewed = true;
+    reviewed[selected] = true;
     var dispatch = decision === 'dispatch';
     var status = dispatch ? '处理中' : '仅接收';
-    var statusCell = document.getElementById('manualDispatchLeadStatus');
+    var prefix = selected === 'brandLinkedManual' ? 'brandManual' : 'manualDispatch';
+    var statusCell = document.getElementById(prefix + 'LeadStatus');
     var badge = document.createElement('span');
     badge.className = 'status-badge ' + (dispatch ? 'status-primary' : 'status-warning');
     badge.textContent = status;
@@ -40,13 +49,14 @@
     description.style.cssText = 'font-size:12px;color:var(--gray-600);margin-top:4px;';
     description.textContent = dispatch ? '人工确认，待厂商响应' : '人工决定不下发';
     statusCell.replaceChildren(badge, description);
-    document.getElementById('manualDispatchLeadActions').innerHTML =
-      '<button class="btn btn-secondary btn-sm" type="button" onclick="openLeadDetail(\'nissanLinkedManual\')">详情</button>';
-    document.getElementById('manualDispatchTabCount').textContent = '0';
+    document.getElementById(prefix + 'LeadActions').innerHTML =
+      '<button class="btn btn-secondary btn-sm" type="button" onclick="openLeadDetail(\'' + selected + '\')">详情</button>';
+    var manualCount = document.getElementById('manualDispatchTabCount');
+    manualCount.textContent = String(Math.max(0, Number(manualCount.textContent) - 1));
     var targetCount = document.getElementById(dispatch ? 'manualDispatchProcessingCount' : 'manualDispatchReceivedCount');
     targetCount.textContent = String(Number(targetCount.textContent) + 1);
 
-    var detail = leadDetailExamples.nissanLinkedManual;
+    var detail = leadDetailExamples[selected];
     detail.statusHtml = '<span class="status-badge ' + (dispatch ? 'status-primary' : 'status-warning') + '">' + status + '</span>';
     detail.dispatchDecision = dispatch ? '人工确认，已提交厂商下发队列，等待响应' : '人工决定仅接收，不下发';
     detail.note = dispatch

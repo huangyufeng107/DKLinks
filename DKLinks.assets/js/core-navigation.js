@@ -2,6 +2,12 @@
   function doLogin() {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('mainApp').classList.add('active');
+    navigateTo('dashboard');
+    var loginUrl = new URL(window.location.href);
+    if (loginUrl.searchParams.has('prototypePage')) {
+      loginUrl.searchParams.delete('prototypePage');
+      try { window.history.replaceState(null, '', loginUrl.href); } catch (error) { /* Local-file URL updates may be restricted. */ }
+    }
     showToast('登录成功，欢迎回来！', 'success');
   }
 
@@ -60,15 +66,16 @@
       showToast('页面不存在：' + page, 'error');
       return;
     }
-    // Leave the schedule drawer before switching to another workspace page.
+    // Retain editor inputs in the main workspace; release its active flag when leaving.
     var scheduleModal = document.getElementById('scheduleModal');
-    if (scheduleModal && scheduleModal.classList.contains('active')) {
+    if (page !== 'schedule-editor' && scheduleModal && scheduleModal.classList.contains('active')) {
       closeModal('scheduleModal');
     }
     // Hide all pages
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     // Show target page
     targetPage.classList.add('active');
+    if (page === 'schedule-editor' && scheduleModal) scheduleModal.classList.add('active');
     document.body.classList.remove('dcc-focus');
     // Update breadcrumb
     const names = {
@@ -93,6 +100,8 @@
       'outbound-channel-dict': '系统设置 / 数据字典管理',
       'lead-intercept': '拦截管理 / 拦截规则',
       'schedule': '投放运营 / 排期管理',
+      'schedule-policy': '投放运营 / 排期管理 / 处理策略',
+      'schedule-editor': '投放运营 / 排期管理 / 排期配置',
       'dk-report': '投放运营 / 排期管理 / 查看报表',
       'dk-leaddetail': '投放运营 / 排期管理 / 线索明细',
       'dk-account': '投放运营 / 报表账号管理',
@@ -105,6 +114,8 @@
     document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
     const sidebarPage = {
       'dk-report': 'schedule',
+      'schedule-policy': 'schedule',
+      'schedule-editor': 'schedule',
       'dk-leaddetail': 'schedule',
       'lead-detail': 'leads',
       'ai-call-record-detail': 'ai-call-records',
@@ -152,6 +163,7 @@
     if (page === 'schedule') {
       renderScheduleTable();
     }
+    if (page === 'schedule-policy' && typeof renderSchedulePolicy === 'function') renderSchedulePolicy();
     // SmartCode管理页面：默认显示维护页签，兼容映射入口
     if (page === 'smartcode') {
       switchSmartCodeTab(requestedPage === 'scmapping' ? 'mapping' : 'maintain');
@@ -160,6 +172,7 @@
     if (page === 'dk-report') {
       initReportPage();
     }
+    if (page === 'dk-leaddetail' && typeof renderScheduleGoalLeadList === 'function') renderScheduleGoalLeadList();
     // 锁单排查页面：渲染锁单列表
     if (page === 'lock-audit' && typeof lockRenderTable === 'function') {
       lockRenderTable();

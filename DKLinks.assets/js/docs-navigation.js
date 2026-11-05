@@ -1,38 +1,25 @@
 (() => {
   'use strict';
-  // Release-log links open the current prototype at a specific workspace page.
-  const prototypePage = new URLSearchParams(window.location.search).get('prototypePage');
-  if (prototypePage) document.addEventListener('DOMContentLoaded', () => {
+  // A fresh prototype load always starts at login, including old workspace links.
+  document.addEventListener('DOMContentLoaded', () => {
     const login = document.getElementById('loginPage');
     const app = document.getElementById('mainApp');
     if (!login || !app) return;
-    if (prototypePage === 'login') {
-      login.style.display = '';
-      app.classList.remove('active');
-      return;
-    }
-    if (!document.getElementById('page-' + prototypePage) || typeof window.navigateTo !== 'function') return;
-    if (prototypePage === 'lead-view-config' && typeof window.hasLeadViewConfigPermission === 'function' && !window.hasLeadViewConfigPermission()) {
-      window.showToast('无权配置线索列表', 'error');
-      return;
-    }
-    login.style.display = 'none';
-    app.classList.add('active');
-    window.navigateTo(prototypePage);
-    if (prototypePage === 'lead-view-config' && typeof window.leadViewSelectConfig === 'function') window.leadViewSelectConfig();
+    login.style.display = '';
+    app.classList.remove('active');
   }, {once:true});
   if (new URLSearchParams(window.location.search).get('standalone') === '1') return;
   if (document.getElementById('dkDocsHeader')) return;
 
   const tabs = [
     ['prototype', '产品原型', './DKLinks.html'],
+    ['requirements', '需求说明', 'DKLinks.assets/docs/需求说明/index.html?v=20261104-schedule-page-layout'],
     ['system-blueprint', '系统蓝图', 'DKLinks.assets/docs/核心文档/线索下发与防死循环技术规格方案.html?v=20261023-v121-appendix-notes'],
-    ['function-doc', '功能文档', 'DKLinks.assets/docs/核心文档/DKLinks_功能文档.html?v=20261026-leadview'],
-    ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_交互流程图.html?v=20261026-leadview'],
-    ['business-flow', '业务流程图', 'DKLinks.assets/docs/核心文档/业务时序图.html?v=20261026-business-scenarios'],
-    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能清单.html?v=20261026-leadview'],
-    ['version-log', '版本号日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261027-prototype-entry'],
-    ['logic-flow', '逻辑流程图', 'DKLinks.assets/docs/核心文档/DKLinks_逻辑流程图.html?v=20261023-direct-page']
+    ['function-doc', '功能文档', 'DKLinks.assets/docs/核心文档/DKLinks_功能文档.html?v=20261104-release-links'],
+    ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_交互流程图.html?v=20261027-regression-close'],
+    ['business-flow', '业务流程图', 'DKLinks.assets/docs/核心文档/业务时序图.html?v=20261104-schedule-page-layout'],
+    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能清单.html?v=20261027-regression-close'],
+    ['version-log', '版本号日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261027-prototype-entry']
   ];
   const normalizeTabId = (id) => {
     if (id === 'blueprint') return 'system-blueprint';
@@ -40,7 +27,6 @@
     if (id === 'sequence') return 'business-flow';
     if (id === 'features') return 'feature-list';
     if (id === 'versions') return 'version-log';
-    if (id === 'logic') return 'logic-flow';
     return id;
   };
 

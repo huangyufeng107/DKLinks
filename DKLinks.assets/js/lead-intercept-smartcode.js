@@ -51,6 +51,8 @@
     { id: 11, event_type: 'phone_status', brandCode: 'WENJIE', rule_name: '号码状态检测', source_lead_id: 'autohome', phone_masked: '137****8080', phone_status: 'UNKNOWN', intercept_action: 4, lead_id: 'LD2026051400007', lead_detail_type: 'phoneStatusUnknown', intercept_at: '2026-05-14 10:30:05' }
   );
 
+  interceptLogs.push({ id: 12, event_type: 'phone_status', brandCode: 'DONGFENG_NISSAN', rule_name: '号码状态检测', source_lead_id: 'dongchedi', phone_masked: '138****0101', phone_status: 'NORMAL', intercept_action: 4, lead_id: 'LD2026102700101', lead_detail_type: 'policyProject', intercept_at: '2026-10-27 10:00:01', policyEvidenceSnapshot: window.LeadPolicyEvidence.get('LD2026102700101') });
+
   var nextInterceptRuleId = 6;
   var currentInterceptTab = 'rules';
   var editingInterceptRuleId = null;
@@ -116,6 +118,7 @@
       if (!actionsReady) {
         config.enabled = false;
         config.needsReview = true;
+        window.dispatchEvent(new CustomEvent('dk-brand-capability-change', { detail: { brandCode: code, capability: 'phone', enabled: false } }));
       }
     });
     renderPhoneStatusConfigTable();
@@ -137,7 +140,7 @@
       var actionButton = config.enabled
         ? '<button class="btn btn-sm btn-secondary" onclick="togglePhoneStatusBrand(&quot;' + brand.code + '&quot;)">停用</button>'
         : '<button class="btn btn-sm btn-primary" onclick="openPhoneStatusConfig(&quot;' + brand.code + '&quot;, true)">配置并启用</button>';
-      return '<tr><td><strong>' + brand.name + '</strong></td>' +
+      return '<tr data-phone-brand="' + escapeHTML(brand.code) + '"><td><strong>' + brand.name + '</strong></td>' +
         '<td>' + (config.enabled ? '<span class="status-badge status-active">检测中</span>' : '<span class="status-badge status-disabled">已关闭</span>') + '</td>' +
         '<td>' + modeText + '<div class="form-hint">未知 / 调用异常：标记后继续</div></td>' +
         '<td>' + mappingBadge + '</td>' +
@@ -202,6 +205,7 @@
     var code = phoneStatusConfigBrand;
     if (!code) return;
     var enabled = document.getElementById('phoneStatusEnabled').checked;
+    var wasEnabled = !!(phoneStatusConfigs[code] && phoneStatusConfigs[code].enabled);
     var actions = Object.assign({}, (phoneStatusConfigs[code] || {}).actions || {});
     document.querySelectorAll('#phoneStatusActionRows .phone-status-action').forEach(function(select) {
       actions[select.getAttribute('data-status-code')] = select.value;
@@ -211,6 +215,7 @@
       return;
     }
     phoneStatusConfigs[code] = { enabled: enabled, actions: actions, needsReview: false, updatedAt: new Date().toLocaleString('zh-CN', { hour12: false }) };
+    if (wasEnabled !== enabled) window.dispatchEvent(new CustomEvent('dk-brand-capability-change', { detail: { brandCode: code, capability: 'phone', enabled: enabled } }));
     delete phoneStatusDrafts[code];
     renderPhoneStatusConfigTable();
     closePhoneStatusConfigModal();
@@ -222,6 +227,7 @@
     if (!config) { openPhoneStatusConfig(code, true); return; }
     if (config.enabled) {
       config.enabled = false;
+      window.dispatchEvent(new CustomEvent('dk-brand-capability-change', { detail: { brandCode: code, capability: 'phone', enabled: false } }));
       config.updatedAt = new Date().toLocaleString('zh-CN', { hour12: false });
       renderPhoneStatusConfigTable();
       showToast('该品牌号码状态检测已停用', 'success');
@@ -254,6 +260,9 @@
   var statusLabels = { 1: '启用', 0: '停用' };
 
   function initInterceptPage() {
+    window.scheduleDedupBrandContext = null;
+    var hint = document.getElementById('policyDedupReturn');
+    if (hint) hint.style.display = 'none';
     switchInterceptTab('rules');
   }
 
@@ -293,6 +302,8 @@
     var statusFilter = statusFilterEl ? statusFilterEl.value : '';
 
     var filtered = interceptRules.filter(function(r) {
+      var context = window.scheduleDedupBrandContext;
+      if (context && r.brand_id && r.brand_name !== context.name) return false;
       if (scopeFilter && (r.source_condition_enabled === false || String(r.rule_scope) !== scopeFilter)) return false;
       if (statusFilter !== '' && String(r.status) !== statusFilter) return false;
       return true;
@@ -362,7 +373,7 @@
       html += '</tr>';
     });
 
-    tbody.innerHTML = html;
+    tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--gray-500);">暂无匹配的去重规则，可新增或调整筛选条件</td></tr>';
     document.getElementById('intercept-pagination-info').textContent = '共 ' + rules.length + ' 条规则';
   }
 
@@ -379,13 +390,17 @@
       brandOpts += '<option value="' + name + '">' + name + '</option>';
     });
     brandSelect.innerHTML = brandOpts;
+    var context = window.scheduleDedupBrandContext;
+    if (context && !Array.from(brandSelect.options).some(function(option) { return option.value === context.name; })) {
+      var option = document.createElement('option'); option.value = context.name; option.textContent = context.name; brandSelect.appendChild(option);
+    }
 
     // Populate channel checkboxes
     renderInterceptSourceCheckboxes([]);
 
     // Reset form
     document.getElementById('interceptRuleName').value = '';
-    document.getElementById('interceptRuleBrand').value = '';
+    document.getElementById('interceptRuleBrand').value = !ruleId && context ? context.name : '';
     document.getElementById('interceptSourceConditionEnabled').checked = false;
     document.getElementById('interceptRuleScope').value = '1';
     document.getElementById('interceptDedupKey').value = '2';
@@ -403,6 +418,7 @@
         saveBtn.textContent = '更新规则';
         document.getElementById('interceptRuleName').value = rule.rule_name;
         document.getElementById('interceptRuleBrand').value = rule.brand_id || '';
+        if (rule.brand_id && !brandSelect.value) brandSelect.value = rule.brand_name || '';
         document.getElementById('interceptSourceConditionEnabled').checked = rule.source_condition_enabled !== false;
         document.getElementById('interceptRuleScope').value = String(rule.rule_scope);
         document.getElementById('interceptDedupKey').value = String(rule.dedup_key);
@@ -540,12 +556,7 @@
     if (sourceConditionEnabled && scope === 2 && sourceIds.length > 1) { showToast('单来源内去重只能选择1个渠道', 'warning'); return; }
     if (timeType !== 3 && !timeValue) { showToast('请输入时间窗口数值', 'warning'); return; }
 
-    var brandName = '';
-    if (brandId) {
-      if (brandRegionData[brandId]) brandName = brandId;
-    } else {
-      brandName = '全品牌通用';
-    }
+    var brandName = brandId || '全品牌通用';
 
     if (editingInterceptRuleId) {
       var rule = interceptRules.find(function(r) { return r.id === editingInterceptRuleId; });
@@ -577,6 +588,7 @@
     editingInterceptRuleId = null;
     closeInterceptRuleModal();
     filterInterceptRules();
+    if (typeof refreshSchedulePolicyDependencies === 'function') refreshSchedulePolicyDependencies();
   }
 
   function editInterceptRule(id) {
@@ -590,6 +602,7 @@
       var action = rule.status === 1 ? '启用' : '停用';
       showToast('规则 ' + rule.rule_name + ' ' + action, 'info');
       filterInterceptRules();
+      if (typeof refreshSchedulePolicyDependencies === 'function') refreshSchedulePolicyDependencies();
     }
   }
 
@@ -617,6 +630,7 @@
     interceptRules = interceptRules.filter(function(r) { return r.id !== id; });
     showToast('规则已删除', 'success');
     filterInterceptRules();
+    if (typeof refreshSchedulePolicyDependencies === 'function') refreshSchedulePolicyDependencies();
   }
 
   function closeInterceptRuleModal() {
@@ -759,6 +773,7 @@
       html += '<tr>';
       html += '<td style="font-size:13px;">' + log.intercept_at + '</td>';
       html += '<td><span class="status-badge ' + (log.event_type === 'phone_status' ? 'status-primary' : 'status-warning') + '">' + typeLabel + '</span><div style="font-size:12px;margin-top:4px;">' + escapeHTML(ruleLabel) + '</div></td>';
+      html += '<td style="font-size:13px;">' + escapeHTML(window.LeadPolicyEvidence.describe(log.policyEvidenceSnapshot)) + '</td>';
       html += '<td style="font-size:13px;">' + sourceLabel(log.source_lead_id) + '</td>';
       html += '<td style="font-size:13px;">' + escapeHTML(log.phone_masked) + '</td>';
       html += '<td style="font-size:13px;">' + statusLabel + '</td>';

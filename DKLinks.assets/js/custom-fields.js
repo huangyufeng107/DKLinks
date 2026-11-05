@@ -2105,7 +2105,7 @@
       code: 'LD2026051400001', customerName: '李明', phone: '138****8888', gender: '男', area: '广东省 深圳市 南山区',
       apiKey: '懂车帝', sourceId: 'DCC_20260514_001', levelHtml: '<span class="level-badge level-a">A级</span>',
       receiveTime: '2026-05-14 09:30:15', brand: '理想汽车', vehicle: '理想L9', budget: '30-50万', buyTime: '一个月内',
-      statusHtml: '<span class="status-badge status-pending">待下发</span>', store: '深圳理想南山店',
+      statusHtml: '<span class="status-badge status-pending">待处理</span>', store: '深圳理想南山店',
       receiveResult: '已接收并保存', dispatchDecision: '待下发', blacklistCheck: '未命中', interceptCheck: '未命中',
       // 原型场景配置快照；非真实历史恢复，不读取当前品牌设置。
       phoneStatusConfigSnapshot: { enabled: false, snapshotId: 'PCSNAP-LD2026051400001', capturedAt: '2026-05-14 09:30:15' },
@@ -2272,6 +2272,34 @@
     if (el) el.textContent = value == null ? '' : value;
   }
 
+  // 独立演示数据，不替换既有历史线索。
+  Object.keys(window.LeadPolicyEvidence.samples).forEach(function (type) {
+    var item = window.LeadPolicyEvidence.samples[type];
+    if (type === 'brandLinkedManual') {
+      leadDetailExamples[type] = Object.assign({}, leadDetailExamples.nissanLinkedManual, {
+        code: item.code, customerName: item.customerName, phone: item.phone, sourceId: 'DEMO_BRAND_005',
+        policyEvidenceSnapshot: item, dispatchDecision: item.reason, note: item.reason,
+        linkedTask: { id: 'CALL-DFN-20261020-005', originalLeadId: 'LD2026102000000-BRAND', linkedAt: '2026-10-20 10:00:03' }
+      });
+      return;
+    }
+    if (type === 'nissanLinkedManual') {
+      leadDetailExamples[type].policyEvidenceSnapshot = item;
+      leadDetailExamples[type].dispatchDecision = item.reason;
+      return;
+    }
+    leadDetailExamples[type] = Object.assign({}, leadDetailExamples.normal, {
+      code: item.code, customerName: item.customerName, phone: item.phone, sourceId: 'DEMO_' + item.code,
+      receiveTime: item.capturedAt, brand: '东风日产', vehicle: '轩逸', store: '东风日产·广州番禺店',
+      statusHtml: '<span class="status-badge status-warning">' + item.outcome + '</span>',
+      dispatchDecision: item.reason, note: item.reason, interceptCheck: type === 'policyInherited' ? '未命中' : '未执行，详见策略依据', blacklistCheck: type === 'policyPaused' ? '未记录，不因跳过号码检测推断通过' : '未命中', checkLog: item.steps.join('；'), decisionLog: item.reason,
+      policyEvidenceSnapshot: item,
+      phoneStatusConfigSnapshot: { enabled: item.phoneEnabled, snapshotId: 'PHONE-' + item.code, capturedAt: item.capturedAt },
+      phoneStatusResult: item.phoneEnabled ? '正常' : '未检测', phoneStatusAction: item.phoneEnabled ? '标记后继续' : '未执行，详见策略依据',
+      outboundConfigSnapshot: { enabled: item.ai, snapshotId: 'AI-' + item.code, capturedAt: item.capturedAt }
+    });
+  });
+
   function setHtmlById(id, value) {
     var el = document.getElementById(id);
     if (el) el.innerHTML = value == null ? '' : value;
@@ -2313,11 +2341,23 @@
     }
     var fromIntercept = leadDetailReturnPage === 'lead-intercept';
     var fromAiCall = leadDetailReturnPage === 'ai-call-record-detail';
-    setTextById('leadDetailBreadcrumbOrigin', fromIntercept ? '拦截管理' : fromAiCall ? 'AI 外呼话单' : '线索列表');
-    setTextById('leadDetailBackButton', fromIntercept ? '返回拦截管理' : fromAiCall ? '返回话单详情' : '返回列表');
+    var fromScheduleReport = leadDetailReturnPage === 'dk-report';
+    var fromScheduleLeads = leadDetailReturnPage === 'dk-leaddetail';
+    setTextById('leadDetailBreadcrumbOrigin', fromIntercept ? '拦截管理' : fromAiCall ? 'AI 外呼话单' : fromScheduleReport ? '排期报表' : fromScheduleLeads ? '排期线索明细' : '线索列表');
+    setTextById('leadDetailBackButton', fromIntercept ? '返回拦截管理' : fromAiCall ? '返回话单详情' : fromScheduleReport ? '返回报表' : fromScheduleLeads ? '返回排期线索明细' : '返回列表');
     setTextById('leadDetailTitle', '线索详情 - ' + data.code);
     setTextById('leadDetailBreadcrumbCode', data.code);
     setTextById('leadDetailSummaryCode', data.code);
+    var evidence = data.policyEvidenceSnapshot;
+    setTextById('leadPolicySchedule', evidence ? (evidence.scheduleName || '未归属排期') : '未记录');
+    setTextById('leadPolicySource', evidence ? evidence.source : '未记录');
+    setTextById('leadPolicyVersion', evidence ? (evidence.version ? '策略第 ' + evidence.version + ' 版' : (evidence.source === '排期停发闸口（演示）' ? '不适用（停发依据）' : evidence.source === '品牌默认' ? '不适用（品牌默认）' : '不适用（接收时无项目发布）')) : '未记录');
+    document.getElementById('leadPolicyVersion').hidden = !evidence;
+    setTextById('leadPolicyCapturedAt', evidence ? evidence.capturedAt : '未记录');
+    window.LeadPolicyEvidence.renderStages(evidence);
+    var historyConfig = document.getElementById('leadPolicyConfigDetails'); if (historyConfig) historyConfig.open = false;
+    setTextById('leadBasicSchedule', evidence ? (evidence.scheduleName || '未归属排期') : '未记录');
+
     var aiCallEntry = document.getElementById('leadAiCallEntry');
     if (aiCallEntry) aiCallEntry.hidden = !data.linkedTask && !data.resultDecisionSnapshot?.sourceTaskId;
     setTextById('leadDetailSummaryName', data.customerName);
@@ -2366,7 +2406,7 @@
       setTextById('leadPreScoreDispatch', data.preScore.dispatch);
       setTextById('leadPreScorePayload', data.preScore.payload);
     }
-    switchLeadTab('basic', true);
+    switchLeadTab('trace', true);
     renderLeadExtendedInfo();
     navigateTo('lead-detail');
     window.scrollTo(0, 0);

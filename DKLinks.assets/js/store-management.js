@@ -1,3 +1,15 @@
+  var storeRecords = {
+        1: { name: '深圳理想南山店', code: 'LIXIANG_SZ_NS_001', type: '1', status: '1', brand: '1', carSeries: ['1', '2'], provinceCode: '44', cityCode: '440300', district: '南山区', afterSaleTel: '0755-88888888', email: 'nanshan@lixiang.com', address: '科苑南路XX号', longitude: '113.9438', latitude: '22.5484' },
+        2: { name: '深圳问界福田店', code: 'AITO_SZ_FT_001', type: '1', status: '1', brand: '2', carSeries: ['3', '8'], provinceCode: '44', cityCode: '440300', district: '福田区', afterSaleTel: '0755-66666666', email: 'futian@aito.com', address: '车公庙XX路XX号', longitude: '114.0555', latitude: '22.5431' },
+        3: { name: '广州小鹏天河店', code: 'XIAOPENG_GZ_TH_001', type: '2', status: '1', brand: '3', carSeries: ['4', '10', '11'], provinceCode: '44', cityCode: '440100', district: '天河区', afterSaleTel: '020-33333333', email: 'tianhe@xiaopeng.com', address: '珠江新城XX路XX号', longitude: '113.3245', latitude: '23.1291' },
+        4: { name: '广州东风日产专营店', code: 'DFN_GZ_TH_001', type: '1', status: '1', brand: '5', carSeries: ['13', '14'], provinceCode: '44', cityCode: '440100', district: '天河区', afterSaleTel: '020-38861234', email: 'gz_tianhe@dongfeng-nissan.com', address: '天河路385号太古汇一座', longitude: '113.3296', latitude: '23.1315' },
+        5: { name: '深圳东风日产龙岗店', code: 'DFN_SZ_LG_001', type: '1', status: '1', brand: '5', carSeries: ['13', '15'], provinceCode: '44', cityCode: '440300', district: '龙岗区', afterSaleTel: '0755-28951234', email: 'sz_longgang@dongfeng-nissan.com', address: '龙翔大道7188号万科广场', longitude: '114.2523', latitude: '22.7206' },
+        6: { name: '上海东风日产浦东店', code: 'DFN_SH_PD_001', type: '1', status: '1', brand: '5', carSeries: ['14', '16'], provinceCode: '31', cityCode: '310100', district: '浦东新区', afterSaleTel: '021-50881234', email: 'sh_pudong@dongfeng-nissan.com', address: '世纪大道100号环球金融中心', longitude: '121.5119', latitude: '31.2363' },
+        7: { name: '佛山东风日产禅城店', code: 'DFN_FS_CC_001', type: '2', status: '1', brand: '5', carSeries: ['13', '15', '16'], provinceCode: '44', cityCode: '440600', district: '禅城区', afterSaleTel: '0757-83121234', email: 'fs_chancheng@dongfeng-nissan.com', address: '季华五路28号万科金融中心', longitude: '113.1115', latitude: '23.0177' },
+        8: { name: '苏州东风日产吴中店', code: 'DFN_SU_WZ_001', type: '2', status: '1', brand: '5', carSeries: ['13', '14', '15'], provinceCode: '32', cityCode: '320500', district: '吴中区', afterSaleTel: '0512-65121234', email: 'su_wuzhong@dongfeng-nissan.com', address: '苏雅路308号信投大厦', longitude: '120.6357', latitude: '31.2645' },
+        9: { name: '杭州东风日产西湖店', code: 'DFN_HZ_XH_001', type: '1', status: '1', brand: '5', carSeries: ['14', '15', '16'], provinceCode: '33', cityCode: '330100', district: '西湖区', afterSaleTel: '0571-87981234', email: 'hz_xihu@dongfeng-nissan.com', address: '天目山路218号第一世界广场', longitude: '120.1338', latitude: '30.2722' }
+      };
+
 // ===== Store Management Functions =====
   function openStoreModal(id) {
     var modal = document.getElementById('storeModal');
@@ -5,6 +17,8 @@
     
     // 设置当前编辑的门店ID（用于双向联动）
     currentEditingStoreId = id || null;
+    modal.dataset.viewMode = '';
+    var saveError = document.getElementById('storeSaveError'); if (saveError) { saveError.textContent = ''; saveError.hidden = true; }
     
     // 先重置表单状态（确保从查看模式切换时正确恢复）
     resetStoreModalForEdit();
@@ -33,18 +47,7 @@
     
     if (id) {
       // 编辑模式 - 模拟数据填充
-      var storeData = {
-        1: { name: '深圳理想南山店', code: 'LIXIANG_SZ_NS_001', type: '1', status: '1', brand: '1', carSeries: ['1', '2'], provinceCode: '44', cityCode: '440300', district: '南山区', afterSaleTel: '0755-88888888', email: 'nanshan@lixiang.com', address: '科苑南路XX号', longitude: '113.9438', latitude: '22.5484' },
-        2: { name: '深圳问界福田店', code: 'AITO_SZ_FT_001', type: '1', status: '1', brand: '2', carSeries: ['3', '8'], provinceCode: '44', cityCode: '440300', district: '福田区', afterSaleTel: '0755-66666666', email: 'futian@aito.com', address: '车公庙XX路XX号', longitude: '114.0555', latitude: '22.5431' },
-        3: { name: '广州小鹏天河店', code: 'XIAOPENG_GZ_TH_001', type: '2', status: '1', brand: '3', carSeries: ['4', '10', '11'], provinceCode: '44', cityCode: '440100', district: '天河区', afterSaleTel: '020-33333333', email: 'tianhe@xiaopeng.com', address: '珠江新城XX路XX号', longitude: '113.3245', latitude: '23.1291' },
-        4: { name: '广州东风日产专营店', code: 'DFN_GZ_TH_001', type: '1', status: '1', brand: '5', carSeries: ['13', '14'], provinceCode: '44', cityCode: '440100', district: '天河区', afterSaleTel: '020-38861234', email: 'gz_tianhe@dongfeng-nissan.com', address: '天河路385号太古汇一座', longitude: '113.3296', latitude: '23.1315' },
-        5: { name: '深圳东风日产龙岗店', code: 'DFN_SZ_LG_001', type: '1', status: '1', brand: '5', carSeries: ['13', '15'], provinceCode: '44', cityCode: '440300', district: '龙岗区', afterSaleTel: '0755-28951234', email: 'sz_longgang@dongfeng-nissan.com', address: '龙翔大道7188号万科广场', longitude: '114.2523', latitude: '22.7206' },
-        6: { name: '上海东风日产浦东店', code: 'DFN_SH_PD_001', type: '1', status: '1', brand: '5', carSeries: ['14', '16'], provinceCode: '31', cityCode: '310100', district: '浦东新区', afterSaleTel: '021-50881234', email: 'sh_pudong@dongfeng-nissan.com', address: '世纪大道100号环球金融中心', longitude: '121.5119', latitude: '31.2363' },
-        7: { name: '佛山东风日产禅城店', code: 'DFN_FS_CC_001', type: '2', status: '1', brand: '5', carSeries: ['13', '15', '16'], provinceCode: '44', cityCode: '440600', district: '禅城区', afterSaleTel: '0757-83121234', email: 'fs_chancheng@dongfeng-nissan.com', address: '季华五路28号万科金融中心', longitude: '113.1115', latitude: '23.0177' },
-        8: { name: '苏州东风日产吴中店', code: 'DFN_SU_WZ_001', type: '2', status: '1', brand: '5', carSeries: ['13', '14', '15'], provinceCode: '32', cityCode: '320500', district: '吴中区', afterSaleTel: '0512-65121234', email: 'su_wuzhong@dongfeng-nissan.com', address: '苏雅路308号信投大厦', longitude: '120.6357', latitude: '31.2645' },
-        9: { name: '杭州东风日产西湖店', code: 'DFN_HZ_XH_001', type: '1', status: '1', brand: '5', carSeries: ['14', '15', '16'], provinceCode: '33', cityCode: '330100', district: '西湖区', afterSaleTel: '0571-87981234', email: 'hz_xihu@dongfeng-nissan.com', address: '天目山路218号第一世界广场', longitude: '120.1338', latitude: '30.2722' }
-      };
-      var data = storeData[id];
+      var data = storeRecords[String(id)];
       if (data) {
         title.textContent = '编辑门店';
         document.getElementById('storeDealerName').value = data.name;
@@ -56,13 +59,9 @@
         document.getElementById('storeBrand').value = data.brand;
         document.getElementById('storeProvinceSelect').value = data.provinceCode;
         onStoreProvinceChange(data.provinceCode);  // 触发省份联动
-        setTimeout(function() {
-          document.getElementById('storeCitySelect').value = data.cityCode;
-          onStoreCityChange(data.cityCode);  // 触发城市联动
-          setTimeout(function() {
-            document.getElementById('storeDistrictSelect').value = data.district;
-          }, 50);
-        }, 50);
+        document.getElementById('storeCitySelect').value = data.cityCode;
+        onStoreCityChange(data.cityCode);
+        document.getElementById('storeDistrictSelect').value = data.district || '';
         document.getElementById('storeAfterSaleTel').value = data.afterSaleTel;
         document.getElementById('storeEmail').value = data.email;
         document.getElementById('storeAddress').value = data.address;
@@ -70,18 +69,12 @@
         document.getElementById('storeLatitude').value = data.latitude;
         // 联动填充大区、小区选项
         onStoreBrandChange(data.brand);
-        // 延迟设置车系回显（从 seriesDealerRelation 中获取）
-        setTimeout(function() {
-          // 从关联关系表获取该门店关联的车系
-          var relatedSeries = getDealerSeries(String(id));
-          if (relatedSeries.length > 0) {
-            storeSelectedSeries = relatedSeries;
-          } else if (data.carSeries && data.carSeries.length > 0) {
-            // 兼容旧数据
-            storeSelectedSeries = data.carSeries;
-          }
-          initStoreSeriesSelector();
-        }, 100);
+        document.getElementById('storeRegion').value = data.region || '';
+        onStoreRegionChange(data.region || '');
+        document.getElementById('storeSubRegion').value = data.subRegion || '';
+        storeSelectedSeries = (data.savedSeries ? data.carSeries : getDealerSeries(String(id))).slice();
+        if (!storeSelectedSeries.length && !data.savedSeries) storeSelectedSeries = (data.carSeries || []).slice();
+        initStoreSeriesSelector();
       }
     } else {
       // 新增模式
@@ -100,7 +93,7 @@
     regionSelect.innerHTML = '<option value="">请选择大区</option>';
     subRegionSelect.innerHTML = '<option value="">请选择小区</option>';
     
-    if (!brandId) return;
+    if (!brandId) { onStoreBrandChangeForSeries(); return; }
     
     var brandRegionMap = {
       '1': {
@@ -140,6 +133,7 @@
         regionSelect.appendChild(opt);
       });
     }
+    onStoreBrandChangeForSeries();
   }
   
   function onStoreRegionChange(regionName) {
@@ -460,24 +454,12 @@
 
   // 切换单个车系选中状态（双向联动）
   function toggleStoreSeries(checkboxElem, seriesId) {
-    // 如果直接点击 checkbox，需要先更新 storeSelectedSeries
-    var isChecked = checkboxElem.checked;
-    
+    var checkbox = checkboxElem.tagName === 'INPUT' ? checkboxElem : checkboxElem.querySelector('input[type="checkbox"]');
+    if (!checkbox) return;
+    if (checkboxElem !== checkbox) checkbox.checked = !checkbox.checked;
     var index = storeSelectedSeries.indexOf(seriesId);
-    if (isChecked && index === -1) {
-      storeSelectedSeries.push(seriesId);
-      // 双向联动：同步更新 seriesDealerRelation
-      if (currentEditingStoreId) {
-        syncSeriesToDealer(String(currentEditingStoreId), seriesId, true);
-      }
-    } else if (!isChecked && index !== -1) {
-      storeSelectedSeries.splice(index, 1);
-      // 双向联动：同步更新 seriesDealerRelation
-      if (currentEditingStoreId) {
-        syncSeriesToDealer(String(currentEditingStoreId), seriesId, false);
-      }
-    }
-    
+    if (checkbox.checked && index === -1) storeSelectedSeries.push(seriesId);
+    else if (!checkbox.checked && index !== -1) storeSelectedSeries.splice(index, 1);
     renderStoreSeriesList();
     updateStoreSelectedSeriesDisplay();
   }
@@ -727,53 +709,6 @@
     updateCarSeriesDropdown(brandId);
   }
 
-  // 同步更新品牌和大区、小区、车系
-  function onStoreBrandChange(brandId) {
-    var regionSelect = document.getElementById('storeRegion');
-    var subRegionSelect = document.getElementById('storeSubRegion');
-    
-    regionSelect.innerHTML = '<option value="">请选择大区</option>';
-    subRegionSelect.innerHTML = '<option value="">请选择小区</option>';
-    
-    if (!brandId) return;
-    
-    var brandRegionMap = {
-      '1': {
-        regions: {
-          '华南大区': ['深圳小区', '广州小区', '东莞小区', '佛山小区'],
-          '华东大区': ['上海小区', '杭州小区', '南京小区', '苏州小区'],
-          '华北大区': ['北京小区', '天津小区', '石家庄小区']
-        }
-      },
-      '2': {
-        regions: {
-          '华南大区': ['深圳小区', '广州小区', '东莞小区'],
-          '华东大区': ['上海小区', '杭州小区', '南京小区']
-        }
-      },
-      '3': {
-        regions: {
-          '华南大区': ['深圳小区', '广州小区', '佛山小区'],
-          '华东大区': ['上海小区', '杭州小区'],
-          '西南大区': ['成都小区', '重庆小区', '昆明小区']
-        }
-      }
-    };
-    
-    var brand = brandRegionMap[brandId];
-    if (brand && brand.regions) {
-      Object.keys(brand.regions).forEach(function(r) {
-        var opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = r;
-        regionSelect.appendChild(opt);
-      });
-    }
-    
-    // 同时更新车系列表
-    onStoreBrandChangeForSeries();
-  }
-
   // ==================== 地图选址功能 ====================
   var mapPickerData = {
     longitude: '',
@@ -993,61 +928,73 @@
     }
   }
   
-  function saveStoreData() {
-    var name = document.getElementById('storeDealerName').value.trim();
-    var code = document.getElementById('storeDealerCode').value.trim();
-    var type = document.getElementById('storeDealerType').value;
-    var brand = document.getElementById('storeBrand').value;
-    var carSeries = document.getElementById('storeCarSeries').value;  // 逗号分隔的ID字符串
-    var province = document.getElementById('storeProvinceSelect').value;
-    var city = document.getElementById('storeCitySelect').value;
-    
-    if (!name) {
-      showToast('请输入经销商名称', 'error');
-      return;
-    }
-    if (!code) {
-      showToast('请输入经销商编码', 'error');
-      return;
-    }
-    if (!type) {
-      showToast('请选择门店类型', 'error');
-      return;
-    }
-    if (!brand) {
-      showToast('请选择所属品牌', 'error');
-      return;
-    }
-    if (!carSeries) {
-      showToast('请选择关联车系', 'error');
-      return;
-    }
-    if (!province) {
-      showToast('请选择所在省份', 'error');
-      return;
-    }
-    if (!city) {
-      showToast('请选择所在城市', 'error');
-      return;
-    }
-    
-    // 获取完整的地区信息
-    var provinceText = document.getElementById('storeProvinceSelect').selectedOptions[0].textContent;
-    var cityText = document.getElementById('storeCitySelect').selectedOptions[0].textContent;
-    var district = document.getElementById('storeDistrictSelect').value;
-    var districtText = district ? document.getElementById('storeDistrictSelect').selectedOptions[0].textContent : '';
-    // 获取车系名称（多选）
-    var carSeriesIds = carSeries.split(',');
-    var carSeriesNames = carSeriesIds.map(function(id) {
-      var seriesList = carSeriesData[brand] || [];
-      var series = seriesList.find(function(s) { return s.id === id; });
-      return series ? series.name : id;
-    });
-    
-    closeModal('storeModal');
-    showToast('门店保存成功', 'success');
+  function storeSaveError(message, fieldId) {
+    var error = document.getElementById('storeSaveError');
+    if (error) { error.textContent = message; error.hidden = false; }
+    var field = document.getElementById(fieldId);
+    if (field) { field.scrollIntoView({ block: 'center' }); if (field.focus) field.focus({ preventScroll: true }); }
+    showToast(message, 'error');
   }
-  
+
+  function findStoreRow(id) {
+    return Array.from(document.querySelectorAll('#page-store tbody tr')).find(function(row) {
+      if (row.dataset.storeId === String(id)) return true;
+      return Array.from(row.querySelectorAll('button[onclick]')).some(function(button) {
+        return button.getAttribute('onclick') === 'openStoreModal(' + id + ')';
+      });
+    });
+  }
+
+  function updateSavedStoreRow(id, data) {
+    var tbody = document.querySelector('#page-store tbody');
+    var row = findStoreRow(id), adding = !row;
+    if (!row) row = document.createElement('tr');
+    row.dataset.storeId = String(id);
+    row.replaceChildren();
+    function cell(text) { var td = document.createElement('td'); if (text != null) td.textContent = text; row.appendChild(td); return td; }
+    var box = document.createElement('input'); box.type = 'checkbox'; box.className = 'store-row-checkbox'; box.onchange = updateStoreSelectionInfo; cell().appendChild(box);
+    var name = document.createElement('strong'); name.textContent = data.name; cell().appendChild(name);
+    var code = document.createElement('code'); code.textContent = data.code; cell().appendChild(code);
+    cell(data.brandName); cell(data.cityName + (data.district || '')); cell(data.type === '1' ? '一网店' : '二网店'); cell(data.afterSaleTel || '—');
+    var badge = document.createElement('span'); badge.className = 'status-badge ' + (data.status === '1' ? 'status-active' : 'status-inactive'); badge.textContent = data.status === '1' ? '启用' : '停用'; cell().appendChild(badge);
+    var actions = cell();
+    function button(label, danger, callback) { var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn btn-sm ' + (danger ? 'btn-danger' : 'btn-secondary'); btn.textContent = label; btn.onclick = callback; actions.appendChild(btn); actions.appendChild(document.createTextNode(' ')); return btn; }
+    button('查看', false, function() { viewStoreDetail(id); });
+    button('编辑', false, function() { openStoreModal(id); });
+    button(data.status === '1' ? '停用' : '启用', false, function() { data.status = data.status === '1' ? '0' : '1'; updateSavedStoreRow(id, data); updateStoreSelectionInfo(); }).setAttribute('data-store-status', 'true');
+    button('删除', true, function() { confirmDeleteStore(id, data.name); });
+    if (adding) tbody.prepend(row);
+  }
+
+  function saveStoreData() {
+    function value(id) { return document.getElementById(id).value.trim(); }
+    var modal = document.getElementById('storeModal');
+    if (modal.dataset.viewMode === 'true') return;
+    var fields = [['storeDealerName', '请输入经销商名称'], ['storeDealerCode', '请输入经销商编码'], ['storeDealerType', '请选择门店类型'], ['storeBrand', '请选择所属品牌'], ['storeProvinceSelect', '请选择所在省份'], ['storeCitySelect', '请选择所在城市']];
+    for (var i = 0; i < fields.length; i++) if (!value(fields[i][0])) { storeSaveError(fields[i][1], fields[i][0]); return; }
+    var selected = Array.from(new Set(storeSelectedSeries.map(String)));
+    if (!selected.length) { storeSaveError('请选择关联车系', 'storeSeriesSelector'); return; }
+    var brand = value('storeBrand');
+    if (selected.some(function(id) { return !(carSeriesData[brand] || []).some(function(series) { return String(series.id) === id; }); })) { storeSaveError('关联车系与所属品牌不一致，请重新选择', 'storeSeriesSelector'); return; }
+    var code = value('storeDealerCode');
+    if (Object.keys(storeRecords).some(function(id) { return id !== String(currentEditingStoreId) && storeRecords[id].code === code; })) { storeSaveError('经销商编码已存在，请使用唯一编码', 'storeDealerCode'); return; }
+    var id = currentEditingStoreId ? String(currentEditingStoreId) : String(Math.max.apply(null, Object.keys(storeRecords).map(Number).concat([0])) + 1);
+    var data = { name: value('storeDealerName'), code: code, type: value('storeDealerType'), status: value('storeStatus'), brand: brand,
+      brandName: document.getElementById('storeBrand').selectedOptions[0].textContent,
+      provinceCode: value('storeProvinceSelect'), cityCode: value('storeCitySelect'), district: value('storeDistrictSelect'), cityName: document.getElementById('storeCitySelect').selectedOptions[0].textContent,
+      region: value('storeRegion'), subRegion: value('storeSubRegion'), carSeries: selected, savedSeries: true,
+      afterSaleTel: value('storeAfterSaleTel'), email: value('storeEmail'), address: value('storeAddress'), longitude: value('storeLongitude'), latitude: value('storeLatitude') };
+    storeRecords[id] = data;
+    Object.keys(seriesDealerRelation).forEach(function(seriesId) { removeDealerFromSeries(seriesId, id); });
+    selected.forEach(function(seriesId) { addDealerToSeries(seriesId, id); });
+    updateSavedStoreRow(id, data);
+    var saveError = document.getElementById('storeSaveError'); if (saveError) { saveError.hidden = true; saveError.textContent = ''; }
+    closeModal('storeModal');
+    updateStoreSelectionInfo();
+    if (typeof filterStoreList === 'function') filterStoreList();
+    showToast('门店保存成功（当前原型会话）', 'success');
+  }
+
   function viewStoreDetail(id) {
     // 查看模式 - 以只读方式打开门店详情
     openStoreModal(id);
@@ -1151,42 +1098,24 @@
   }
   
   function deleteStore(id) {
-    // 模拟删除操作 - 实际项目中应调用API
-    var tbody = document.querySelector('#page-store tbody');
-    var rows = tbody.querySelectorAll('tr');
-    rows.forEach(function(row) {
-      var btn = row.querySelector('button[onclick*="confirmDeleteStore(' + id + ')"]');
-      if (btn) {
-        row.remove();
-        showToast('门店删除成功', 'success');
-      }
-    });
-    
-    // 更新分页信息
-    updateStorePaginationInfo();
-    
+    var row = findStoreRow(id);
+    if (row) row.remove();
+    delete storeRecords[String(id)];
+    Object.keys(seriesDealerRelation).forEach(function(seriesId) { removeDealerFromSeries(seriesId, String(id)); });
+    updateStoreSelectionInfo();
     closeStoreDeleteModal();
+    showToast('门店删除成功', 'success');
   }
-  
-  function updateStorePaginationInfo() {
-    var tbody = document.querySelector('#page-store tbody');
-    var rows = tbody.querySelectorAll('tr');
-    var infoEl = document.getElementById('storeSelectionInfo');
-    if (infoEl) {
-      var totalRows = document.querySelectorAll('#page-store tbody tr').length + 256;
-      infoEl.textContent = '已选 0 / ' + rows.length + ' 条，共 ' + (256 - (3 - rows.length)) + ' 条数据';
-    }
-  }
-  
+
+  function updateStorePaginationInfo() { updateStoreSelectionInfo(); }
+
   function closeStoreModalAndReset() {
     var modal = document.getElementById('storeModal');
     modal.dataset.viewMode = '';
     closeModal('storeModal');
     
     // 延迟恢复表单状态，确保下次打开正常
-    setTimeout(function() {
-      resetStoreModalForEdit();
-    }, 300);
+    resetStoreModalForEdit();
   }
   
   function resetStoreModalForEdit() {
@@ -1214,7 +1143,7 @@
       storeSeriesSelector.style.cursor = 'pointer';
       storeSeriesSelector.style.borderColor = '';
       storeSeriesSelector.style.background = '';
-      storeSeriesSelector.onclick = function() { toggleStoreSeriesDropdown(); };
+      storeSeriesSelector.onclick = null;
       // 恢复下拉箭头
       var arrow = storeSeriesSelector.querySelector('span:last-child');
       if (arrow) arrow.style.display = '';
@@ -1251,7 +1180,7 @@
     // 恢复底部按钮
     var footer = modal.querySelector('.modal-footer');
     if (footer) {
-      footer.innerHTML = '<button class="btn btn-secondary" onclick="closeModal(\'storeModal\')">取消</button><button class="btn btn-primary" onclick="saveStoreData()">确认保存</button>';
+      footer.innerHTML = '<p id="storeSaveError" role="alert" hidden style="margin:0 auto 0 0;color:#b91c1c;font-size:13px;"></p><button class="btn btn-secondary" onclick="closeModal(\'storeModal\')">取消</button><button class="btn btn-primary" onclick="saveStoreData()">确认保存</button>';
     }
   }
 
@@ -1277,7 +1206,7 @@
     var infoEl = document.getElementById('storeSelectionInfo');
 
     // 更新显示文本
-    infoEl.textContent = '已选 ' + checkedCount + ' / ' + totalRows + ' 条，共 256 条数据';
+    infoEl.textContent = '已选 ' + checkedCount + ' / ' + totalRows + ' 条，共 ' + totalRows + ' 条数据';
 
     // 更新全选框状态
     var headerCheckbox = document.getElementById('selectAllStoreRows');
@@ -1321,7 +1250,9 @@
     checkedBoxes.forEach(function(cb) {
       var row = cb.closest('tr');
       var badge = row.querySelector('.status-badge.status-active, .status-badge.status-inactive');
-      var btn = row.querySelector('button[onclick*="toggleStatus"]');
+      var btn = row.querySelector('button[onclick*="toggleStatus"]') || row.querySelector('button[data-store-status]');
+
+      if (row.dataset.storeId && storeRecords[row.dataset.storeId]) storeRecords[row.dataset.storeId].status = action === 'enable' ? '1' : '0';
 
       if (action === 'enable') {
         if (badge && !badge.classList.contains('status-active')) {

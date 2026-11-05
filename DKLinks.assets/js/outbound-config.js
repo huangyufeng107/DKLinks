@@ -1037,7 +1037,9 @@
       return;
     }
     try {
+      var wasEnabled = readScope().enabled;
       saveBrandConfig('scope', { enabled: input.checked });
+      if (wasEnabled !== input.checked) window.dispatchEvent(new CustomEvent('dk-brand-capability-change', { detail: { brandCode: selectedBrandCode, capability: 'ai', enabled: input.checked } }));
       renderStatus();
       showToast((brandNames[selectedBrandCode] || selectedBrandCode) + '外呼接入范围已保存', 'success');
     } catch (error) {

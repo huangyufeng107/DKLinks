@@ -52,7 +52,8 @@
   }
   function available(brand, kind) {
     var extras = fields(brand).filter(function (f) { return kind === 'columns' || [1, 2, 3, 4].includes(f.field.type); });
-    return (kind === 'columns' ? baseColumns : baseFilters).concat(extras);
+    var scheduleField = { key: 'policy:schedule', name: '归属排期', type: '单选', field: { key: 'policy_schedule', type: 4, enumValues: ['2026年10月全国庆典促销', '未记录'] } };
+    return (kind === 'columns' ? baseColumns : baseFilters).concat([scheduleField], extras);
   }
   function defaults(brand) {
     var extras = fields(brand).filter(function (f) { return f.field.scope === 'brand'; });
@@ -126,6 +127,7 @@
   }
   function fieldValue(row, f) {
     var code = row.cells[0].textContent.trim();
+    if (f.key === 'policy:schedule') { var snapshot = window.LeadPolicyEvidence.get(code); return snapshot ? snapshot.scheduleName : '未记录'; }
     var examples = {
       'LD2026051400001': { test_drive_intent: '有意试驾', trade_in_need: '有旧车需置换' },
       'LD2026051400002': { store_visit_intent: '本周可到店' },

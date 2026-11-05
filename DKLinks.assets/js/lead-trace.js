@@ -136,8 +136,12 @@
   }
 
   window.renderLeadTrace = function (type, data) {
+    if (type === 'brandLinkedManual') type = 'nissanLinkedManual';
     data = data || {};
-    var trace = traces[type] || legacyTrace(data);
+    var evidence = data.policyEvidenceSnapshot;
+    var trace = evidence ? { status: evidence.outcome, reason: evidence.reason, next: evidence.outcome === '待人工处理' ? '人工核查暂停原因及补处理条件；本条不自动重跑。' : (evidence.stageEvidence && evidence.stageEvidence[3] && evidence.stageEvidence[3][1] === '未记录' ? '下发结果未记录，请核查厂商下发请求及回执。' : '查看当时处理依据，等待厂商下发处理。'), events: evidence.steps.map(function (step, index) {
+      return event(evidence.capturedAt, '策略处理依据', 'info', step, '独立原型演示快照', window.LeadPolicyEvidence.describe(evidence), '按当时策略执行或跳过', step, 'POLICY-' + data.code + '-' + (index + 1));
+    }) } : traces[type] || legacyTrace(data);
     var events = trace.events.slice();
     var status = trace.status;
     var reason = trace.reason;
@@ -158,6 +162,13 @@
         receivedOnly ? '确认仅接收' : '提交厂商下发队列，不附无效外呼结果',
         receivedOnly ? '处理终结' : '等待厂商响应', data.code));
     }
+    if (data.policyManualReview) {
+      var review = data.policyManualReview;
+      status = review.status; reason = review.reason;
+      next = review.status === '仅接收' ? '人工处理完成，本条不再自动下发。' : '等待重新校验结果；真实队列未接入，不代表检测或下发成功。';
+      events.push(event(review.at, '人工核查处理', 'info', review.reason, '操作人：' + review.actor + '；备注：' + review.remark, '原暂停快照保留；复核当前排期及发布依赖', review.reason, next, data.code));
+    }
+    if (Array.isArray(data.scheduleGoalTraceStages)) { status = data.policyEvidenceSnapshot.outcome; reason = data.policyEvidenceSnapshot.reason; next = data.scheduleGoalNextAction; }
     if (events.every(function (item) { return item.record && Number.isInteger(item.record.sequence); })) {
       events.sort(function (left, right) { return left.record.sequence - right.record.sequence; });
     }
@@ -166,7 +177,7 @@
   };
 
   var stageNames = ['鉴权与接收字段校验', '来源线索 ID 检查', '黑名单', '接收去重规则', '号码状态检测', '外呼处理', '厂商下发'];
-  var stateNames = { passed: '已通过', skipped: '已跳过', processing: '处理中', stopped: '已停止', not_run: '未执行', unrecorded: '未记录' };
+  var stateNames = { waiting: '等待处理', passed: '已通过', skipped: '已跳过', processing: '处理中', stopped: '已停止', not_run: '未执行', unrecorded: '未记录' };
 
   function plain(value) { return String(value || '').replace(/<[^>]*>/g, ''); }
 
@@ -313,6 +324,33 @@
 
   function renderProgress(type, data, events, status, reason, next) {
     var stages = progressStages(type, data, events, status);
+    var snapshot = data.policyEvidenceSnapshot;
+    if (snapshot && Array.isArray(snapshot.stageEvidence)) {
+      var common = stageNames.slice(0, 3).map(function (name, index) {
+        var check = snapshot.commonChecks && snapshot.commonChecks[index];
+        return { name: name, state: check ? check.state : 'unrecorded', current: false, reason: check ? check.reason : '该公共校验的历史结果未记录，不根据排期归属推断。', evidence: '公共接收校验；不受项目环节开关控制', events: [] };
+      });
+      var projectStages = [1, 0, 2, 3].map(function (recordIndex, index) {
+        var record = snapshot.stageEvidence[recordIndex];
+        var paused = type === 'policyPaused' && snapshot.outcome === '待人工处理';
+        var state = !record ? 'unrecorded' : paused ? (recordIndex === 0 ? 'stopped' : 'not_run') : record[1] === '等待处理' ? 'waiting' : record[1] === '未记录' ? 'unrecorded' : record[1].indexOf('未执行') === 0 ? 'skipped' : 'passed';
+        if (record && record[1].indexOf('转人工') !== -1) state = 'stopped';
+        if (type === 'nissanLinkedManual' && recordIndex === 3 && !data.decisionActor) state = 'not_run';
+        return { name: stageNames[index + 3], state: state, current: paused ? recordIndex === 0 : state === 'waiting' || state === 'stopped', reason: record ? record[1] + '；' + record[2] : '该环节的历史结果未记录。', evidence: window.LeadPolicyEvidence.describe(snapshot), events: [] };
+      });
+      stages = common.concat(projectStages);
+    }
+
+    if (Array.isArray(data.scheduleGoalTraceStages) && data.scheduleGoalTraceStages.length === stageNames.length) stages = data.scheduleGoalTraceStages;
+    if (type === 'nissanLinkedManual' && data.decisionActor) {
+      stages.forEach(function (stage) { stage.current = false; });
+      stages[6] = { name: stageNames[6], state: status === '仅接收' ? 'skipped' : 'processing', current: true, reason: data.dispatchDecision, evidence: data.note, events: events.slice(-1) };
+    }
+    if (data.policyManualReview) {
+      stages.forEach(function (stage) { stage.current = false; });
+      var review = data.policyManualReview;
+      stages[6] = { name: stageNames[6], state: review.status === '仅接收' ? 'skipped' : 'waiting', current: true, reason: review.reason, evidence: '人工：' + review.actor + '；时间：' + review.at + '；备注：' + review.remark + '。原暂停依据继续保留。', events: events.slice(-1) };
+    }
     var current = stages.find(function (stage) { return stage.current; });
     document.getElementById('leadTraceCurrentStatus').textContent = status;
     document.getElementById('leadTraceCurrentReason').textContent = reason;
@@ -320,7 +358,7 @@
     document.getElementById('leadProgressLocation').textContent = current
       ? current.name + (current.state === 'stopped' ? ' · 已停止' : current.state === 'processing' ? ' · 处理中' : ' · ' + stateNames[current.state]) : '当前环节未记录';
     document.getElementById('leadTraceOverviewActions').hidden = !(type === 'nissanLinkedManual' && !data.decisionActor);
-    document.getElementById('leadTraceEventCount').textContent = '7 个环节';
+    document.getElementById('leadTraceEventCount').textContent = stages.length + ' 个环节';
     var container = document.getElementById('leadTraceEvents');
     container.replaceChildren();
     stages.forEach(function (stage, index) {

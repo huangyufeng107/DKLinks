@@ -258,8 +258,7 @@
 
   function closeSchedulePage() {
     closeModal('scheduleModal');
-    document.getElementById('currentPageName').textContent = '排期管理';
-    renderScheduleTable();
+    navigateTo('schedule');
   }
 
   function getScheduleBrandNames(schedule) {
@@ -322,9 +321,28 @@
     if (addSupplierBtn) addSupplierBtn.disabled = isView;
   }
 
+
+
+  function switchScheduleEditorTab(tab) {
+    if (!['basic', 'suppliers'].includes(tab)) return;
+    document.querySelectorAll('[data-schedule-editor-tab]').forEach(function (button) {
+      var selected = button.getAttribute('data-schedule-editor-tab') === tab;
+      button.classList.toggle('active', selected); button.setAttribute('aria-selected', selected ? 'true' : 'false'); button.tabIndex = selected ? 0 : -1;
+    });
+    ['basic', 'suppliers'].forEach(function (key) { document.getElementById('scheduleEditorPanel-' + key).hidden = key !== tab; });
+  }
+
+  function handleScheduleEditorTabKeydown(event) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    var tabs = Array.from(document.querySelectorAll('[data-schedule-editor-tab]')), index = tabs.indexOf(document.activeElement);
+    if (index < 0) return;
+    var next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    event.preventDefault(); switchScheduleEditorTab(tabs[next].getAttribute('data-schedule-editor-tab')); tabs[next].focus();
+  }
+
   function openScheduleModal(mode, scheduleId) {
     mode = mode || 'add';
-    navigateTo('schedule');
+    navigateTo('schedule-editor');
     var modal = document.getElementById('scheduleModal');
     var title = document.getElementById('scheduleModalTitle');
     scheduleSupplierRowCounter = 0;
@@ -382,7 +400,9 @@
       }
     }
     modal.classList.add('active');
+    switchScheduleEditorTab('basic');
     setSchedulePageMode(mode);
+    if (typeof window.scrollTo === 'function') window.scrollTo(0, 0);
   }
 
 
@@ -957,7 +977,14 @@
     if (!sel) return;
     var currentVal = selectedValue !== undefined ? selectedValue : sel.value;
     var codes = getSmartCodeMaintainList();
+    if (currentVal && codes.indexOf(currentVal) === -1) {
+      var savedOption = document.createElement('option');
+      savedOption.value = currentVal;
+      savedOption.textContent = currentVal + '（已保存，未在维护列表中）';
+      savedOption.selected = true;
+    }
     sel.innerHTML = '<option value="">请选择SMARTCODE</option>';
+    if (savedOption) sel.appendChild(savedOption);
     codes.forEach(function(code) {
       var opt = document.createElement('option');
       opt.value = code;
@@ -998,13 +1025,13 @@
     var cpsGroup = document.getElementById('supCpsPriceGroup' + idx);
     if (method === 'CPL') {
       if (cplGroup) cplGroup.style.display = 'grid';
-      if (cpsGroup) cpsGroup.style.display = 'grid';
+      if (cpsGroup) cpsGroup.style.display = 'none';
       if (costEl) { costEl.style.opacity = ''; costEl.required = true; }
       if (saleEl) { saleEl.style.opacity = ''; saleEl.required = true; }
       if (dCostEl) { dCostEl.style.opacity = ''; dCostEl.required = false; }
       if (dSaleEl) { dSaleEl.style.opacity = ''; dSaleEl.required = false; }
     } else {
-      if (cplGroup) cplGroup.style.display = 'grid';
+      if (cplGroup) cplGroup.style.display = 'none';
       if (cpsGroup) cpsGroup.style.display = 'grid';
       if (costEl) { costEl.style.opacity = ''; costEl.required = false; }
       if (saleEl) { saleEl.style.opacity = ''; saleEl.required = false; }
@@ -1165,12 +1192,12 @@
     var endTime = document.getElementById('scheduleEndTime').value;
     var totalBudget = parseFloat(document.getElementById('scheduleTotalBudget').value) || 0;
     var status = parseInt(document.getElementById('scheduleStatus').value);
-    if (!name) { showToast('请填写排期名称', 'error'); return; }
-    if (!startTime || !endTime) { showToast('请选择排期时间', 'error'); return; }
-    if (!totalBudget) { showToast('请填写总预算', 'error'); return; }
-    if (scheduleSelectedSeries.length === 0) { showToast('请选择至少一个关联车系', 'error'); return; }
+    if (!name) { switchScheduleEditorTab('basic'); showToast('请填写排期名称', 'error'); return; }
+    if (!startTime || !endTime) { switchScheduleEditorTab('basic'); showToast('请选择排期时间', 'error'); return; }
+    if (!totalBudget) { switchScheduleEditorTab('basic'); showToast('请填写总预算', 'error'); return; }
+    if (scheduleSelectedSeries.length === 0) { switchScheduleEditorTab('basic'); showToast('请选择至少一个关联车系', 'error'); return; }
     var supplierRows = document.querySelectorAll('#scheduleSupplierTbody .schedule-supplier-row');
-    if (supplierRows.length === 0) { showToast('请至少添加一条供应商信息', 'error'); return; }
+    if (supplierRows.length === 0) { switchScheduleEditorTab('suppliers'); showToast('请至少添加一条供应商信息', 'error'); return; }
 
     var suppliers = [];
     var accountSet = {};
@@ -1190,7 +1217,9 @@
       if (!accountId || !smartcode || !budget) { hasSupplierError = true; return; }
       if (accountSet[accountId]) { showToast('同一排期内账号ID不可重复：' + accountId, 'error'); hasSupplierError = true; return; }
       if (smartcodeSet[smartcode]) { showToast('同一排期内SMARTCODE不可重复：' + smartcode, 'error'); hasSupplierError = true; return; }
-      if (settlement === 'CPL' && (!costPrice || !salePrice)) { showToast('CPL结算需填写商机成本价和商机销售价', 'error'); hasSupplierError = true; return; }
+      var owner = scheduleData.find(function(item) { return item.id !== currentEditingScheduleId && (item.suppliers || []).some(function(sup) { return sup.smartcode === smartcode; }); });
+      if (owner) { showToast('SmartCode 已关联排期「' + owner.name + '」，不可跨排期复用', 'error'); hasSupplierError = true; return; }
+      if ((settlement === 'CPL') && (!(costPrice > 0) || !(salePrice > 0))) { showToast(settlement + '结算需填写大于0的商机成本价和商机销售价', 'error'); hasSupplierError = true; return; }
       if (settlement === 'CPS' && (!deliveryCost || !deliverySale)) { showToast('CPS结算需填写交车成本价和交车销售价', 'error'); hasSupplierError = true; return; }
       accountSet[accountId] = true;
       smartcodeSet[smartcode] = true;
@@ -1201,28 +1230,28 @@
         budget: budget,
         smartcode: smartcode,
         settlement: settlement,
-        costPrice: settlement === 'CPL' ? costPrice : null,
-        salePrice: settlement === 'CPL' ? salePrice : null,
+        costPrice: (settlement === 'CPL') ? costPrice : null,
+        salePrice: (settlement === 'CPL') ? salePrice : null,
         deliveryCost: settlement === 'CPS' ? deliveryCost : null,
         deliverySale: settlement === 'CPS' ? deliverySale : null,
         storeIds: storeIds
       });
     });
-    if (hasSupplierError) return;
+    if (hasSupplierError) { switchScheduleEditorTab('suppliers'); return; }
 
-    var scheduleObj = {
+    var previousSchedule = scheduleData.find(function(item) { return item.id === currentEditingScheduleId; }) || {};
+    var scheduleObj = Object.assign({}, previousSchedule, {
       id: currentEditingScheduleId || String(Date.now()).slice(-4),
       name: name, startTime: startTime, endTime: endTime,
       totalBudget: totalBudget, status: status,
       baseSeries: scheduleSelectedSeries.slice(),
       suppliers: suppliers, storeIds: []
-    };
+    });
 
     if (currentEditingScheduleId) {
       var existingIdx = scheduleData.findIndex(function(s) { return s.id === currentEditingScheduleId; });
       if (existingIdx >= 0) { scheduleData[existingIdx] = scheduleObj; }
     } else { scheduleData.push(scheduleObj); }
-
     closeSchedulePage();
     showToast(currentEditingScheduleId ? '排期保存成功' : '排期创建成功', 'success');
   }
@@ -1257,9 +1286,13 @@
     tbody.innerHTML = filteredData.map(function(s) {
       var timeStr = s.startTime.replace('T', ' ') + ' ～ ' + s.endTime.replace('T', ' ');
       var statusHtml = s.status === 1 ? '<span class="status-badge status-active">启用</span>' : '<span class="status-badge status-inactive">禁用</span>';
+      if (typeof getSchedulePolicySummary === 'function') {
+        var policyState = getSchedulePolicySummary(s.id);
+        if (policyState.blocked.length) statusHtml += '<div class="form-hint" style="color:var(--warning);">处理策略：' + escapeHTML(policyState.blocked[0].label) + '</div>';
+      }
       var brandText = getScheduleBrandNames(s).join('、') || '-';
       return '<tr><td>' + (filteredData.indexOf(s) + 1) + '</td><td>' + escapeHTML(brandText) + '</td><td><strong>' + escapeHTML(s.name) + '</strong></td><td>' + timeStr + '</td><td>¥' + s.totalBudget.toLocaleString() + '</td><td>' + statusHtml + '</td>' +
-      '<td><button class="btn btn-secondary btn-sm" onclick="openScheduleModal(\'view\',\'' + s.id + '\')">查看</button> <button class="btn btn-secondary btn-sm" onclick="openScheduleModal(\'edit\',\'' + s.id + '\')">编辑</button> <button class="btn btn-secondary btn-sm" onclick="navigateTo(\'dk-report\')">查看报表</button> <button class="btn btn-secondary btn-sm" onclick="navigateTo(\'dk-leaddetail\')">线索明细</button></td></tr>';
+      '<td><button class="btn btn-secondary btn-sm" onclick="openScheduleModal(\'view\',\'' + s.id + '\')">查看</button> <button class="btn btn-secondary btn-sm" onclick="openScheduleModal(\'edit\',\'' + s.id + '\')">编辑</button> <button class="btn btn-secondary btn-sm" onclick="openSchedulePolicy(\'' + s.id + '\')">处理策略</button> <button class="btn btn-secondary btn-sm" onclick="navigateTo(\'dk-report\')">查看报表</button> <button class="btn btn-secondary btn-sm" onclick="navigateTo(\'dk-leaddetail\')">线索明细</button></td></tr>';
     }).join('');
     if (info) info.textContent = '共 ' + filteredData.length + ' 条';
   }
@@ -1329,26 +1362,29 @@
     return document.getElementById('reportDateTo').value;
   }
 
+  function getReportSource() { return typeof getScheduleScopedReportData === 'function' ? (getScheduleScopedReportData() || reportRawData) : reportRawData; }
+
   function initReportPage() {
+    if (typeof initScheduleGoalReportContext === 'function') initScheduleGoalReportContext();
     if (!document.getElementById('reportDateFrom').value) document.getElementById('reportDateFrom').value = '2026-06-01T00:00';
     if (!document.getElementById('reportDateTo').value) document.getElementById('reportDateTo').value = '2026-06-15T00:00';
-    renderReportTable(reportRawData);
+    renderReportTable(getReportSource());
   }
 
   function reportValue(value) {
-    if (value === null || value === undefined || value === '') return '-';
+    if (value === null || value === undefined || value === '') return '—';
     if (typeof value === 'number') return value.toLocaleString();
     return value;
   }
 
   function reportHasChildren(row) {
-    return reportRawData.some(function(item) { return item.parent === row.id; });
+    return getReportSource().some(function(item) { return item.parent === row.id; });
   }
 
   function reportAncestorsVisible(row) {
     var parentId = row.parent;
     while (parentId) {
-      var parent = reportRawData.find(function(item) { return item.id === parentId; });
+      var parent = getReportSource().find(function(item) { return item.id === parentId; });
       if (!parent || !parent.expanded) return false;
       parentId = parent.parent;
     }
@@ -1426,33 +1462,35 @@
   }
 
   function toggleReportDetail(id) {
-    var row = reportRawData.find(function(item) { return item.id === id; });
+    var row = getReportSource().find(function(item) { return item.id === id; });
     if (!row) return;
     row.detailOpen = !row.detailOpen;
-    renderReportTable(reportRawData);
+    renderReportTable(getReportSource());
   }
 
   function toggleReportRow(id) {
-    var row = reportRawData.find(function(item) { return item.id === id; });
+    var row = getReportSource().find(function(item) { return item.id === id; });
     if (!row) return;
     row.expanded = !row.expanded;
-    renderReportTable(reportRawData);
+    renderReportTable(getReportSource());
   }
 
   function loadReportData() {
     var dateFrom = getReportDateFrom();
     var dateTo = getReportDateTo();
     if (!dateFrom || !dateTo) { showToast('请选择完整的创建时间范围', 'warning'); return; }
-    renderReportTable(reportRawData);
-    showToast('查询成功', 'success');
+    if (!Number.isFinite(Date.parse(dateFrom)) || !Number.isFinite(Date.parse(dateTo)) || dateFrom > dateTo) { showToast('创建时间范围无效，请核对起止时间', 'warning'); return; }
+    renderReportTable(getReportSource());
+    showToast(typeof hasScheduleGoalReportContext === 'function' && hasScheduleGoalReportContext() ? '已刷新会话演示数据；真实报表查询尚未接入' : '查询成功', 'success');
   }
 
   function resetReportFilter() {
+    if (typeof resetScheduleGoalReportDates === 'function' && resetScheduleGoalReportDates()) { updateReportPresetActive(); renderReportTable(getReportSource()); return; }
     document.getElementById('reportDateFrom').value = '2026-06-01T00:00';
     document.getElementById('reportDateTo').value = '2026-06-15T00:00';
     updateReportPresetActive();
-    reportRawData.forEach(function(row) { row.expanded = row.level < 2; });
-    renderReportTable(reportRawData);
+    getReportSource().forEach(function(row) { row.expanded = row.level < 2; });
+    renderReportTable(getReportSource());
   }
 
   function exportReportData() { showToast('报表数据导出中，请稍候…', 'info'); }
