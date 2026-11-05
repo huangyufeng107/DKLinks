@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="DKLinks.assets/css/app.css?v=20261026-brand-view">
+<link rel="stylesheet" href="DKLinks.assets/css/app.css?v=20261104-schedule-page-layout">
 <link rel="stylesheet" href="DKLinks.assets/css/docs-navigation.css?v=20261020-modal-offset">
-<script defer src="DKLinks.assets/js/docs-navigation.js?v=20261027-prototype-entry"></script>
+<script defer src="DKLinks.assets/js/docs-navigation.js?v=20261104-login-dashboard"></script>
 <style>
 /* ===== 锁单排查（局部样式） ===== */
 .lock-rule-chip { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; margin: 0 3px 3px 0; border-radius: 5px; background: #fef3c7; color: #b45309; font-size: 11px; font-weight: 700; }
@@ -63,6 +63,7 @@
 @media (max-width: 850px) { .outbound-dictionary-grid, .outbound-dictionary-form-grid { grid-template-columns: minmax(0, 1fr); } .outbound-dictionary-hero { align-items:flex-start; flex-direction:column; } }
 .outbound-walkthrough-controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap}.outbound-walkthrough-controls .form-group{margin:0;min-width:min(100%,340px)}.outbound-walkthrough-meta{margin:16px 0 12px;padding:12px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-50);font-size:13px;line-height:1.7;color:var(--gray-700)}.outbound-walkthrough-steps{display:grid;gap:10px;margin:0;padding:0;list-style:none}.outbound-walkthrough-steps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:12px 14px;border:1px solid var(--gray-200);border-radius:8px;background:#fff}.outbound-walkthrough-steps li.current{border-color:#93b4ff;background:#f4f8ff}.outbound-walkthrough-steps .step-index{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#e8efff;color:#003594;font-size:12px;font-weight:700}.outbound-walkthrough-steps strong{display:block;margin-bottom:3px;color:var(--gray-900);font-size:13px}.outbound-walkthrough-steps p{margin:0;color:var(--gray-700);font-size:13px;line-height:1.65}
 </style>
+<link rel="stylesheet" href="DKLinks.assets/css/schedule-editor.css?v=20261104-pre-cpql-rollback">
 </head>
 <body>
 
@@ -1588,7 +1589,7 @@ X-Signature = HmacSHA256(
       </div>
 
       <!-- ===== LEAD INTERCEPT RULES ===== -->
-      <div class="page" id="page-lead-intercept">
+      <div class="page" id="page-lead-intercept"><div class="policy-return-context" id="policyDedupReturn" style="display:none;"><span id="policyDedupReturnText"></span><button type="button" class="btn btn-secondary btn-sm" onclick="showAllPolicyDedupRules()">查看全部规则</button><button type="button" class="btn btn-secondary btn-sm" onclick="returnToSchedulePolicyFromBrandConfig()">返回排期处理策略</button></div><div class="policy-return-context" id="policyPhoneReturn" style="display:none;"><span id="policyPhoneReturnText"></span><button type="button" class="btn btn-secondary btn-sm" onclick="returnToSchedulePolicyFromBrandConfig()">返回排期处理策略</button></div>
         <div class="page-header">
           <h1 class="page-title">拦截规则</h1>
           <p class="page-subtitle">配置线索去重拦截与号码状态检测策略，按品牌决定保留、标记或停止下发</p>
@@ -1741,7 +1742,7 @@ X-Signature = HmacSHA256(
               <thead>
                 <tr>
                   <th>时间</th>
-                  <th>命中类型 / 规则</th>
+                  <th>命中类型 / 规则</th><th>执行依据</th>
                   <th>来源渠道</th>
                   <th>手机号</th>
                   <th>号码状态</th>
@@ -2295,7 +2296,7 @@ X-Signature = HmacSHA256(
             <button class="tab-btn" onclick="filterByStatus(this, '3')">已下发 <span style="background: var(--warning-light); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">48</span></button>
             <button class="tab-btn" onclick="filterByStatus(this, '4')">下发失败 <span style="background: var(--gray-200); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">18</span></button>
             <button class="tab-btn" onclick="filterByStatus(this, '5')">仅接收 <span id="manualDispatchReceivedCount" style="background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">3</span></button>
-            <button class="tab-btn" onclick="filterByStatus(this, '6')">待人工处理 <span id="manualDispatchTabCount" style="background: var(--warning-light); color: var(--warning); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">1</span></button>
+            <button class="tab-btn" onclick="filterByStatus(this, '6')">待人工处理 <span id="manualDispatchTabCount" style="background: var(--warning-light); color: var(--warning); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">2</span></button>
           </div>
 
 
@@ -2335,13 +2336,21 @@ X-Signature = HmacSHA256(
                 </tr>
               </thead>
               <tbody id="clue-tbody">
+<tr><td><code>LD2026102700101</code></td><td><strong>陈先生</strong><div>138****0101</div></td><td>东风日产</td><td>轩逸</td><td><span class="level-badge level-b">B</span></td><td>懂车帝</td><td>东风日产·广州番禺店</td><td><span class="status-badge status-warning">待处理</span><div class="form-hint">策略依据演示</div></td><td><span class="phone-status-marker" data-phone-status="NORMAL">正常</span></td><td>2026-10-27 10:00</td><td><button class="btn btn-secondary btn-sm" onclick="openLeadDetail('policyProject')">详情</button></td></tr>
+<tr><td><code>LD2026102700102</code></td><td><strong>林女士</strong><div>138****0102</div></td><td>东风日产</td><td>轩逸</td><td><span class="level-badge level-b">B</span></td><td>懂车帝</td><td>东风日产·广州番禺店</td><td><span class="status-badge status-warning">待处理</span><div class="form-hint">策略依据演示</div></td><td>未检测</td><td>2026-10-27 09:00</td><td><button class="btn btn-secondary btn-sm" onclick="openLeadDetail('policyInherited')">详情</button></td></tr>
+<tr><td><code>LD2026102700103</code></td><td><strong>周先生</strong><div>138****0103</div></td><td>东风日产</td><td>轩逸</td><td><span class="level-badge level-b">B</span></td><td>懂车帝</td><td>东风日产·广州番禺店</td><td id="policyPausedStatus"><span class="status-badge status-warning">待处理</span><div class="form-hint">品牌号码检测关闭，跳过检测</div></td><td>未检测</td><td>2026-10-27 11:00</td><td><button class="btn btn-secondary btn-sm" onclick="openLeadDetail('policyPaused')">详情</button></td></tr>
+                <tr id="brandManualLeadRow">
+                  <td><code style="font-size:12px;">LD2026102000005</code></td><td><strong>孙先生</strong><div>139****5505</div></td><td>东风日产</td><td>轩逸</td><td><span class="level-badge level-b">B</span></td><td>懂车帝</td><td>东风日产·广州番禺店</td>
+                  <td id="brandManualLeadStatus"><span class="status-badge status-warning">待人工处理</span><div class="form-hint">未归属排期 · 品牌等待超时转人工（演示）</div></td><td>未检测</td><td>2026-10-20 10:00</td>
+                  <td id="brandManualLeadActions"><button class="btn btn-primary btn-sm" type="button" onclick="openManualDispatchReview('brandLinkedManual')">处理</button> <button class="btn btn-secondary btn-sm" type="button" onclick="openLeadDetail('brandLinkedManual')">详情</button></td>
+                </tr>
                 <tr id="manualDispatchLeadRow">
                   <td><code style="font-size: 12px;">LD2026102000003</code></td>
                   <td><div><strong>王先生</strong></div><div style="font-size: 12px; color: var(--gray-500);">137****6688</div></td>
                   <td>东风日产</td><td>轩逸</td><td><span class="level-badge level-b">B</span></td>
                   <td><span style="font-size: 12px; color: var(--gray-600);">懂车帝</span></td>
                   <td>东风日产·广州番禺店</td>
-                  <td id="manualDispatchLeadStatus"><span class="status-badge status-warning">待人工处理</span><div style="font-size: 12px; color: var(--warning); margin-top: 4px;">等待外呼结果超时</div></td>
+                  <td id="manualDispatchLeadStatus"><span class="status-badge status-warning">待人工处理</span><div style="font-size: 12px; color: var(--warning); margin-top: 4px;">排期AI培育 · 等待超时转人工（演示）</div></td>
                   <td>未检测</td><td style="font-size: 12px; color: var(--gray-500);">2026-10-20 10:00</td>
                   <td id="manualDispatchLeadActions"><button class="btn btn-primary btn-sm" type="button" onclick="openManualDispatchReview()">处理</button> <button class="btn btn-secondary btn-sm" type="button" onclick="openLeadDetail('nissanLinkedManual')">详情</button></td>
                 </tr>
@@ -2572,18 +2581,22 @@ X-Signature = HmacSHA256(
         <div class="lead-detail-content card">
       <!-- Tabs -->
       <div class="tabs" id="leadDetailTabs" role="tablist" aria-label="线索详情" onkeydown="handleLeadDetailTabKeydown(event)">
-        <button class="tab-btn active" id="leadDetailTab-basic" type="button" role="tab" aria-controls="leadTab-basic" aria-selected="true" tabindex="0" data-tab="basic" onclick="switchLeadTab('basic')">基本信息</button>
-        <button class="tab-btn" id="leadDetailTab-trace" type="button" role="tab" aria-controls="leadTab-trace" aria-selected="false" tabindex="-1" data-tab="trace" onclick="switchLeadTab('trace')">处理进度</button>
+        <button class="tab-btn" id="leadDetailTab-basic" type="button" role="tab" aria-controls="leadTab-basic" aria-selected="false" tabindex="-1" data-tab="basic" onclick="switchLeadTab('basic')">基本信息</button>
+        <button class="tab-btn active" id="leadDetailTab-trace" type="button" role="tab" aria-controls="leadTab-trace" aria-selected="true" tabindex="0" data-tab="trace" onclick="switchLeadTab('trace')">处理进度</button>
         <button class="tab-btn" id="leadDetailTab-extended" type="button" role="tab" aria-controls="leadTab-extended" aria-selected="false" tabindex="-1" data-tab="extended" onclick="switchLeadTab('extended')">拓展信息</button>
       </div>
 
-      <div id="leadTab-trace" class="lead-tab-panel" role="tabpanel" aria-labelledby="leadDetailTab-trace" aria-hidden="true" style="display:none;">
+      <div id="leadTab-trace" class="lead-tab-panel active" role="tabpanel" aria-labelledby="leadDetailTab-trace" aria-hidden="false">
+        <section class="lead-policy-context" aria-label="本条线索的排期与策略">
+          <div class="lead-policy-context-summary"><div><span>归属排期</span><strong id="leadPolicySchedule">未记录</strong></div><div><span>处理依据</span><strong id="leadPolicySource">未记录</strong><strong id="leadPolicyVersion">未记录</strong></div></div>
+          <details id="leadPolicyConfigDetails" class="lead-policy-config-details"><summary>查看当时配置</summary><div class="lead-policy-config-body"><p class="form-hint">依据记录时间：<span id="leadPolicyCapturedAt">未记录</span>。仅展示当时保存的配置，不读取当前设置；执行结果见下方处理进度。</p><div class="lead-policy-stage-scroll" role="region" aria-label="当时配置与来源" tabindex="0"><table class="lead-policy-stage-table"><thead><tr><th scope="col">处理环节</th><th scope="col">当时配置</th><th scope="col">配置来源</th></tr></thead><tbody id="leadPolicyStageRows"></tbody></table></div></div></details>
+        </section>
         <div class="lead-progress-location"><span>当前环节</span><strong id="leadProgressLocation">—</strong></div>
         <div class="lead-trace-section-head"><div><h3>处理进度</h3><p>查看线索在哪个环节停下，以及原因；点击环节查看判断依据。</p></div><span id="leadTraceEventCount">—</span></div>
         <div class="lead-trace-events" id="leadTraceEvents" aria-live="polite"></div>
       </div>
 
-      <div id="leadTab-basic" class="lead-tab-panel active" role="tabpanel" aria-labelledby="leadDetailTab-basic" aria-hidden="false">
+      <div id="leadTab-basic" class="lead-tab-panel" role="tabpanel" aria-labelledby="leadDetailTab-basic" aria-hidden="true" style="display:none;">
       <div class="detail-section">
         <div class="detail-title">客户信息</div>
         <div class="detail-grid">
@@ -2608,7 +2621,7 @@ X-Signature = HmacSHA256(
 
       <div class="detail-section">
         <div class="detail-title">来源信息</div>
-        <div class="detail-grid">
+        <div class="detail-grid"><div class="detail-item"><div class="detail-label">归属排期</div><div class="detail-value" id="leadBasicSchedule">未记录</div></div>
           <div class="detail-item">
             <div class="detail-label">API Key</div>
             <div class="detail-value" id="leadDetailApiKey">懂车帝</div>
@@ -3652,6 +3665,103 @@ X-Signature = HmacSHA256(
         </div>
       </div>
 
+      <div class="page" id="page-schedule-policy">
+        <div class="page-header policy-heading"><div><h1 class="page-title">排期处理策略</h1><p class="page-subtitle">在品牌已开放的能力范围内，明确设置本项目是否执行</p></div><button type="button" class="btn btn-secondary" onclick="navigateTo('schedule')">返回排期列表</button></div>
+        <section class="card policy-card">
+          <div class="policy-context-fields"><label>排期<select id="policySchedule" class="form-input" onchange="changeSchedulePolicyScope()"></select></label><label>适用品牌<select id="policyBrand" class="form-input" onchange="changeSchedulePolicyBrand()"></select></label><span id="policyVersion" class="status-badge status-warning"></span><span id="policyDraftStatus" class="status-badge status-warning" role="status" hidden></span></div>
+          <p id="policyContext" class="form-hint"></p><p id="policyExecutionStatus" class="policy-notice" role="status"></p>
+          <p id="policyScenarioNote" class="policy-notice"></p>
+        </section>
+        <section class="card policy-card">
+          <div class="policy-section-heading"><h2>处理环节与有效配置</h2></div>
+          <p class="form-hint">品牌能力关闭或无可用去重规则时，本项目对应环节关闭／不执行，新线索跳过该环节继续后续处理；品牌重新开启后，项目仍保持关闭，需运营另行开启并发布。已创建任务沿用原快照和既定停止机制。</p>
+          <div class="table-wrapper"><table class="policy-table"><thead><tr><th>处理环节</th><th>品牌能力 / 规则状态</th><th>本项目设置</th><th>当前设置计算结果</th></tr></thead><tbody id="policyRows"></tbody></table></div>
+          <p id="policyReadiness" role="status" class="policy-notice"></p>
+          <div class="policy-actions"><button class="btn btn-secondary btn-sm" type="button" onclick="openPolicyDedupRules()">配置去重规则</button><button class="btn btn-secondary btn-sm" type="button" onclick="openPolicyPhoneRules()">配置品牌号码检测</button><button class="btn btn-secondary btn-sm" type="button" onclick="openPolicyBrandAi()">查看品牌 AI 配置</button><button class="btn btn-secondary btn-sm" type="button" onclick="renderSchedulePolicy()">刷新品牌状态</button></div>
+          <div class="policy-footer"><button class="btn btn-secondary" type="button" onclick="resetSchedulePolicyDraft()">放弃草稿修改</button><button class="btn btn-secondary" type="button" onclick="saveSchedulePolicyDraft()">保存草稿</button><button class="btn btn-primary" type="button" onclick="publishSchedulePolicy()">核对并发布</button></div>
+        </section>
+      </div>
+
+      <div class="page schedule-editor-page" id="page-schedule-editor">
+        <div id="scheduleModal" class="schedule-editor-shell">
+          <section class="card schedule-editor-head">
+            <div class="schedule-editor-title-row"><div><h1 class="page-title" id="scheduleModalTitle">新增排期</h1><p class="page-subtitle" id="schedulePageSubtitle">排期管理 / 新增排期</p></div><button class="btn btn-secondary" type="button" onclick="closeSchedulePage()">返回排期列表</button></div>
+<div class="schedule-editor-summary">
+        <div class="schedule-summary-item"><div class="schedule-summary-label">排期名称</div><div class="schedule-summary-value" id="scheduleSummaryName">未填写</div></div>
+        <div class="schedule-summary-item"><div class="schedule-summary-label">时间范围</div><div class="schedule-summary-value" id="scheduleSummaryTime">未选择</div></div>
+        <div class="schedule-summary-item"><div class="schedule-summary-label">总预算</div><div class="schedule-summary-value" id="scheduleSummaryBudget">¥0</div></div>
+        <div class="schedule-summary-item"><div class="schedule-summary-label">已分配预算</div><div class="schedule-summary-value" id="scheduleSummaryAllocated">¥0</div></div>
+        <div class="schedule-summary-item"><div class="schedule-summary-label">配置规模</div><div class="schedule-summary-value" id="scheduleSummaryScale">0 车系 · 0 供应商</div></div>
+      </div>
+      
+          </section>
+          <section class="card schedule-editor-workspace">
+            <nav class="schedule-editor-tabs" role="tablist" aria-label="排期配置分组" onkeydown="handleScheduleEditorTabKeydown(event)"><button class="tab-btn active" id="scheduleEditorTab-basic" data-schedule-editor-tab="basic" type="button" role="tab" aria-controls="scheduleEditorPanel-basic" aria-selected="true" onclick="switchScheduleEditorTab('basic')">基础信息</button><button class="tab-btn" id="scheduleEditorTab-suppliers" data-schedule-editor-tab="suppliers" type="button" role="tab" aria-controls="scheduleEditorPanel-suppliers" aria-selected="false" onclick="switchScheduleEditorTab('suppliers')">账号与预算</button></nav>
+            <div class="schedule-editor-panels">
+              <div class="schedule-editor-tab-panel" id="scheduleEditorPanel-basic" role="tabpanel" aria-labelledby="scheduleEditorTab-basic"><div class="card" id="scheduleBasicSection" style="border:1px solid var(--gray-200);">
+        <div class="card-header"><span class="card-title">基础信息</span></div>
+        <div class="card-body">
+          <div class="schedule-basic-grid">
+            <div class="form-group schedule-field-id" aria-hidden="true"><label class="form-label">主键ID</label><div class="view-value" style="color:var(--gray-400)" id="scheduleIdDisplay">系统自动生成</div></div>
+            <div class="form-group schedule-field-name"><label class="form-label">排期名称 <span class="required">*</span></label><input type="text" class="form-input" id="scheduleName" placeholder="请输入排期名称"></div>
+            <div class="form-group schedule-field-status"><label class="form-label">状态 <span class="required">*</span></label><select class="form-select" id="scheduleStatus"><option value="1">启用</option><option value="0">禁用</option></select></div>
+            <div class="form-group schedule-field-budget"><label class="form-label">总预算 <span class="required">*</span></label><input type="number" class="form-input" id="scheduleTotalBudget" placeholder="请输入总预算" min="0" step="0.01"></div>
+            <div class="form-group schedule-field-start"><label class="form-label">开始时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleStartTime"></div>
+            <div class="form-group schedule-field-end"><label class="form-label">结束时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleEndTime"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="scheduleSeriesSection" style="border:1px solid var(--gray-200);">
+        <div class="card-header"><span class="card-title">关联车系</span></div>
+        <div class="card-body">
+          <div class="form-group full">
+            <label class="form-label">关联车系 <span class="required">*</span></label>
+            <div id="scheduleBaseSeriesTags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:40px;padding:8px 12px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;">
+              <span style="color:var(--gray-400);font-size:13px;" id="scheduleSeriesPlaceholder">暂未选择关联车系</span>
+            </div>
+            <div class="schedule-inline-series-picker">
+              <div class="schedule-inline-series-brands">
+                <div class="schedule-inline-picker-title">先选品牌（多选）</div>
+                <div id="scheduleInlineBrandList"></div>
+              </div>
+              <div class="schedule-inline-series-main">
+                <div class="schedule-inline-series-toolbar">
+                  <input class="form-input" id="scheduleInlineSeriesSearch" placeholder="搜索车系名称或编码" oninput="renderScheduleInlineSeriesList()">
+                  <span id="scheduleInlineSeriesCount" style="font-size:12px;color:var(--gray-500);"></span>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllScheduleInlineSeries()">全选当前</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="clearScheduleInlineSeries()">清空已选</button>
+                </div>
+                <div id="scheduleInlineSeriesList" class="schedule-inline-series-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+              <div class="schedule-editor-tab-panel" id="scheduleEditorPanel-suppliers" role="tabpanel" aria-labelledby="scheduleEditorTab-suppliers" hidden><div class="card schedule-supplier-workspace" id="scheduleSupplierSection" style="border:1px solid var(--gray-200);">
+        <div class="card-header">
+          <span class="card-title">供应商配置</span>
+          <button class="btn btn-primary btn-sm" id="scheduleAddSupplierBtn" onclick="addScheduleSupplierRow()">＋ 添加供应商</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div id="scheduleSupplierTabs" class="schedule-supplier-tabs"></div>
+          <div id="scheduleSupplierEmpty" style="padding:32px;text-align:center;color:var(--gray-400);">暂无供应商信息，请点击「＋ 添加供应商」</div>
+          <div id="scheduleSupplierTbody" class="schedule-supplier-panels"></div>
+        </div>
+      </div>
+      </div>
+            </div>
+          </section>
+<div class="schedule-editor-footer">
+      <div class="schedule-footer-summary" id="scheduleFooterSummary">0 车系 · 0 供应商 · 0 家专营店 · 已分配 ¥0 / ¥0</div>
+      <button class="btn btn-secondary" id="scheduleCancelBtn" onclick="closeSchedulePage()">取消</button>
+      <button class="btn btn-primary" id="scheduleEditBtn" onclick="openScheduleModal('edit', currentEditingScheduleId)" style="display:none;">编辑排期</button>
+      <button class="btn btn-primary" id="scheduleSaveBtn" onclick="saveSchedule()">确认保存</button>
+    </div>
+  
+        </div>
+      </div>
+
       <!-- ===== 投放运营: 查看报表 ===== -->
       <div class="page" id="page-dk-report">
         <div class="card detail-page-summary">
@@ -3707,7 +3817,7 @@ X-Signature = HmacSHA256(
                 </tr>
               </thead>
               <tbody id="reportDataTbody">
-                <tr><td colspan="14" style="text-align:center;padding:40px;color:var(--gray-400);">请先选择创建时间，点击查询加载数据</td></tr>
+                <tr><td colspan="18" style="text-align:center;padding:40px;color:var(--gray-400);">请先选择创建时间，点击查询加载数据</td></tr>
               </tbody>
             </table>
           </div>
@@ -3887,11 +3997,13 @@ X-Signature = HmacSHA256(
                 <tbody id="smartcodeMaintainTbody">
                   <tr><td>1</td><td><code>112233</code></td><td style="font-size:12px;color:var(--gray-500)">2026-05-15 14:30</td><td>管理员</td><td><button class="btn btn-secondary btn-sm" onclick="openSmartCodeMaintainModal('edit', {code:'112233', remark:'十月份促销推广使用'})">编辑</button> <button class="btn btn-danger btn-sm" onclick="showToast('已删除','success')">删除</button></td></tr>
                   <tr><td>2</td><td><code>445566</code></td><td style="font-size:12px;color:var(--gray-500)">2026-05-20 10:15</td><td>管理员</td><td><button class="btn btn-secondary btn-sm" onclick="openSmartCodeMaintainModal('edit', {code:'445566', remark:'十一月份推广使用'})">编辑</button> <button class="btn btn-danger btn-sm" onclick="showToast('已删除','success')">删除</button></td></tr>
-                </tbody>
+                
+                  <tr><td>3</td><td><code>SC-OLD-001</code></td><td style="font-size:12px;color:var(--gray-500)">2026-10-27 10:00</td><td>管理员</td><td><span class="form-hint">全国庆典促销试点</span></td></tr>
+</tbody>
               </table>
             </div>
             <div class="pagination">
-              <div class="pagination-info">共 2 条</div>
+              <div class="pagination-info">共 3 条</div>
               <div class="pagination-controls"><button class="pagination-btn">‹</button><button class="pagination-btn active">1</button><button class="pagination-btn">›</button></div>
             </div>
           </div>
@@ -3977,7 +4089,7 @@ X-Signature = HmacSHA256(
       </div>
 
       <!-- ===== 培育引擎：AI 外呼配置 ===== -->
-      <div class="page" id="page-dcc-outbound-config"><div class="page-header">
+      <div class="page" id="page-dcc-outbound-config"><div class="policy-return-context" id="policyAiReturn" style="display:none;"><span id="policyAiReturnText"></span><button type="button" class="btn btn-secondary btn-sm" onclick="returnToSchedulePolicyFromBrandConfig()">返回排期处理策略</button></div><div class="page-header">
           <h1 class="page-title">AI 外呼配置</h1>
           <p class="page-subtitle">按品牌设置外呼接入、预评分分配、任务去重、线索等待与结果映射规则</p>
         </div><div class="outbound-config-top"><div class="card" style="margin-bottom:16px;">
@@ -4189,91 +4301,6 @@ X-Signature = HmacSHA256(
 </div>
 
 <!-- ========== MODALS ========== -->
-
-<!-- Schedule Add/Edit Modal -->
-<div class="modal-overlay drawer-overlay" id="scheduleModal">
-  <div class="modal drawer-panel">
-    <div class="modal-header schedule-page-header">
-      <div>
-        <span class="modal-title" id="scheduleModalTitle">新增排期</span>
-        <div class="schedule-page-subtitle" id="schedulePageSubtitle">排期管理 / 新增排期</div>
-      </div>
-      <div class="schedule-page-header-actions">
-        <button type="button" aria-label="关闭" class="modal-close" onclick="closeSchedulePage()">×</button>
-      </div>
-    </div>
-    <div class="modal-body">
-      <div class="schedule-drawer-summary">
-        <div class="schedule-summary-item"><div class="schedule-summary-label">排期名称</div><div class="schedule-summary-value" id="scheduleSummaryName">未填写</div></div>
-        <div class="schedule-summary-item"><div class="schedule-summary-label">时间范围</div><div class="schedule-summary-value" id="scheduleSummaryTime">未选择</div></div>
-        <div class="schedule-summary-item"><div class="schedule-summary-label">总预算</div><div class="schedule-summary-value" id="scheduleSummaryBudget">¥0</div></div>
-        <div class="schedule-summary-item"><div class="schedule-summary-label">已分配预算</div><div class="schedule-summary-value" id="scheduleSummaryAllocated">¥0</div></div>
-        <div class="schedule-summary-item"><div class="schedule-summary-label">配置规模</div><div class="schedule-summary-value" id="scheduleSummaryScale">0 车系 · 0 供应商</div></div>
-      </div>
-      <div class="schedule-flow-layout">
-      <!-- 排期基本信息 -->
-      <div class="card" id="scheduleBasicSection" style="border:1px solid var(--gray-200);">
-        <div class="card-header"><span class="card-title">基础信息</span></div>
-        <div class="card-body">
-          <div class="schedule-basic-grid">
-            <div class="form-group schedule-field-id" aria-hidden="true"><label class="form-label">主键ID</label><div class="view-value" style="color:var(--gray-400)" id="scheduleIdDisplay">系统自动生成</div></div>
-            <div class="form-group schedule-field-name"><label class="form-label">排期名称 <span class="required">*</span></label><input type="text" class="form-input" id="scheduleName" placeholder="请输入排期名称"></div>
-            <div class="form-group schedule-field-status"><label class="form-label">状态 <span class="required">*</span></label><select class="form-select" id="scheduleStatus"><option value="1">启用</option><option value="0">禁用</option></select></div>
-            <div class="form-group schedule-field-budget"><label class="form-label">总预算 <span class="required">*</span></label><input type="number" class="form-input" id="scheduleTotalBudget" placeholder="请输入总预算" min="0" step="0.01"></div>
-            <div class="form-group schedule-field-start"><label class="form-label">开始时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleStartTime"></div>
-            <div class="form-group schedule-field-end"><label class="form-label">结束时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleEndTime"></div>
-          </div>
-        </div>
-      </div>
-      <!-- 关联车系 -->
-      <div class="card" id="scheduleSeriesSection" style="border:1px solid var(--gray-200);">
-        <div class="card-header"><span class="card-title">关联车系</span></div>
-        <div class="card-body">
-          <div class="form-group full">
-            <label class="form-label">关联车系 <span class="required">*</span></label>
-            <div id="scheduleBaseSeriesTags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:40px;padding:8px 12px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;">
-              <span style="color:var(--gray-400);font-size:13px;" id="scheduleSeriesPlaceholder">暂未选择关联车系</span>
-            </div>
-            <div class="schedule-inline-series-picker">
-              <div class="schedule-inline-series-brands">
-                <div class="schedule-inline-picker-title">先选品牌（多选）</div>
-                <div id="scheduleInlineBrandList"></div>
-              </div>
-              <div class="schedule-inline-series-main">
-                <div class="schedule-inline-series-toolbar">
-                  <input class="form-input" id="scheduleInlineSeriesSearch" placeholder="搜索车系名称或编码" oninput="renderScheduleInlineSeriesList()">
-                  <span id="scheduleInlineSeriesCount" style="font-size:12px;color:var(--gray-500);"></span>
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllScheduleInlineSeries()">全选当前</button>
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="clearScheduleInlineSeries()">清空已选</button>
-                </div>
-                <div id="scheduleInlineSeriesList" class="schedule-inline-series-list"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- 供应商信息（可重复行） -->
-      <div class="card schedule-supplier-workspace" id="scheduleSupplierSection" style="border:1px solid var(--gray-200);">
-        <div class="card-header">
-          <span class="card-title">供应商配置</span>
-          <button class="btn btn-primary btn-sm" id="scheduleAddSupplierBtn" onclick="addScheduleSupplierRow()">＋ 添加供应商</button>
-        </div>
-        <div class="card-body" style="padding:0;">
-          <div id="scheduleSupplierTabs" class="schedule-supplier-tabs"></div>
-          <div id="scheduleSupplierEmpty" style="padding:32px;text-align:center;color:var(--gray-400);">暂无供应商信息，请点击「＋ 添加供应商」</div>
-          <div id="scheduleSupplierTbody" class="schedule-supplier-panels"></div>
-        </div>
-      </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <div class="schedule-footer-summary" id="scheduleFooterSummary">0 车系 · 0 供应商 · 0 家专营店 · 已分配 ¥0 / ¥0</div>
-      <button class="btn btn-secondary" id="scheduleCancelBtn" onclick="closeSchedulePage()">取消</button>
-      <button class="btn btn-primary" id="scheduleEditBtn" onclick="openScheduleModal('edit', currentEditingScheduleId)" style="display:none;">编辑排期</button>
-      <button class="btn btn-primary" id="scheduleSaveBtn" onclick="saveSchedule()">确认保存</button>
-    </div>
-  </div>
-</div>
 
 <!-- Import Series Modal -->
 <div class="modal-overlay" id="importSeriesModal">
@@ -5849,6 +5876,7 @@ X-Signature = HmacSHA256(
       </div>
     </div>
     <div class="modal-footer">
+      <p id="storeSaveError" role="alert" hidden style="margin:0 auto 0 0;color:#b91c1c;font-size:13px;"></p>
       <button class="btn btn-secondary" onclick="closeStoreModalAndReset()">取消</button>
       <button class="btn btn-primary" onclick="saveStoreData()">确认保存</button>
     </div>
@@ -5941,9 +5969,10 @@ X-Signature = HmacSHA256(
       </div>
       <div class="detail-grid" style="margin-bottom:18px;">
         <div class="detail-item"><div class="detail-label">品牌 / 车系</div><div class="detail-value">东风日产 / 轩逸</div></div>
-        <div class="detail-item"><div class="detail-label">客户 / 手机号</div><div class="detail-value">王先生 / 137****6688</div></div>
-        <div class="detail-item"><div class="detail-label">关联外呼任务</div><div class="detail-value">CALL-DFN-20261020-001</div></div>
-        <div class="detail-item"><div class="detail-label">原线索 ID</div><div class="detail-value">LD2026102000000</div></div>
+        <div class="detail-item"><div class="detail-label">客户 / 手机号</div><div class="detail-value" id="manualReviewCustomer">王先生 / 137****6688</div></div>
+        <div class="detail-item"><div class="detail-label">关联外呼任务</div><div class="detail-value" id="manualReviewTask">CALL-DFN-20261020-001</div></div>
+        <div class="detail-item"><div class="detail-label">原线索 ID</div><div class="detail-value" id="manualReviewOriginal">LD2026102000000</div></div>
+        <div class="detail-item"><div class="detail-label">处理依据</div><div class="detail-value" id="manualReviewSource">排期策略</div></div>
         <div class="detail-item"><div class="detail-label">等待截止</div><div class="detail-value">2026-10-20 10:15</div></div>
         <div class="detail-item"><div class="detail-label">接收 / 去重 / 准入</div><div class="detail-value">已接收 / 未命中 / 通过</div></div>
         <div class="detail-item"><div class="detail-label">厂商下发状态</div><div class="detail-value">尚未调用</div></div>
@@ -6010,20 +6039,23 @@ X-Signature = HmacSHA256(
 
 <!-- SheetJS Library for Excel Import -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-<script src="DKLinks.assets/js/core-navigation.js?v=20261026-list-config-permission"></script>
+<script src="DKLinks.assets/js/core-navigation.js?v=20261104-login-dashboard"></script>
 <script src="DKLinks.assets/js/vehicle-series.js"></script>
 <script src="DKLinks.assets/js/region-management.js?v=20261026-brand-view"></script>
-<script src="DKLinks.assets/js/store-management.js?v=20261026-brand-view"></script>
-<script src="DKLinks.assets/js/operations-management.js?v=20261022-unified-close"></script>
-<script src="DKLinks.assets/js/custom-fields.js?v=20261022-phone-independent"></script>
+<script src="DKLinks.assets/js/store-management.js?v=20261102-store-save"></script>
+<script src="DKLinks.assets/js/operations-management.js?v=20261104-schedule-prefill-fix"></script>
+<script src="DKLinks.assets/js/lead-policy-evidence.js?v=20261104-brand-manual-demo"></script>
+<script src="DKLinks.assets/js/custom-fields.js?v=20261104-brand-manual-demo"></script>
 <script src="DKLinks.assets/js/ai-call-records.js?v=20261022-ops-cleanup"></script>
-<script src="DKLinks.assets/js/lead-trace.js?v=20261022-all-progress-fixtures"></script>
-<script src="DKLinks.assets/js/manual-dispatch-review.js?v=20261021-trace-audit"></script>
-<script src="DKLinks.assets/js/outbound-config.js?v=20261022-config-tabs-scope"></script>
+<script src="DKLinks.assets/js/lead-trace.js?v=20261104-brand-manual-demo"></script>
+<script src="DKLinks.assets/js/manual-dispatch-review.js?v=20261104-brand-manual-demo"></script>
+<script src="DKLinks.assets/js/outbound-config.js?v=20261027-regression-close"></script>
 <script src="DKLinks.assets/js/outbound-config-tabs.js?v=20261022-four-tabs"></script>
 <script src="DKLinks.assets/js/outbound-flow-walkthrough.js?v=20261021-nissan-flow-data"></script>
-<script src="DKLinks.assets/js/lead-intercept-smartcode.js?v=20261022-phone-independent"></script>
-<script src="DKLinks.assets/js/lead-view-config.js?v=20261026-list-config-permission"></script>
+<script src="DKLinks.assets/js/lead-intercept-smartcode.js?v=20261027-regression-close"></script>
+<script src="DKLinks.assets/js/lead-view-config.js?v=20261027-policy-evidence"></script>
+<script src="DKLinks.assets/js/schedule-policy.js?v=20261104-brand-manual-demo"></script>
+
 
 <script>
 // 试点供应商直连与线索中心协同开发技术方案弹窗控制器
