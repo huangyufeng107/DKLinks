@@ -1,5 +1,6 @@
 /* 排期配置整页布局，沿用线索详情的白色概览卡、浅蓝摘要与页签容器。 */
 #page-schedule-editor { min-width: 0; }
+#page-schedule-editor [hidden] { display: none !important; }
 #page-schedule-editor #scheduleModal { position: static; width: 100%; height: auto; background: transparent; }
 #page-schedule-editor .schedule-editor-head { padding: 22px 24px 0; margin-bottom: 16px; }
 #page-schedule-editor .schedule-editor-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 20px; }
