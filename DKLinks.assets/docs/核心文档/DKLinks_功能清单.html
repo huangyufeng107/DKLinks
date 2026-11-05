@@ -141,13 +141,13 @@ tr:last-child td { border-bottom: none; }
 .catalog-sidebar .tab-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; box-shadow: 0 2px 5px rgba(0,53,148,.16); }
 .catalog-group { overflow: hidden; border: 1px solid #dce4f0; border-radius: 7px; background: #fff; }
 .catalog-group[open] { border-color: #bad0ff; }
-.catalog-group summary { display: flex; align-items: center; gap: 7px; padding: 9px 10px; background: #f8faff; color: #334155; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; }
+.catalog-group summary { display: flex; align-items: center; justify-content: flex-start; gap: 10px; text-align: left; padding: 9px 10px; background: #f8faff; color: #334155; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; }
 .catalog-group summary::-webkit-details-marker { display: none; }
 .catalog-group summary::before { content: '›'; color: #8291a8; font-size: 15px; line-height: 1; transition: transform .15s; }
 .catalog-group[open] summary { background: #edf3ff; color: var(--accent); }
 .catalog-group[open] summary::before { transform: rotate(90deg); }
 .catalog-group summary:hover { background: #edf3ff; color: var(--accent); }
-.catalog-group-count { margin-left: auto; padding: 1px 6px; border-radius: 999px; background: #e4e9f1; color: #64748b; font-size: 11px; }
+.catalog-group-count { flex-shrink: 0; margin-left: auto; padding: 1px 6px; border-radius: 999px; background: #e4e9f1; color: #64748b; font-size: 11px; }
 .catalog-group[open] .catalog-group-count { background: #dbeafe; color: var(--accent); }
 .catalog-group-items { display: grid; gap: 4px; margin: 6px 8px 8px 12px; padding-left: 8px; border-left: 1.5px solid #dce4f0; }
 .catalog-sidebar .catalog-group-items .tab-btn { padding: 7px 9px; border-color: transparent; background: #fff; }
@@ -158,7 +158,7 @@ tr:last-child td { border-bottom: none; }
 .catalog-version-search label { display: block; margin-bottom: 5px; color: #334155; font-size: 11px; font-weight: 700; }
 .catalog-version-search input { width: 100%; height: 36px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; background: #fff; font: inherit; font-size: 12px; }
 .catalog-version-search p { margin: 5px 0 0; color: #64748b; font-size: 10px; line-height: 1.5; }
-.catalog-group summary .catalog-group-label { flex: 1; text-align: center; }
+.catalog-group summary .catalog-group-label { flex: 1; text-align: left; }
 .catalog-group-items .tab-btn { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .catalog-item-count { padding: 1px 6px; border-radius: 999px; background: #e4e9f1; color: #64748b; font-size: 10px; line-height: 1.4; }
 .catalog-group-items .tab-btn.active .catalog-item-count { background: #ffffff40; color: #fff; }
@@ -173,7 +173,7 @@ html { scrollbar-gutter: stable; }
 /* 文档左侧栏的统一收起按钮 */
 
 /* 文档分组统一箭头：收起向右，展开向下 */
-.catalog-group summary::before{content:'';display:block;flex:none;width:12px;height:12px;margin-right:6px;background-color:#8291a8;-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");-webkit-mask-size:12px 12px;mask-size:12px 12px;transition:transform .15s ease}
+.catalog-group summary::before{content:'';display:block;flex:none;width:12px;height:12px;margin-right:0;background-color:#8291a8;-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");-webkit-mask-size:12px 12px;mask-size:12px 12px;transition:transform .15s ease}
 .catalog-group[open] summary::before{transform:rotate(90deg);background-color:#003594}
 .catalog-landing{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px}.catalog-landing h2{margin:0 0 14px;font-size:18px}.catalog-landing p{margin:0}.catalog-landing[hidden]{display:none!important}
 </style>
@@ -227,7 +227,7 @@ html { scrollbar-gutter: stable; }
 
 <div class="summary-cards">
   <div class="summary-card"><div class="summary-label">功能菜单</div><div class="summary-value">23</div></div>
-  <div class="summary-card"><div class="summary-label">功能条目</div><div class="summary-value" id="totalFeatures">175</div></div>
+  <div class="summary-card"><div class="summary-label">功能条目</div><div class="summary-value" id="totalFeatures">178</div></div>
   <div class="summary-card"><div class="summary-label">板块分类</div><div class="summary-value">6</div></div>
 </div>
 
@@ -237,7 +237,7 @@ html { scrollbar-gutter: stable; }
 <div class="tab-content" id="tab-overview">
 <div class="table-card">
   <div class="table-toolbar">
-    <div><span class="toolbar-title">全部功能条目</span><span class="toolbar-count">（175条）</span></div>
+    <div><span class="toolbar-title">全部功能条目</span><span class="toolbar-count">（178条）</span></div>
     <div class="toolbar-actions">
       <button class="btn btn-primary" data-export-table="tbl-overview" data-export-name="D客连_功能清单_全部">导出CSV</button>
     </div>
@@ -294,7 +294,7 @@ html { scrollbar-gutter: stable; }
 </div>
 
 <div class="tab-content" id="tab-schedule">
-<div class="table-card"><div class="table-toolbar"><div><span class="toolbar-title">排期管理</span><span class="toolbar-count">（8条）</span></div><div class="toolbar-actions"><button class="btn btn-primary" data-export-table="tbl-schedule" data-export-name="D客连_功能清单_排期管理">导出CSV</button></div></div><div class="search-box" style="padding:12px 16px"><input type="text" class="search-input" data-table="tbl-schedule" placeholder="搜索..."></div><div class="table-scroll"><table id="tbl-schedule"><thead><tr><th>项目版本号</th><th>修订类型</th><th>系统</th><th>板块</th><th>子板块</th><th>功能模块</th><th>描述</th><th>需求来源</th></tr></thead><tbody><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>D客连</td><td>排期管理</td><td>排期列表</td><td>排期表格：序号/品牌/名称/时间/预算/状态/操作，按品牌Tab分组</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>新增/编辑排期</td><td>抽屉面板：名称/状态/预算/时间/关联车系/供应商配置（账号/预算/结算/门店）</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>查看排期</td><td>只读抽屉面板展示排期完整信息含摘要统计</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>供应商配置</td><td>在排期中添加/配置多个供应商：账号/预算/SMARTCODE/结算方式/结算价/专营店</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>关联车系</td><td>品牌多选+车系搜索多选组件</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>查看报表</td><td>行内操作跳转到排期报表页</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>线索明细</td><td>行内操作跳转到排期线索明细页</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>排期筛选</td><td>按名称/状态筛选，支持重置</td><td>原型</td></tr></tbody></table></div></div>
+<div class="table-card"><div class="table-toolbar"><div><span class="toolbar-title">排期管理</span><span class="toolbar-count">（8条）</span></div><div class="toolbar-actions"><button class="btn btn-primary" data-export-table="tbl-schedule" data-export-name="D客连_功能清单_排期管理">导出CSV</button></div></div><div class="search-box" style="padding:12px 16px"><input type="text" class="search-input" data-table="tbl-schedule" placeholder="搜索..."></div><div class="table-scroll"><table id="tbl-schedule"><thead><tr><th>项目版本号</th><th>修订类型</th><th>系统</th><th>板块</th><th>子板块</th><th>功能模块</th><th>描述</th><th>需求来源</th></tr></thead><tbody><tr><td>待评审</td><td>新增</td><td>D客连</td><td>投放运营</td><td>排期处理策略</td><td>项目处理策略</td><td>按排期继承品牌已开启能力；接收去重按适用规则显示有无可用规则，支持去重、号码和AI配置页跳转返回、草稿和发布；线索列表可配置归属排期筛选与列，详情保留策略依据，原命中记录显示执行来源。</td><td>三期需求与用户确认；讨论原型</td></tr><tr><td>待评审</td><td>新增</td><td>D客连</td><td>投放运营</td><td>排期处理策略</td><td>SmartCode唯一归属</td><td>一个SmartCode仅关联一个排期；跨排期重复引用拒绝保存，归属同时检查品牌、渠道、有效期和启停。</td><td>三期需求与用户确认；讨论原型</td></tr><tr><td>待评审</td><td>新增</td><td>D客连</td><td>投放运营</td><td>排期处理策略</td><td>处理快照核对</td><td>演示配置来源；品牌依赖关闭后暂停后续新线索，恢复并重新发布后生效；草稿与历史快照互不覆盖。</td><td>三期需求与用户确认；讨论原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>D客连</td><td>排期管理</td><td>排期列表</td><td>排期表格：序号/品牌/名称/时间/预算/状态/操作，按品牌Tab分组</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>新增/编辑排期</td><td>抽屉面板：名称/状态/预算/时间/关联车系/供应商配置（账号/预算/结算/门店）</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>查看排期</td><td>只读抽屉面板展示排期完整信息含摘要统计</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>供应商配置</td><td>在排期中添加/配置多个供应商：账号/预算/SMARTCODE/结算方式/结算价/专营店</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>关联车系</td><td>品牌多选+车系搜索多选组件</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>查看报表</td><td>行内操作跳转到排期报表页</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>线索明细</td><td>行内操作跳转到排期线索明细页</td><td>原型</td></tr><tr><td>v1.1.1</td><td>新增</td><td>D客连</td><td>排期管理</td><td>排期管理</td><td>排期筛选</td><td>按名称/状态筛选，支持重置</td><td>原型</td></tr></tbody></table></div></div>
 </div>
 
 <div class="tab-content" id="tab-dkaccount">

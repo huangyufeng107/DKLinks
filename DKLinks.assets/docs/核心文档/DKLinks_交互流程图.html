@@ -170,14 +170,14 @@
   .flow-search-hint { margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px solid #e0e4ee; color: #7b8496; font-size: 11px; }
   .flow-nav-group { border: 1px solid #e0e5ef; border-radius: 7px; margin: 8px 0; overflow: hidden; background: #fff; }
   .flow-nav-group[open] { border-color: #c7d9fc; }
-  .flow-nav-group summary { display: flex; align-items: center; justify-content: space-between; gap: 6px; list-style: none; padding: 8px 10px; background: #f8fafc; color: #34445e; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .flow-nav-group summary { display: flex; align-items: center; justify-content: flex-start; gap: 10px; text-align: left; list-style: none; padding: 8px 10px; background: #f8fafc; color: #34445e; font-size: 12px; font-weight: 700; cursor: pointer; }
   .flow-nav-group summary::-webkit-details-marker { display: none; }
   .flow-nav-group summary::before { content: '›'; color: #8291a8; font-size: 14px; transition: transform .15s; }
   .flow-nav-group[open] summary::before { transform: rotate(90deg); }
   .flow-nav-group summary:hover { background: #f1f5f9; color: #003594; text-decoration: none; }
   .flow-nav-group[open] summary { background: #eef4ff; color: #003594; }
   .flow-nav-group[open] .flow-group-count { background: #dbeafe; color: #003594; }
-  .flow-group-count { color: #64748b; background: #e7ebf2; border-radius: 999px; padding: 1px 6px; font-size: 10px; white-space: nowrap; }
+  .flow-group-count { margin-left: auto; flex-shrink: 0; color: #64748b; background: #e7ebf2; border-radius: 999px; padding: 1px 6px; font-size: 10px; white-space: nowrap; }
   .flow-nav-items { display: grid; gap: 2px; margin: 3px 8px 6px 12px; padding: 4px 0 4px 10px; border-left: 1.5px solid #e2e8f0; }
   .flow-page-btn { width: 100%; padding: 7px 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #475569; font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
   .flow-page-btn:hover { background: rgba(0,53,148,.05); color: #003594; }
@@ -233,7 +233,7 @@ html { scrollbar-gutter: stable; }
 }
 
 /* 文档分组统一箭头：收起向右，展开向下 */
-.flow-nav-group summary::before{content:'';display:block;flex:none;width:12px;height:12px;margin-right:6px;background-color:#8291a8;-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");-webkit-mask-size:12px 12px;mask-size:12px 12px;transition:transform .15s ease}
+.flow-nav-group summary::before{content:'';display:block;flex:none;width:12px;height:12px;margin-right:0;background-color:#8291a8;-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m4.5 2.5 3.5 3.5-3.5 3.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");-webkit-mask-size:12px 12px;mask-size:12px 12px;transition:transform .15s ease}
 .flow-nav-group[open] summary::before{transform:rotate(90deg);background-color:#003594}
 .flow-landing{background:#fff;border:1px solid #c3c6d6;border-radius:8px;padding:24px 28px;color:#334155}.flow-landing h2{margin:0 0 14px;font-size:18px;color:#191b23}.flow-landing p{margin:0}.flow-landing[hidden],.end-hint[hidden]{display:none!important}
 </style>
@@ -286,7 +286,7 @@ html { scrollbar-gutter: stable; }
     <div class="op-group"><button data-op="树形导航">树形导航</button><button data-op="新增节点">新增节点</button><button data-op="编辑节点">编辑节点</button><button data-op="删除节点">删除节点</button><button data-op="批量导入">批量导入</button><button data-op="导出数据">导出数据</button></div>
     <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看详情">查看详情</button><button data-op="停用启用">停用/启用</button><button data-op="删除门店">删除门店</button><button data-op="批量操作">批量操作</button><button data-op="地图选址">地图选址</button><button data-op="批量导入">批量导入</button><button data-op="导出数据">导出数据</button></div>
     <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看详情">查看详情</button><button data-op="停用启用">停用/启用</button><button data-op="重置Key">重置APIKey</button></div>
-    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看报表">查看报表</button><button data-op="线索明细">线索明细</button></div>
+    <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="查看报表">查看报表</button><button data-op="线索明细">线索明细</button><button data-op="处理策略">处理策略</button></div>
     <div class="op-group"><button data-op="查询筛选">查询筛选</button><button data-op="新增编辑">新增/编辑</button><button data-op="删除帐号">删除帐号</button></div>
     <div class="op-group"><button data-op="SmartCode维护">SmartCode维护</button><button data-op="SmartCode映射">SmartCode映射</button><button data-op="批量导入">批量导入</button></div>
     <div class="op-group"><button data-op="规则配置">规则配置</button><button data-op="拦截记录">拦截记录</button><button data-op="黑名单管理">黑名单管理</button><button data-op="导出规则">导出规则</button><button data-op="号码状态检测">号码状态检测</button></div>
@@ -1306,6 +1306,26 @@ A["按任务或线索、品牌、系统类型、状态筛选"] --> B["进入任�
   </pre>
 </div>
 
+<div class="chart-card" data-page="排期管理" data-op="处理策略" id="interaction-80"><h2>排期管理 · 处理策略</h2><p class="menu-path">投放运营 → 排期管理 → 处理策略</p><p>线索列表可配置归属排期筛选与列；详情默认打开处理进度，顶部概括结论；进度上方展示接收时归属、策略来源与版本，可展开当时配置；配置依据不重复实际执行结果；原规则命中记录补充执行依据。关闭与暂停只记录处理原因，不生成命中记录。历史缺少快照显示未记录。</p><div class="param-box">讨论原型：总部日产试点，SC-OLD-001只关联一个排期；项目差异覆盖品牌默认。保存草稿与发布分开，品牌关闭或依赖缺失时阻止发布。配置按钮跳转对应品牌页面，去重入口定位适用公共／品牌规则并含停用项，返回保留草稿；已发布依赖关闭后暂停后续新线索。正式接收、并发与权限仍需服务端实现。</div><pre class="mermaid">flowchart TD
+ A["选择排期及适用品牌"] --> B["读取品牌默认与项目差异"]
+ B --> C["修改项目设置并保存草稿"]
+ C --> D{"品牌已开启且依赖齐全？"}
+ D -->|否| E["跳转对应品牌页面完善规则"]
+ D -->|是| F["发布项目差异"]
+ F --> G["按SmartCode定位唯一排期"]
+ G --> H{"品牌、渠道、时间和状态有效？"}
+ H -->|否| I["给出原因，不自动任选排期"]
+ H -->|是| J["读取已发布差异与当时品牌默认"]
+ J --> K["生成本次有效配置快照"]
+ K --> L["历史任务继续使用原依据"]
+
+ E --> R["返回原排期并保留草稿"]
+ R --> D
+ F --> M["持续复核品牌能力"]
+ M -->|依赖关闭| N["标记需处理，暂停后续新线索"]
+ N --> O["修复或调整并重新发布"]
+ O --> F
+</pre></div>
 <!-- ====== 报表账号管理 ====== -->
 <div class="chart-card" data-page="报表账号管理" data-op="查询筛选" id="interaction-51">
   <h2><span class="card-index">1</span>报表账号管理 · 查询筛选<span class="page-badge">报表账号管理</span></h2><p class="menu-path">菜单路径：投放运营 → 报表账号管理</p>
