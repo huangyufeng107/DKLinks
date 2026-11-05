@@ -312,7 +312,7 @@
     if (editBtn) editBtn.style.display = isView ? '' : 'none';
     document.querySelectorAll('#scheduleModal input, #scheduleModal select, #scheduleModal textarea').forEach(function(el) {
       if (el.type === 'hidden') return;
-      el.disabled = isView;
+      el.disabled = isView || el.dataset.followSchedule === 'true';
     });
     document.querySelectorAll('#scheduleModal .schedule-inline-series-picker button, #scheduleModal .schedule-inline-series-picker input').forEach(function(el) {
       el.disabled = isView;
@@ -354,6 +354,7 @@
     var panelsEl = document.getElementById('scheduleSupplierTbody');
     if (tabsEl) tabsEl.innerHTML = '';
     if (panelsEl) panelsEl.innerHTML = '';
+    ScheduleCommercial.load(scheduleData.find(function (s) { return s.id === scheduleId; }), mode);
 
     if (mode === 'add') {
       title.textContent = '新增排期';
@@ -401,6 +402,7 @@
     }
     modal.classList.add('active');
     switchScheduleEditorTab('basic');
+    ScheduleCommercial.change();
     setSchedulePageMode(mode);
     if (typeof window.scrollTo === 'function') window.scrollTo(0, 0);
   }
@@ -739,6 +741,7 @@
     if (confirmSuppliersEl) confirmSuppliersEl.textContent = supplierRows.length;
     if (confirmStoresEl) confirmStoresEl.textContent = storeCount;
     if (confirmBudgetEl) confirmBudgetEl.textContent = '¥' + allocated.toLocaleString() + ' / ¥' + totalBudget.toLocaleString();
+    if (window.ScheduleCommercial) ScheduleCommercial.summary();
   }
 
   function initScheduleFlowSteps() {
@@ -867,13 +870,14 @@
           '<div class="form-group"><label class="form-label">账号简称</label><input type="text" class="form-input" id="supAccountShort' + idx + '" value="' + (prefill ? prefill.accountShort || '' : '') + '" placeholder="自动填充" readonly style="background:var(--gray-100);"></div>' +
           '<div class="form-group"><label class="form-label">分配预算 <span class="required">*</span></label><input type="number" class="form-input" id="supBudget' + idx + '" value="' + (prefill ? prefill.budget || '' : '') + '" placeholder="预算" oninput="updateScheduleSupplierCardSummary(' + idx + ')"></div>' +
           '<div class="form-group"><label class="form-label">SMARTCODE <span class="required">*</span></label><select class="form-select" id="supSmartcode' + idx + '" onchange="updateScheduleSupplierCardSummary(' + idx + ')"><option value="">请选择SMARTCODE</option></select></div>' +
-          '<div class="form-group"><label class="form-label">结算方式 <span class="required">*</span></label><select class="form-select" id="supSettlement' + idx + '" onchange="onScheduleSettlementChange(' + idx + ');updateScheduleSupplierCardSummary(' + idx + ')"><option value="CPL" ' + (prefill && prefill.settlement === 'CPL' ? 'selected' : '') + '>CPL</option><option value="CPS" ' + (prefill && prefill.settlement === 'CPS' ? 'selected' : '') + '>CPS</option></select></div>' +
+          '<div class="form-group"><label class="form-label">结算方式（跟随排期）</label><input class="form-input" id="supSettlement' + idx + '" readonly placeholder="请先在基础信息选择结算方式"></div>' +
         '</div>' +
       '</div>' +
       '<div class="schedule-panel-section">' +
         '<div class="schedule-panel-section-title">结算价格</div>' +
         '<div class="schedule-supplier-price-grid" id="supCplPriceGroup' + idx + '"><div class="form-group"><label class="form-label">商机成本价 <span class="required">*</span></label><input type="number" class="form-input" id="supCostPrice' + idx + '" value="' + (prefill && prefill.costPrice ? prefill.costPrice : '') + '" placeholder="商机成本" step="0.01"></div><div class="form-group"><label class="form-label">商机销售价 <span class="required">*</span></label><input type="number" class="form-input" id="supSalePrice' + idx + '" value="' + (prefill && prefill.salePrice ? prefill.salePrice : '') + '" placeholder="商机售价" step="0.01"></div></div>' +
         '<div class="schedule-supplier-price-grid" id="supCpsPriceGroup' + idx + '"><div class="form-group"><label class="form-label">交车成本价 <span class="required">*</span></label><input type="number" class="form-input" id="supDeliveryCost' + idx + '" value="' + (prefill && prefill.deliveryCost ? prefill.deliveryCost : '') + '" placeholder="交车成本" step="0.01"></div><div class="form-group"><label class="form-label">交车销售价 <span class="required">*</span></label><input type="number" class="form-input" id="supDeliverySale' + idx + '" value="' + (prefill && prefill.deliverySale ? prefill.deliverySale : '') + '" placeholder="交车售价" step="0.01"></div></div>' +
+        '<div class="schedule-supplier-price-grid" id="supOrderPriceGroup' + idx + '" hidden><div class="form-group"><label class="form-label">锁单／订单成本价</label><input type="number" class="form-input" id="supOrderCost' + idx + '" min="1" step="1" value="' + (prefill && prefill.orderCost ? prefill.orderCost : '') + '"></div><div class="form-group"><label class="form-label">锁单／订单销售价</label><input type="number" class="form-input" id="supOrderSale' + idx + '" min="1" step="1" value="' + (prefill && prefill.orderSale ? prefill.orderSale : '') + '"></div></div>' +
       '</div>' +
       '<div class="schedule-panel-section"><input type="hidden" id="supStoreIds' + idx + '" value="' + ((prefill && prefill.storeIds) ? prefill.storeIds.join(',') : '') + '">' +
         '<label class="form-label" style="display:block;margin-bottom:10px;">关联专营店 <span id="supStoreSummary' + idx + '" class="store-picker-count" style="float:right;"></span><span style="display:none;" id="supStoreCount' + idx + '">' + ((prefill && prefill.storeIds) ? prefill.storeIds.length : 0) + '</span></label>' +
@@ -895,6 +899,7 @@
         '<p class="form-hint">提示：专营店列表会根据所选“所属品牌”自动过滤，支持按编码或名称搜索和全选</p>' +
       '</div>';
     tbody.appendChild(panel);
+    ScheduleCommercial.supplier(idx, prefill);
     initScheduleSupplierStorePicker(idx);
     onScheduleSettlementChange(idx);
     populateScheduleSmartCodeDropdown(idx, prefill ? prefill.smartcode || '' : '');
@@ -1017,27 +1022,14 @@
 
   function onScheduleSettlementChange(idx) {
     var method = document.getElementById('supSettlement' + idx).value;
-    var costEl = document.getElementById('supCostPrice' + idx);
-    var saleEl = document.getElementById('supSalePrice' + idx);
-    var dCostEl = document.getElementById('supDeliveryCost' + idx);
-    var dSaleEl = document.getElementById('supDeliverySale' + idx);
-    var cplGroup = document.getElementById('supCplPriceGroup' + idx);
-    var cpsGroup = document.getElementById('supCpsPriceGroup' + idx);
-    if (method === 'CPL') {
-      if (cplGroup) cplGroup.style.display = 'grid';
-      if (cpsGroup) cpsGroup.style.display = 'none';
-      if (costEl) { costEl.style.opacity = ''; costEl.required = true; }
-      if (saleEl) { saleEl.style.opacity = ''; saleEl.required = true; }
-      if (dCostEl) { dCostEl.style.opacity = ''; dCostEl.required = false; }
-      if (dSaleEl) { dSaleEl.style.opacity = ''; dSaleEl.required = false; }
-    } else {
-      if (cplGroup) cplGroup.style.display = 'none';
-      if (cpsGroup) cpsGroup.style.display = 'grid';
-      if (costEl) { costEl.style.opacity = ''; costEl.required = false; }
-      if (saleEl) { saleEl.style.opacity = ''; saleEl.required = false; }
-      if (dCostEl) { dCostEl.style.opacity = ''; dCostEl.required = true; }
-      if (dSaleEl) { dSaleEl.style.opacity = ''; dSaleEl.required = true; }
-    }
+    document.getElementById('supCplPriceGroup' + idx).style.display = 'grid';
+    document.getElementById('supCpsPriceGroup' + idx).style.display = 'grid';
+    document.getElementById('supOrderPriceGroup' + idx).hidden = method !== 'CPO';
+    [['CostPrice','商机成本价',method === 'CPL' || method === 'CPQL'],['SalePrice','商机销售价',method === 'CPL' || method === 'CPQL'],['DeliveryCost','交车成本价',method === 'CPS'],['DeliverySale','交车销售价',method === 'CPS'],['OrderCost','锁单／订单成本价',method === 'CPO'],['OrderSale','锁单／订单销售价',method === 'CPO']].forEach(function (item) {
+      var input = document.getElementById('sup' + item[0] + idx);
+      input.required = item[2]; input.min = '1'; input.step = '1';
+      input.previousElementSibling.innerHTML = item[1] + (item[2] ? ' <span class="required">*</span>' : '（选填）');
+    });
   }
 
   function getAllScheduleStores() {
@@ -1187,6 +1179,8 @@
   }
 
   function saveSchedule() {
+    var commercial = ScheduleCommercial.validate();
+    if (commercial.error) { switchScheduleEditorTab('basic'); showToast(commercial.error, 'error'); return; }
     var name = document.getElementById('scheduleName').value.trim();
     var startTime = document.getElementById('scheduleStartTime').value;
     var endTime = document.getElementById('scheduleEndTime').value;
@@ -1194,7 +1188,7 @@
     var status = parseInt(document.getElementById('scheduleStatus').value);
     if (!name) { switchScheduleEditorTab('basic'); showToast('请填写排期名称', 'error'); return; }
     if (!startTime || !endTime) { switchScheduleEditorTab('basic'); showToast('请选择排期时间', 'error'); return; }
-    if (!totalBudget) { switchScheduleEditorTab('basic'); showToast('请填写总预算', 'error'); return; }
+    if (commercial.payment === 'prepaid' && !totalBudget) { switchScheduleEditorTab('basic'); showToast('请填写总预算', 'error'); return; }
     if (scheduleSelectedSeries.length === 0) { switchScheduleEditorTab('basic'); showToast('请选择至少一个关联车系', 'error'); return; }
     var supplierRows = document.querySelectorAll('#scheduleSupplierTbody .schedule-supplier-row');
     if (supplierRows.length === 0) { switchScheduleEditorTab('suppliers'); showToast('请至少添加一条供应商信息', 'error'); return; }
@@ -1205,7 +1199,9 @@
     var hasSupplierError = false;
     supplierRows.forEach(function(row) {
       var idx = row.id.replace('supplierRow', '');
-      var settlement = document.getElementById('supSettlement' + idx).value;
+      var settlement = commercial.settlement;
+      var allocation = ScheduleCommercial.readSupplier(idx, commercial);
+      if (allocation.error) { showToast(allocation.error, 'error'); hasSupplierError = true; return; }
       var accountId = document.getElementById('supAccountId' + idx).value.trim();
       var smartcode = document.getElementById('supSmartcode' + idx).value.trim();
       var budget = parseFloat(document.getElementById('supBudget' + idx).value) || 0;
@@ -1214,36 +1210,48 @@
       var deliveryCost = parseFloat(document.getElementById('supDeliveryCost' + idx).value) || null;
       var deliverySale = parseFloat(document.getElementById('supDeliverySale' + idx).value) || null;
       var storeIds = getScheduleSupplierStoreIds(idx);
-      if (!accountId || !smartcode || !budget) { hasSupplierError = true; return; }
+      if (!accountId || !smartcode) { showToast('请补齐供应商账号和SMARTCODE', 'error'); hasSupplierError = true; return; }
       if (accountSet[accountId]) { showToast('同一排期内账号ID不可重复：' + accountId, 'error'); hasSupplierError = true; return; }
       if (smartcodeSet[smartcode]) { showToast('同一排期内SMARTCODE不可重复：' + smartcode, 'error'); hasSupplierError = true; return; }
       var owner = scheduleData.find(function(item) { return item.id !== currentEditingScheduleId && (item.suppliers || []).some(function(sup) { return sup.smartcode === smartcode; }); });
-      if (owner) { showToast('SmartCode 已关联排期「' + owner.name + '」，不可跨排期复用', 'error'); hasSupplierError = true; return; }
-      if ((settlement === 'CPL') && (!(costPrice > 0) || !(salePrice > 0))) { showToast(settlement + '结算需填写大于0的商机成本价和商机销售价', 'error'); hasSupplierError = true; return; }
-      if (settlement === 'CPS' && (!deliveryCost || !deliverySale)) { showToast('CPS结算需填写交车成本价和交车销售价', 'error'); hasSupplierError = true; return; }
+      if (owner) { ScheduleCommercial.showError('SmartCode 已关联排期「' + owner.name + '」，请选择未占用的测试编码，例如 SC-TEST-001。'); hasSupplierError = true; return; }
+      var priceError = ScheduleCommercial.priceError(idx);
+      if (priceError) { ScheduleCommercial.showError(priceError); hasSupplierError = true; return; }
+      var orderCost = Number(document.getElementById('supOrderCost' + idx).value) || null;
+      var orderSale = Number(document.getElementById('supOrderSale' + idx).value) || null;
+      if (['CPL', 'CPQL'].includes(settlement) && (!(costPrice > 0) || !(salePrice > 0))) { showToast(settlement + '结算需填写大于0的成本价和销售价', 'error'); hasSupplierError = true; return; }
+      if (settlement === 'CPS' && (!(deliveryCost > 0) || !(deliverySale > 0))) { showToast('CPS结算需填写大于0的交车成本价和交车销售价', 'error'); hasSupplierError = true; return; }
       accountSet[accountId] = true;
       smartcodeSet[smartcode] = true;
       suppliers.push({
         accountId: accountId,
         accountName: document.getElementById('supAccountName' + idx).value,
         accountShort: document.getElementById('supAccountShort' + idx).value,
-        budget: budget,
+        budget: allocation.budget,
+        expectedSupply: allocation.expectedSupply,
+        expectedConversionRate: allocation.expectedConversionRate,
+        targetLockedOrders: allocation.targetLockedOrders,
         smartcode: smartcode,
         settlement: settlement,
-        costPrice: (settlement === 'CPL') ? costPrice : null,
-        salePrice: (settlement === 'CPL') ? salePrice : null,
-        deliveryCost: settlement === 'CPS' ? deliveryCost : null,
-        deliverySale: settlement === 'CPS' ? deliverySale : null,
+        costPrice: costPrice,
+        salePrice: salePrice,
+        orderCost: orderCost,
+        orderSale: orderSale,
+        deliveryCost: deliveryCost,
+        deliverySale: deliverySale,
         storeIds: storeIds
       });
     });
     if (hasSupplierError) { switchScheduleEditorTab('suppliers'); return; }
+    var allocationError = ScheduleCommercial.checkTotals(suppliers, commercial);
+    if (allocationError) { switchScheduleEditorTab('suppliers'); showToast(allocationError, 'error'); return; }
 
     var previousSchedule = scheduleData.find(function(item) { return item.id === currentEditingScheduleId; }) || {};
     var scheduleObj = Object.assign({}, previousSchedule, {
       id: currentEditingScheduleId || String(Date.now()).slice(-4),
       name: name, startTime: startTime, endTime: endTime,
-      totalBudget: totalBudget, status: status,
+      totalBudget: commercial.payment === 'prepaid' ? totalBudget : 0, status: status,
+      commercial: commercial,
       baseSeries: scheduleSelectedSeries.slice(),
       suppliers: suppliers, storeIds: []
     });
