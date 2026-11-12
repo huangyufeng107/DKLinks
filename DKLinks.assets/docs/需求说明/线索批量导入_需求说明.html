@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>线索批量导入 · 需求说明</title>
+<style>
+:root{font:15px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#182230;background:#faf8ff}body{margin:0}main{max-width:1080px;margin:auto;padding:24px}header,section{padding:20px 24px;margin:14px 0;border:1px solid #d5e4fb;border-radius:10px;background:#fff}header{background:#eff6ff}h1,h2{line-height:1.35;margin:0 0 10px}h2{font-size:19px}p,ul{margin:8px 0}a{color:#175cd3}
+</style></head>
+<body><main>
+<a href="index.html">← 返回需求目录</a>
+<header><h1>线索批量导入</h1><p>运营按原供应商补传线索，使用品牌模板保留定制字段。提交后按现有规则统一接收和处理。</p><p>业务口径已确认 · 本地原型 · 2026-11-12</p></header>
+<section><h2>运营如何操作</h2><p>在线索列表点击「批量导入」，选择品牌和原供应商。下载模板并填写后上传，确认提交通过校验的行。失败行可下载、修正后重传，弹窗内可展开操作说明。</p></section>
+<section><h2>接收与验收</h2><ul>
+<li>同一批对应一个品牌和一家原供应商。模板包含启用的公共接收字段和当前品牌字段。</li>
+<li>保留原来源线索 ID。正式服务沿用来源线索 ID 防重，以及适用的排期、供应商和门店范围校验。通过接收的线索继续按现行策略处理。</li>
+<li>东风日产示例覆盖已接收、重复线索和门店超范围。正式验收需验证实际 Excel 文件往返、权限、跨入口防重及处理结果留存。</li>
+</ul><p>原型结果在当前会话模拟。真实接收、持久化及下发链路待联调。</p></section>
+<section><h2>关联材料</h2><p><a href="../核心文档/DKLinks_功能文档.html#lead-import-spec">功能规格与验收</a> · <a href="../核心文档/DKLinks_交互流程图.html#interaction-lead-import">页面交互</a> · <a href="../核心文档/业务时序图.html#FLOW-001-import">业务流程</a> · <a href="../核心文档/DKLinks_版本日志.html#version-123">v1.2.3 版本日志</a></p></section>
+</main></body></html>
