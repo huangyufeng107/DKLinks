@@ -21,11 +21,11 @@
   const tabs = [
     ['prototype', '产品原型', './DKLinks.html'],
     ['requirements', '需求说明', 'DKLinks.assets/docs/需求说明/index.html?v=20261118-lead-ops-docs'],
-    ['system-blueprint', '技术参考 · 系统蓝图', 'DKLinks.assets/docs/核心文档/线索下发与防死循环技术规格方案.html?v=20261119-capability-map'],
-    ['function-doc', '功能说明', 'DKLinks.assets/docs/核心文档/DKLinks_功能文档.html?v=20261119-docs-cleanup'],
-    ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_交互流程图.html?v=20261118-lead-ops-docs'],
-    ['business-flow', '业务流程', 'DKLinks.assets/docs/核心文档/业务时序图.html?v=20261119-flow-viewer'],
-    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能清单.html?v=20261118-lead-ops-docs'],
+    ['system-blueprint', '技术参考 · 系统蓝图', 'DKLinks.assets/docs/核心文档/DKLinks_系统蓝图.html?v=20261119-capability-map'],
+    ['function-doc', '功能说明', 'DKLinks.assets/docs/核心文档/DKLinks_功能说明.html?v=20261119-docs-cleanup'],
+    ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_页面交互图.html?v=20261118-lead-ops-docs'],
+    ['business-flow', '业务流程', 'DKLinks.assets/docs/核心文档/DKLinks_业务流程.html?v=20261119-flow-viewer'],
+    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能点清单.html?v=20261118-lead-ops-docs'],
     ['version-log', '版本日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261119-direct-review']
   ];
   const primaryTabs = ['prototype', 'function-doc', 'business-flow', 'version-log'];

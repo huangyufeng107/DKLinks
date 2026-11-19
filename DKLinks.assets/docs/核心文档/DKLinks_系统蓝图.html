@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D客连 · 系统蓝图</title>
+<link rel="stylesheet" href="../../css/document-hero.css?v=20261023-blueprint-match">
+<link rel="stylesheet" href="../../css/flow-viewer.css?v=20261119-flow-viewer">
+<style>
+:root{color-scheme:light;--ink:#142239;--muted:#49607a;--blue:#003594;--line:#d8e2f1;--soft:#f0f5fc}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fa;color:var(--ink);font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+.page{max-width:1440px;margin:auto;padding:20px 24px 52px}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;align-items:start}
+.toc{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}
+.toc strong{display:block;padding:0 6px 8px;color:var(--blue)}
+.toc a{display:block;padding:5px 7px;border-radius:5px;color:#334e70;text-decoration:none}
+.toc .subnav{padding-inline-start:18px;font-size:12px}
+.toc a:hover,.toc a:focus-visible{background:#edf4ff;color:var(--blue)}
+main{min-width:0}
+section{scroll-margin-top:16px;background:#fff;padding:22px 26px;border:1px solid var(--line);border-radius:10px;margin-bottom:18px}
+h2{font-size:21px;line-height:1.35;margin:0 0 12px}
+h3{font-size:16px;margin:18px 0 6px}
+p{margin:8px 0 12px}
+a{color:#094998;text-underline-offset:3px}
+.lead{color:var(--muted)}
+.status{display:inline-block;margin-top:14px;padding:2px 9px;border:1px solid #ffffff55;border-radius:5px;font-size:12px;color:#fff}
+.note{background:var(--soft);border-left:3px solid #537eb8;padding:9px 12px}
+.table-wrap,.diagram-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:550px;font-size:13px}
+th,td{padding:9px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+thead th{background:#eef4fb;color:#153758}
+tbody th{background:#f8fafc;min-width:105px}
+figure{margin:10px 0}
+.capability-map{display:grid;gap:14px}
+.capability-group{padding:12px;border:1px solid var(--line);border-radius:8px;background:#f5f8fc}
+.capability-group>h3{margin:0 0 8px;color:#254a73;font-size:13px}
+.capability-grid{display:grid;gap:8px}
+.capability-grid--paired{grid-template-columns:repeat(2,minmax(0,1fr))}
+.capability-card{min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.capability-card h4,.capability-governance h3{margin:0;font-size:15px}
+.capability-card p,.capability-governance p{margin:4px 0 6px}
+.capability-links{display:flex;flex-wrap:wrap;gap:3px 14px;font-size:12px}
+.capability-governance{background:#edf4ff;padding:12px 14px}
+@media(max-width:600px){.capability-grid--paired{grid-template-columns:1fr}}
+:where(h3,h4,th)[id]{scroll-margin-top:16px}
+.diagram-wrap{border:1px solid var(--line);border-radius:8px;background:#f8fbff;padding:12px}
+.diagram-wrap svg{display:block;margin:auto;width:920px;max-width:none;height:auto}
+figcaption{color:var(--muted);font-size:12px;margin-top:8px}
+svg text{font-family:inherit;fill:#152f50}
+svg .node{fill:#fff;stroke:#a5bada}
+svg .core{fill:#eaf3ff;stroke:#3568ac;stroke-width:1.6}
+svg .link{fill:none;stroke:#546e91;stroke-width:1.6}
+svg .label{font-size:13px}
+svg .name{font-size:16px;font-weight:700}
+svg .meta{font-size:13px;fill:#405a77}
+ol,ul{padding-left:22px}
+li+li{margin-top:5px}
+@media(max-width:800px){.page{padding:12px}.layout{grid-template-columns:1fr;gap:12px}.toc{position:static;max-height:none}.toc div{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}section{padding:16px}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="hero">
+  <h1>D客连 · 系统蓝图</h1>
+  <p>覆盖基础资料与合作方、投放运营、线索经营、锁单核查和经营分析，说明各域如何协作与治理。</p>
+  <span class="status">架构设计评审稿 · 2026-11-19</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="系统蓝图目录">
+  <strong>系统蓝图目录</strong>
+  <div>
+    <a href="#sec-overview">1. 平台定位与交付范围</a>
+    <a href="#sec-context">2. 系统上下文</a>
+    <a href="#sec-capabilities">3. 平台能力版图</a>
+    <a href="#sec-collaboration">4. 跨域协作</a>
+    <a href="#sec-governance">5. 平台治理</a>
+    <a href="#sec-ddl">6. 数据与归属</a>
+    <a href="#sec-apis">7. 接口与责任</a>
+    <a class="subnav" href="#sec-contract-check">接口联调约定</a>
+    <a href="#sec-sequence">8. 专项运行场景 · 线索接入与下发</a>
+    <a class="subnav" href="#sec-runtime-example">运行时序</a>
+    <a href="#sec-deadloop">9. 一致性与防环路</a>
+    <a href="#sec-deployment">10. 部署、安全与运维</a>
+    <a class="subnav" href="#sec-quality">质量场景与证据</a>
+    <a class="subnav" href="#sec-recovery">故障处置与恢复</a>
+    <a href="#sec-decisions">11. 架构决策与风险</a>
+    <a class="subnav" href="#sec-review-triggers">决策取舍与复审条件</a>
+    <a href="#sec-testcases">12. 实施与验收</a>
+    <a class="subnav" href="#sec-release-gates">分阶段验收</a>
+  </div>
+</nav>
+<main>
+<section id="sec-overview">
+  <h2>1. 平台定位与交付范围</h2>
+  <p>D客连面向汽车品牌的投放与线索运营。平台维护品牌、门店和合作方关系，帮助运营配置排期与供应商目标，执行适用的接收、培育和门店下发规则，并通过锁单核查、日志和报表对照计划与结果。经确认的经营结论可以用于后续排期和策略调整。</p>
+  <div class="table-wrap"><table><thead><tr><th scope="col">阶段</th><th scope="col">覆盖与交付边界</th></tr></thead><tbody>
+    <tr><th scope="row">原型现状</th><td>覆盖下文 8 个业务域，数据和执行结果来自浏览器本地配置或样例。</td></tr>
+    <tr><th scope="row">目标设计</th><td>各业务域需确认主数据与操作权限、配置发布、跨域数据关联和历史追溯。服务端持久化、并发控制及外部接口依赖通过联调逐项核实。</td></tr>
+    <tr><th scope="row">后续评估</th><td>逐笔计费、门店额度与资源包、动态定价、对账及真实收付款、人工坐席拨打与派单、持续回池、企微短信、到店成交闭环。根据运营确认确定后续范围。下游到店、试驾或成交回传列入后续业务闭环。</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="sec-context">
+  <h2>2. 系统上下文</h2>
+  <p class="lead">系统范围为 D客连平台。运营和管理员在平台内维护资料、配置投放、核查执行与分析结果。渠道、数据组、AI 外呼系统及品牌通道通过各自契约提供源事实或执行外部动作。</p>
+  <figure>
+<div class="diagram-wrap" tabindex="0" role="region" aria-label="系统上下文图">
+<svg viewBox="0 0 920 338" role="img" aria-labelledby="blueprint-context-title blueprint-context-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="blueprint-context-title">系统上下文图</title><desc id="blueprint-context-desc">渠道与运营使用 D客连。D客连与号码检测、AI 外呼、数据组以及品牌下发通道交互。</desc>
+<defs><marker id="blueprint-context-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#546e91"/></marker></defs>
+<rect class="node" x="18" y="24" width="180" height="70" rx="9"/><text class="name" x="108.0" y="53" text-anchor="middle">渠道与供应商</text><text class="meta" x="108.0" y="76" text-anchor="middle">外部系统</text>
+<rect class="node" x="18" y="132" width="180" height="70" rx="9"/><text class="name" x="108.0" y="161" text-anchor="middle">运营与管理人员</text><text class="meta" x="108.0" y="184" text-anchor="middle">系统使用者</text>
+<rect class="core" x="356" y="66" width="208" height="134" rx="9"/><text class="name" x="460.0" y="95" text-anchor="middle">D客连</text><text class="meta" x="460.0" y="118" text-anchor="middle">投放计划、线索运营与经营分析</text>
+<rect class="node" x="714" y="20" width="186" height="70" rx="9"/><text class="name" x="807.0" y="49" text-anchor="middle">号码状态检测</text><text class="meta" x="807.0" y="72" text-anchor="middle">外部服务</text>
+<rect class="node" x="714" y="117" width="186" height="70" rx="9"/><text class="name" x="807.0" y="146" text-anchor="middle">AI 外呼系统</text><text class="meta" x="807.0" y="169" text-anchor="middle">任务执行与话单</text>
+<rect class="node" x="714" y="214" width="186" height="70" rx="9"/><text class="name" x="807.0" y="243" text-anchor="middle">线索中心或品牌接口</text><text class="meta" x="807.0" y="266" text-anchor="middle">按品牌选择接收通道</text>
+<rect class="node" x="18" y="252" width="180" height="70" rx="9"/><text class="name" x="108.0" y="281" text-anchor="middle">数据组</text><text class="meta" x="108.0" y="304" text-anchor="middle">预评分与有效锁单</text>
+<path class="link" d="M198 58H280V94H356" marker-end="url(#blueprint-context-arrow)"/><text class="label" x="275" y="48" text-anchor="middle">提交线索</text>
+<path class="link" d="M198 166H356" marker-end="url(#blueprint-context-arrow)"/><text class="label" x="278" y="153" text-anchor="middle">配置投放、核查和分析</text>
+<path class="link" d="M564 91H640V58H714" marker-end="url(#blueprint-context-arrow)"/><text class="label" x="640" y="47" text-anchor="middle">请求号码状态</text>
+<path class="link" d="M564 133H714" marker-end="url(#blueprint-context-arrow)"/><text class="label" x="638" y="121" text-anchor="middle">任务与结果交互</text>
+<path class="link" d="M564 173H631V247H714" marker-end="url(#blueprint-context-arrow)"/><text class="label" x="673" y="231" text-anchor="middle">发线索、取得回执</text>
+<path class="link" d="M198 283H452V200" marker-end="url(#blueprint-context-arrow)"/><text class="label" x="302" y="270" text-anchor="middle">提供评分与锁单事实</text>
+</svg>
+</div><figcaption>箭头表示主交互方向，箭头旁标注交互内容。返回结果和协议约束见接口与责任。</figcaption>
+</figure>
+  <p>下游接收方由品牌通道配置决定，可经线索中心或直接对接品牌接口。数据组提供评分或锁单的源事实，D客连负责关联、快照与业务统计。品牌和门店是平台维护的业务对象。厂商或线索中心提供下发受理回执。门店端接收后的到店、试驾及成交归属仍按外部契约确认。运营可按授权核对排期、线索、日志、锁单和报表。</p>
+</section>
+
+<section id="sec-capabilities">
+  <h2>3. 平台能力版图</h2>
+  <div class="capability-map">
+    <div class="capability-group">
+      <h3>基础支撑</h3>
+      <article class="capability-card" aria-labelledby="domain-1">
+        <h4 id="domain-1">基础资料与合作方</h4>
+        <p>维护品牌、车系、城市、品牌区域和门店，登记接入方身份，为排期配置和线索归属提供基础资料。</p>
+        <div class="capability-links">
+          <a href="DKLinks_功能说明.html#tab-panel-1">品牌管理</a>
+          <a href="DKLinks_功能说明.html#tab-panel-5">门店管理</a>
+          <a href="DKLinks_功能说明.html#tab-panel-6">开发者管理</a>
+        </div>
+      </article>
+    </div>
+    <div class="capability-group">
+      <h3>核心运营</h3>
+      <div class="capability-grid capability-grid--paired">
+        <article class="capability-card" aria-labelledby="domain-2">
+          <h4 id="domain-2">投放运营</h4>
+          <p>通过报表账号、SmartCode 和排期明确线索归属，按结算方式配置预算或目标，并维护供应商分配和排期策略。</p>
+          <div class="capability-links">
+            <a href="DKLinks_功能说明.html#tab-panel-7">排期管理</a>
+            <a href="../需求说明/按量付费排期_供应商达标停发与门店下发_需求说明.html">按量付费排期</a>
+          </div>
+        </article>
+        <article class="capability-card" aria-labelledby="domain-3">
+          <h4 id="domain-3">线索接入与风控</h4>
+          <p>统一接收渠道推送和运营批量导入，执行字段校验、来源 ID 防重、黑名单及适用的去重规则，留存接收结果和拦截原因。</p>
+          <div class="capability-links">
+            <a href="DKLinks_功能说明.html#tab-panel-10">拦截规则</a>
+            <a href="../需求说明/线索批量导入_需求说明.html">线索批量导入</a>
+          </div>
+        </article>
+        <article class="capability-card" aria-labelledby="domain-4">
+          <h4 id="domain-4">线索培育</h4>
+          <p>按适用策略进行号码检测、预评分和 AI 外呼，记录处理结果，支持运营核查话单和处理待人工线索。</p>
+          <div class="capability-links">
+            <a href="DKLinks_功能说明.html#tab-panel-aiconfig">AI 外呼配置</a>
+            <a href="DKLinks_功能说明.html#tab-panel-aicalls">AI 外呼话单</a>
+          </div>
+        </article>
+        <article class="capability-card" aria-labelledby="domain-5">
+          <h4 id="domain-5">门店下发</h4>
+          <p>按排期规则确定原传和派生门店，逐店校验后经品牌通道发送，记录厂商受理回执及失败补发结果。</p>
+          <div class="capability-links">
+            <a href="DKLinks_功能说明.html#tab-panel-12">线索接收与下发配置</a>
+            <a href="DKLinks_业务流程.html#FLOW-007-overview">失败核查与补发</a>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="capability-group">
+      <h3>结果反馈</h3>
+      <div class="capability-grid capability-grid--paired">
+        <article class="capability-card" aria-labelledby="domain-6">
+          <h4 id="domain-6">锁单管理</h4>
+          <p>追溯锁单对应的排期、供应商和线索。原传有效锁单用于判断供应商是否达标，平台派生锁单单独统计。</p>
+          <div class="capability-links">
+            <a href="DKLinks_功能说明.html#tab-panel-16">锁单排查</a>
+          </div>
+        </article>
+        <article class="capability-card" aria-labelledby="domain-7">
+          <h4 id="domain-7">经营分析</h4>
+          <p>通过工作台和排期报表查看投放表现，按排期、账号、区域或门店查看指标并回查线索和锁单明细。</p>
+          <div class="capability-links">
+            <a href="DKLinks_功能说明.html#tab-panel-0">工作台</a>
+            <a href="DKLinks_功能说明.html#spec-7-source-stats">排期报表</a>
+          </div>
+        </article>
+      </div>
+    </div>
+    <article class="capability-card capability-governance" aria-labelledby="domain-8">
+      <h3 id="domain-8">平台治理</h3>
+      <p>通过账号角色、数据权限和数据字典统一各业务域的操作范围和数据口径，保留配置变更与操作记录供核查。</p>
+      <div class="capability-links">
+        <a href="DKLinks_功能说明.html#tab-panel-14">权限管理</a>
+        <a href="DKLinks_功能说明.html#tab-panel-dictionaries">数据字典</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="sec-collaboration">
+  <h2>4. 跨域协作</h2>
+  <p class="lead">投放准备、线索执行、锁单反馈和经营复盘由不同业务域接力。以下表明各域交接的依据和结果。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">业务场景</th><th scope="col">参与域</th><th scope="col">交接与业务约束</th><th scope="col">流程依据</th></tr></thead><tbody>
+<tr><th scope="row">准备投放</th><td>基础资料、开发者与报表账号 → 投放运营</td><td>运营配置 SmartCode、排期、供应商分配及门店规则，并核对策略发布状态。</td><td><a href="DKLinks_业务流程.html#FLOW-004-overview">投放准备与排期配置</a> · <a href="DKLinks_业务流程.html#FLOW-005-overview">渠道与品牌接入</a></td></tr>
+<tr><th scope="row">执行投放</th><td>投放运营 → 接入与风控 → 培育 → 门店下发</td><td>线索匹配排期和供应商，按适用规则确定是否继续。接收原因、处理快照、原传与派生关系和真实回执各自留证。</td><td><a href="DKLinks_业务流程.html#FLOW-001-overview">线索接收与下发</a></td></tr>
+<tr><th scope="row">达标影响新线索</th><td>锁单管理 → 排期供应商目标 → 接入与风控</td><td>累计量按同一排期和供应商计算，只纳入原传有效锁单。达到分配量后的新线索仅接收，已入队任务照原安排。</td><td><a href="DKLinks_业务流程.html#FLOW-001-supplier-gate">达标停发分支</a> · <a href="DKLinks_业务流程.html#FLOW-009-source-breakdown">锁单及来源追溯</a></td></tr>
+<tr><th scope="row">经营复盘</th><td>经营分析 → 线索、日志和锁单明细 → 投放运营</td><td>运营按同一排期、期间和维度回查原传与派生指标，发现问题后复核策略、厂商回执或锁单归属。确认后调整后续投放。</td><td><a href="DKLinks_业务流程.html#FLOW-009-overview">投放效果复盘</a></td></tr>
+<tr><th scope="row">异常协同</th><td>风控、培育、下发或锁单管理 → 对应运营核查</td><td>分别用规则命中、话单、厂商回执和锁单依据核查。人工决定、补发、锁单改判各按对应入口与权限处理。</td><td><a href="DKLinks_业务流程.html#FLOW-006-overview">拦截核查</a> · <a href="DKLinks_业务流程.html#FLOW-007-overview">失败与补发</a> · <a href="DKLinks_业务流程.html#FLOW-008-overview">异常锁单</a></td></tr>
+</tbody></table></div>
+</section>
+
+<section id="sec-governance">
+  <h2>5. 平台治理</h2>
+<div class="table-wrap"><table><thead><tr><th scope="col">治理主题</th><th scope="col">适用范围与规则</th><th scope="col">目标控制与验收</th></tr></thead><tbody>
+<tr><th scope="row">身份与数据范围</th><td>区分平台操作账号、渠道接入身份和报表业务账号。账号与角色控制动作权限，品牌、排期、供应商或门店范围约束实际可见数据。</td><td>由服务端校验写操作与查询范围，按权限返回数据和导出结果。各类角色可见范围待权限矩阵确认。</td></tr>
+<tr><th scope="row">主数据与字典</th><td>品牌、车系、区域和门店关系供多域复用。状态码、外呼通道字典和业务字段映射各自维护并保留来源。</td><td>验证主数据更新后的引用关系、停用状态及历史查询语义。实际主数据同步与责任方需实施确认。</td></tr>
+<tr><th scope="row">配置生效与历史</th><td>项目策略草稿供核对，已发布策略供后续线索使用。其他品牌字段映射、门店或报表配置按各自规则生效。</td><td>保存业务发生时依据。查询历史处理使用保存的信息，配置变更以可追溯记录说明何时及影响哪些业务。</td></tr>
+<tr><th scope="row">操作留痕与敏感数据</th><td>把导入、发布、人工决定、补发、锁单改判和导出关联至操作者、对象、时间与结果。</td><td>完整手机号、话单明细和原始报文受控访问。日志及查询显示遵循对应授权和脱敏规则。</td></tr>
+<tr><th scope="row">报表口径与回查</th><td>经营汇总按相同范围与来源读取。线索量按线索标识去重，有效锁单按锁单唯一标识去重。</td><td>供应商累计达标和报表时段统计分别说明范围，保留原传、派生归属及对应明细。</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="sec-ddl">
+  <h2>6. 数据与归属</h2>
+  <p class="lead">此处定义逻辑对象、关联键与事实归属，供接口和物理数据模型设计使用。</p>
+  <div class="table-wrap"><table><thead><tr><th scope="col">对象</th><th scope="col">权威记录及关联键</th><th scope="col">生命周期与读取边界</th></tr></thead><tbody>
+    <tr><th scope="row">主数据与合作方</th><td>D客连管理品牌、车系、城市、区域、门店、开发者和报表账号等配置。外部标识映射及同步责任由对应方确认。</td><td>各域通过稳定的业务标识引用；保存历史事件时保留所用归属。</td></tr>
+<tr><th scope="row">投放排期与供应商目标</th><td>D客连维护排期、项目目标、供应商分配、SmartCode 关联及处理策略。</td><td>排期归属供线索准入使用，原传有效锁单累计量用于同一排期内的供应商达标判断。</td></tr>
+<tr><th scope="row">经营指标与权限</th><td>报表基于线索、下发及锁单记录按当前范围汇总。角色、权限与业务账号分别维护。</td><td>指标可回查明细；角色和数据范围共同约束读写。报表维度或账户变更须核对历史范围。</td></tr>
+    <tr><th scope="row">接收记录</th><td>渠道提供来源线索 ID。D客连保存渠道标识、接收记录 ID、接收判定和时间；来源渠道＋来源线索 ID 识别重复提交，具体作用域在契约中确认。</td><td>Excel 同样使用原供应商身份及原来源 ID，保存批次和操作人。拒绝入库只查接收记录及命中依据。</td></tr>
+    <tr><th scope="row">正式线索与派生</th><td>D客连以平台线索 ID 标识记录，派生线索另有独立 ID，并关联原线索和目标门店。</td><td>原传及派生的发送结果分别记录；派生引用原线索检测和外呼依据，供应商传输量及成本只归原传。</td></tr>
+    <tr><th scope="row">配置与判定快照</th><td>D客连保存本次排期、配置来源／版本、规则命中、外呼等待、评分、下发映射与决定。</td><td>发布或调整影响后续处理；历史解释读取当时证据，缺失项显示「未记录」。</td></tr>
+    <tr><th scope="row">外呼任务与话单</th><td>AI 外呼系统提供任务与话单源事实；D客连保存平台关联、外部任务 ID、每次通话、状态及结果快照。</td><td>一项任务可关联多条线索。等待期限和最终处理决定按线索保存。通话状态、标签、小结及任务状态分别记录。</td></tr>
+    <tr><th scope="row">下发记录与尝试</th><td>D客连保存下发业务 ID、线索及目标门店、规则依据、尝试序号、请求标识和结果。厂商回执是确认已下发的依据。</td><td>原传、派生及重试均可追查。补发沿用既有下发业务标识，并追加尝试记录。</td></tr>
+    <tr><th scope="row">有效锁单</th><td>数据组提供锁单源事实及唯一标识；D客连按锁单唯一标识去重，记录归属、来源、关联线索和入库时间。</td><td>排期＋供应商累计统计只纳入原传有效锁单；派生有效锁单单列。已入库明细供查询追溯。</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="sec-apis">
+  <h2>7. 接口与责任</h2>
+  <p class="lead">以下为接口目录。协议、地址、字段类型、鉴权方式、错误码和重试预算以联调契约定稿。</p>
+  <h3 id="sec-contract-check">联调边界与证据</h3>
+  <div class="table-wrap"><table><thead><tr><th scope="col">接口</th><th scope="col">责任方与需确认的事项</th><th scope="col">联调证据</th></tr></thead><tbody>
+    <tr><th scope="row">渠道接收</th><td>渠道与接入研发核对鉴权、来源 ID 作用域、字段、拒绝语义与重试。接收去重拒绝入库按已确认的 409 口径。</td><td>同来源的首次与重复提交指向同一接收记录；拒绝分支保存命中依据。</td></tr>
+    <tr><th scope="row">号码检测</th><td>检测服务对接确认状态映射、限流、超时、退避及不可重试错误。</td><td>明确状态与 UNKNOWN 分开记录，服务失败保留原因。</td></tr>
+    <tr><th scope="row">预评分</th><td>数据组确认线索标识、分值范围、空值语义、响应关联与重试预算。</td><td>路由和传分可复用本次快照；超过 6 分钟按无分处理。</td></tr>
+    <tr><th scope="row">AI 外呼</th><td>外呼对接确认通道、任务 ID、回调验证、事件键、终态及话单字段。</td><td>核对同任务的正常、重复和迟到事件，以及各关联线索的独立决定。</td></tr>
+    <tr><th scope="row">品牌下发</th><td>品牌或线索中心对接确认鉴权、必填字段、回执、外部 ID、查询、重试及来源回流识别。</td><td>分别留存明确成功、明确拒绝和结果未知的记录及关联尝试。</td></tr>
+    <tr><th scope="row">锁单同步</th><td>数据组与排期运营确认锁单标识、线索归属、同步频率和缺失或更正口径。</td><td>重复锁单只计一次，缺失与零值分开。更正影响按确认口径验收。</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="sec-sequence">
+  <h2>8. 专项运行场景 · 线索接入与下发</h2>
+  <p class="lead">本章详述线索接收、培育和下发专项。平台其他业务如何交接，见 <a href="#sec-collaboration">跨域协作</a>。</p>
+  <h3>从接收判定到下发结果</h3>
+  <ol>
+    <li><strong>接收与归属。</strong>完成接收校验并保存依据后返回接收判定。准入核对包含来源 ID、黑名单及排期归属。号码检测、AI 外呼与实际下发位于后续处理链路。拒绝入库保留接收及命中记录。</li>
+    <li><strong>供应商达标。</strong>CPQL／CPO 按量付费排期按「排期＋供应商」的原传有效锁单累计量判断。达标后的新线索仅接收并记录原因，去重、检测、外呼及下发未执行，也不生成派生线索。已有下发任务按原安排执行。数据缺失时查询显示「待接入锁单数据」，生产判断的缺失处理待接口定稿。</li>
+    <li><strong>执行有效策略。</strong>品牌能力关闭或无可用去重规则时跳过对应环节。品牌能力恢复后，运营显式开启并发布项目策略。仍开启的有效环节如必要配置不完整，保留异常依据并按发布策略处理。</li>
+    <li><strong>确定门店并下发。</strong>原线索满足下发条件后，独立校验原传门店；一发多再从适用范围选派生门店，排除原传及重复目标。逐店校验范围、可用性与同客同店重复下发。比例名额保留计划与实际使用记录，未尝试名额由下一条续接。</li>
+  </ol>
+  <h3 id="sec-runtime-example">允许下发的运行时序</h3>
+  <figure><div class="diagram-wrap" tabindex="0" role="region" aria-label="允许下发的运行时序图">
+    <svg viewBox="0 0 920 408" role="img" aria-labelledby="runtime-title runtime-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="runtime-title">允许下发的运行时序</title>
+      <desc id="runtime-desc">渠道提交后收到已保存的接收判定。D客连后续发起外呼，收到结束结果后保存有效决定，并在允许下发时向品牌通道逐门店发送及取得回执。</desc>
+      <defs><marker id="runtime-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#546e91"/></marker></defs>
+<rect class="core" x="37" y="20" width="166" height="42" rx="7"/><text class="name" x="120" y="47" text-anchor="middle">渠道／供应商</text><path class="link" d="M120 62V389" stroke-dasharray="5 5"/>
+<rect class="core" x="265" y="20" width="166" height="42" rx="7"/><text class="name" x="348" y="47" text-anchor="middle">D客连</text><path class="link" d="M348 62V389" stroke-dasharray="5 5"/>
+<rect class="core" x="492" y="20" width="166" height="42" rx="7"/><text class="name" x="575" y="47" text-anchor="middle">AI 外呼系统</text><path class="link" d="M575 62V389" stroke-dasharray="5 5"/>
+<rect class="core" x="719" y="20" width="166" height="42" rx="7"/><text class="name" x="802" y="47" text-anchor="middle">品牌通道</text><path class="link" d="M802 62V389" stroke-dasharray="5 5"/>
+<path class="link" d="M120 100H348" marker-end="url(#runtime-arrow)"/><text class="label" x="234.0" y="91" text-anchor="middle">提交来源线索</text>
+<path class="link" d="M348 140H120" stroke-dasharray="5 4" marker-end="url(#runtime-arrow)"/><text class="label" x="234.0" y="131" text-anchor="middle">返回已保存的接收判定</text>
+<path class="link" d="M348 188H575" marker-end="url(#runtime-arrow)"/><text class="label" x="461.5" y="179" text-anchor="middle">创建外呼任务（示例）</text>
+<path class="link" d="M575 230H348" stroke-dasharray="5 4" marker-end="url(#runtime-arrow)"/><text class="label" x="461.5" y="221" text-anchor="middle">回传任务终态及结果</text>
+<rect class="node" x="242" y="254" width="213" height="50" rx="7"/><text class="label" x="348" y="275" text-anchor="middle">保存本条线索的有效决定</text><text class="meta" x="348" y="293" text-anchor="middle">满足条件后校验目标门店</text>
+<path class="link" d="M348 344H802" marker-end="url(#runtime-arrow)"/><text class="label" x="575.0" y="335" text-anchor="middle">按目标门店发送并关联下发业务 ID</text>
+<path class="link" d="M802 380H348" stroke-dasharray="5 4" marker-end="url(#runtime-arrow)"/><text class="label" x="575.0" y="371" text-anchor="middle">返回可核验的品牌回执</text>
+    </svg>
+  </div><figcaption>示例条件为通过准入、适用外呼策略、需要新建任务且有效决定允许下发。由上至下表示业务顺序，实线为发起，虚线为返回或回调。</figcaption></figure>
+  <p>外呼回调、超时或人工处理竞争本条最终决定时，以首次有效提交为准。后到结果留作证据。达到供应商锁单目标的新线索结束于「仅接收」，不进入图中的外呼和下发。<a href="DKLinks_业务流程.html#FLOW-001-supplier-gate">查看达标分支</a> · <a href="DKLinks_业务流程.html#FLOW-003-result">查看独立等待及结果分支</a></p>
+  <h3 id="sec-phone">号码检测与预评分</h3>
+  <p>号码检测和厂商字段映射各自配置。检测关闭时跳过，品牌明确状态按其动作继续或停止，服务异常保留 UNKNOWN。有效映射决定是否传递结果，厂商必填字段在下发时校验。需要评分时使用本次取分，最多等待 6 分钟，然后按原流程或配置的无分线路继续；迟到评分保留事件。</p>
+  <h3 id="sec-outbound">任务复用、独立等待与人工决定</h3>
+  <p>通过前置判断且启用外呼后，按同品牌及完整手机号判断在途任务。符合条件时关联原任务，并沿用该任务创建时的结果规则和下发映射快照。冷却期命中时复用最近可用结果，按新线索接收时的规则快照重新判断。每条线索独立保存等待起点、期限和兜底，首条从任务创建成功计时，关联线索从自身准入并关联时计时。结果无法核验时转人工核查。人工决定记录结论及备注，允许继续下发或仅接收。晚到事件保留记录且不覆盖已生效决定。</p>
+  <div class="table-wrap"><table><thead><tr><th scope="col">状态维度</th><th scope="col">展示依据</th></tr></thead><tbody>
+    <tr><th scope="row">线索结论</th><td>待处理、处理中、待人工处理、仅接收、下发失败或已下发等，读取本条处理结论及原因。厂商回执满足品牌受理条件后才确认已下发。</td></tr>
+    <tr><th scope="row">环节进度</th><td>已通过有执行依据；已跳过有规则依据；已停止有终止原因；未执行为前序停止或尚未到达；处理中有等待或排队事实；未记录为历史依据缺失。</td></tr>
+    <tr><th scope="row">运营追溯</th><td>规则命中、外呼任务及话单、下发尝试和锁单记录各自提供证据。仅凭线索末态无法确定发生的具体环节。</td></tr>
+  </tbody></table></div>
+  <p id="sec-state-evidence"><a href="#sec-ddl">数据归属</a> · <a href="DKLinks_业务流程.html#FLOW-001-flow">接收与下发</a> · <a href="DKLinks_业务流程.html#FLOW-002-flow">预评分</a> · <a href="DKLinks_业务流程.html#FLOW-003-task">AI 外呼及结果处理</a> · <a href="DKLinks_业务流程.html#FLOW-009-source-breakdown">达标与报表追溯</a></p>
+</section>
+
+<section id="sec-deadloop">
+  <h2>9. 一致性与防环路</h2>
+  <div class="table-wrap"><table><thead><tr><th scope="col">控制点</th><th scope="col">一致性原则</th><th scope="col">应留证据</th></tr></thead><tbody>
+    <tr><th scope="row">接收与重复来源</th><td>原子创建或复用接收记录；同一提交重试保持原接收结果和独立的后续状态。接收去重规则另行判断。</td><td>来源键、原接收记录 ID、重复识别结果。</td></tr>
+    <tr><th scope="row">任务与最终动作</th><td>同品牌＋完整手机号的有效在途任务需并发控制。重复回调按事件键判重，超时、回调和人工操作只允许提交一次有效线索决定。</td><td>外部任务 ID、原始事件键、到达时间、有效决定和迟到记录。</td></tr>
+    <tr><th scope="row">派生与下发</th><td>原传与派生逐门店落账，补发复用原下发业务标识。遇回执不明时先查证再重发。已发出的请求保留执行历史，后续操作追加事件。</td><td>目标门店、下发业务 ID、重试序号、回执或失败原因。</td></tr>
+    <tr><th scope="row">跨系统回流</th><td>向线索中心提供双方约定的来源与平台线索 ID。接收方识别同源事件，避免回流重新创建线索与触发下发，具体字段和事件契约由双方确认。</td><td>关联 ID、来源识别结果及重复转发联调样例。</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="sec-deployment">
+  <h2>10. 部署、安全与运维</h2>
+  <h3>部署视图</h3>
+  <p>当前已知部署形态为浏览器加载静态原型及配套文档，部分操作由本地数据演示。目标环境的实际节点、网络拓扑及技术选型待评审。</p>
+  <figure>
+    <div class="diagram-wrap" tabindex="0" role="region" aria-label="目标部署与信任边界">
+      <svg viewBox="0 0 920 392" role="img" aria-labelledby="deployment-title deployment-desc" xmlns="http://www.w3.org/2000/svg">
+        <title id="deployment-title">目标部署与信任边界</title>
+        <desc id="deployment-desc">外部渠道、运营端和外部服务通过受控入口与 D客连交互。接入判定独立于长耗时工作，业务事实由持久化能力保存。</desc>
+        <defs><marker id="deployment-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#546e91"/></marker></defs>
+        <rect x="255" y="18" width="438" height="350" rx="12" fill="#edf4ff" stroke="#547da9" stroke-dasharray="7 4"/>
+        <text class="name" x="273" y="48">D客连受控运行范围</text>
+        <rect class="node" x="18" y="99" width="174" height="60" rx="8"/>
+        <text class="name" x="105" y="135" text-anchor="middle">渠道／供应商</text>
+        <rect class="node" x="18" y="209" width="174" height="60" rx="8"/>
+        <text class="name" x="105" y="245" text-anchor="middle">运营浏览器</text>
+        <rect class="core" x="284" y="80" width="378" height="74" rx="8"/>
+        <text class="name" x="473" y="109" text-anchor="middle">受控接入与查询</text>
+        <text class="meta" x="473" y="133" text-anchor="middle">身份校验、接收判定、运营操作与回调入口</text>
+        <rect class="core" x="284" y="192" width="378" height="66" rx="8"/>
+        <text class="name" x="473" y="219" text-anchor="middle">异步处理与外部对接</text>
+        <text class="meta" x="473" y="242" text-anchor="middle">检测、外呼等待、门店下发与结果处理</text>
+        <rect class="core" x="284" y="292" width="378" height="60" rx="8"/>
+        <text class="name" x="473" y="317" text-anchor="middle">持久化与审计</text>
+        <text class="meta" x="473" y="338" text-anchor="middle">接收事实、执行事件、配置快照与锁单</text>
+        <rect class="node" x="745" y="130" width="157" height="100" rx="8"/>
+        <text class="name" x="823" y="163" text-anchor="middle">外部服务</text>
+        <text class="meta" x="823" y="186" text-anchor="middle">数据组、号码检测、</text>
+        <text class="meta" x="823" y="207" text-anchor="middle">AI 外呼、品牌通道</text>
+        <path class="link" d="M192 129H284" marker-end="url(#deployment-arrow)"/>
+        <path class="link" d="M192 239H226V143H284" marker-end="url(#deployment-arrow)"/>
+        <path class="link" d="M473 154V192" marker-end="url(#deployment-arrow)"/>
+        <path class="link" d="M473 258V292" marker-end="url(#deployment-arrow)"/>
+        <path class="link" d="M745 148H710V113H662" marker-end="url(#deployment-arrow)"/>
+        <path class="link" d="M662 222H745" marker-end="url(#deployment-arrow)"/>
+        <text class="label" x="229" y="116" text-anchor="middle">提交</text>
+        <text class="label" x="218" y="225" text-anchor="end">操作</text>
+        <text class="label" x="486" y="178">调度</text>
+        <text class="label" x="486" y="281">留存</text>
+        <text class="label" x="703" y="102" text-anchor="middle">回调／同步</text>
+        <text class="label" x="703" y="246" text-anchor="middle">外部调用</text>
+      </svg>
+    </div>
+    <figcaption>部署图表达目标信任边界和运行职责，方框可以由一个或多个实际节点承担。主机、进程划分、网络与存储选型待实施评审。</figcaption>
+  </figure>
+  <p>联调使用隔离数据和测试通道。上线前确认生产拓扑、外部访问授权以及回调与厂商通道的切换和回退方式。</p>
+  <div class="table-wrap"><table><thead><tr><th scope="col">目标控制</th><th scope="col">设计要求</th><th scope="col">实施评审需提供</th></tr></thead><tbody>
+    <tr><th scope="row">外部信任边界</th><td>凭证由服务端受控管理，回调验证来源并识别重放。日志避免暴露完整号码、凭证与原始敏感资料。</td><td>鉴权和凭证轮换约定、敏感字段与保留策略。</td></tr>
+    <tr><th scope="row">观测与恢复</th><td>关联接收记录、线索、任务、下发和锁单标识。分别监控校验拒绝、评分超时、回调积压、门店下发失败与锁单同步延迟。</td><td>告警阈值、重试与复核入口、观察窗口及责任团队。</td></tr>
+  </tbody></table></div>
+  <h3 id="sec-quality">质量场景与证据</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">质量关注</th><th scope="col">验证方式</th><th scope="col">通过依据与责任</th></tr></thead><tbody>
+<tr><th scope="row">接入响应</th><td>代表性峰谷流量下并行提交正常、重复及被拒请求。统计入口收到请求到接收响应的 P95，同时核对重复提交的结果。</td><td>接入压测报告，吞吐与 P95 门槛由研发和运维按实测确认。</td></tr>
+<tr><th scope="row">处理积压</th><td>模拟外部依赖变慢，观测最老待处理任务年龄、积压峰值和恢复时间。</td><td>运行指标与告警记录，告警门槛和恢复目标由运维确认。</td></tr>
+<tr><th scope="row">并发及回执</th><td>同一来源重复提交，回调、超时与人工决定并发，模拟厂商迟到回执。</td><td>只产生一条有效接收事实、一次有效线索决定和对应门店的合法下发。比对记录标识与尝试历史。</td></tr>
+<tr><th scope="row">灾难恢复</th><td>对隔离环境执行备份恢复和处理任务重启，核对接收、锁单和下发证据。</td><td>记录实测恢复时长、可恢复时间点、账实差异和重复数。生产 RTO 与 RPO 待评审。</td></tr>
+<tr><th scope="row">授权与审计</th><td>以无授权身份查询跨品牌线索、导出和提交人工决定，再以授权角色执行。</td><td>越权被拒，授权行为按范围生效并可回查操作者、对象及时间。</td></tr>
+</tbody></table></div>
+  <h3 id="sec-recovery">故障处置与恢复</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">异常</th><th scope="col">处置动作</th><th scope="col">保留证据</th></tr></thead><tbody>
+<tr><th scope="row">号码检测超时或不可用</th><td>保存 UNKNOWN 和失败原因，沿当前业务策略继续；检查是否为单条异常或依赖故障。</td><td>检测请求标识、错误分类、检测结论与后续事件。</td></tr>
+<tr><th scope="row">评分超过等待上限</th><td>按无分路径继续，迟到分数只留痕。</td><td>等待起止、无分原因、适用兜底和迟到记录。</td></tr>
+<tr><th scope="row">厂商回执未知</th><td>优先按品牌契约查证，必要时人工核对。符合重试条件后复用同一业务标识。</td><td>尝试、请求标识、查询证据、最终回执。</td></tr>
+<tr><th scope="row">锁单同步延迟或缺失</th><td>显示数据缺失或不及时的依据，不将空值当成零。生产停发判断口径由数据组与排期运营确认。</td><td>最近同步时间、缺失范围、原传锁单统计明细。</td></tr>
+<tr><th scope="row">异步任务重启</th><td>从已保存状态恢复，检查是否已有最终决定或发送结果，再按幂等约束继续。</td><td>恢复前后关联 ID、事件顺序、发送尝试和差异记录。</td></tr>
+</tbody></table></div>
+  <p>厂商回执由品牌对接核查，锁单延迟由数据组核对批次及归属。恢复后由运维核对积压、重复下发和重复入库。</p>
+</section>
+
+<section id="sec-decisions">
+  <h2>11. 架构决策与风险</h2>
+  <h3 id="sec-review-triggers">决策取舍与重新评审条件</h3>
+  <div class="table-wrap"><table><thead><tr><th scope="col">决策</th><th scope="col">采用依据</th><th scope="col">实施影响及复审条件</th><th scope="col">对应视图</th></tr></thead><tbody>
+<tr><th scope="row">接收判定与后续异步执行</th><td>接收应答与检测、外呼和发送等待隔离。准入判定须留存，接收可复查。</td><td>异步进度需要持久化以支持恢复。若对接方要求实时最终结果，须重新评审契约与超时预算。</td><td><a href="#sec-apis">接口责任</a></td></tr>
+<tr><th scope="row">外呼任务可复用，线索独立决策</th><td>关联或复用已有任务减少重复拨打，每条线索仍保留自己的等待、快照及最终决定。</td><td>需维护任务到线索的关联。AI 通道终态或事件唯一性约定变化时，复核关联与重放处理。</td><td><a href="#sec-outbound">外呼运行</a></td></tr>
+<tr><th scope="row">下发按门店归档，锁单按来源统计</th><td>同一原线索可关联多个门店级结果。供应商达标量依据其原传有效锁单，支持从报表回查。</td><td>记录单独的发送与派生依据。门店路由或锁单归属规则发生变化时，先核对统计影响和历史兼容。</td><td><a href="#sec-ddl">数据归属</a></td></tr>
+<tr><th scope="row">回执不明先核对再补发</th><td>以实际品牌回执确认受理。已有下发业务标识复用，补发追加尝试。</td><td>依赖查询或人工核对渠道。品牌的查询或去重能力变化时，重新评审批量恢复和手工处置。</td><td><a href="#sec-recovery">故障处置</a></td></tr>
+</tbody></table></div>
+  <p>主数据维护权及外部映射由平台运营、数据与研发确认。变更账号、门店或区域归属时核对排期引用和历史报表。</p>
+</section>
+
+<section id="sec-testcases">
+  <h2>12. 实施与验收</h2>
+  <h3 id="sec-platform-acceptance">平台域验收</h3>
+  <div class="table-wrap"><table><thead><tr><th scope="col">业务范围</th><th scope="col">核对对象与操作</th><th scope="col">通过依据</th><th scope="col">证据与阶段</th></tr></thead><tbody>
+    <tr><th scope="row">基础资料与合作方</th><td>选择一组品牌、车系、区域、门店、开发者及报表账号，核对在投放和接入配置中的选项及关联。</td><td>关联使用同一业务标识和适用范围，能区分接入身份与业务账号。</td><td>原型核对候选与回显；正式验收补主数据同步及历史关联证据。</td></tr>
+    <tr><th scope="row">投放运营</th><td>检查排期、SmartCode、供应商目标和处理策略。切换适用结算方式，分别保存草稿与发布策略。</td><td>所需字段随业务类型变化，分配合计正确，已发布配置和历史处理快照可分别核对。</td><td><a href="DKLinks_业务流程.html#FLOW-004-acceptance">排期验收清单</a> · 正式持久化、策略生效和接口行为待联调。</td></tr>
+    <tr><th scope="row">线索执行</th><td>以线上提交或运营补传进入，核对拦截、培育、人工决定、下发和日志。</td><td>来源可追查，处理结论使用当时的依据。厂商回执和处理阶段分别呈现。</td><td><a href="DKLinks_业务流程.html#FLOW-001-acceptance">线索接收与下发验收清单</a> · 统一接收与实际厂商回执待联调。</td></tr>
+    <tr><th scope="row">锁单与经营复盘</th><td>从排期核对供应商累计量，再用明确统计期间查看报表，钻查原传及派生明细与异常锁单。</td><td>各统计口径使用对应范围，可回到同一线索或锁单证据。锁单排查结论按约定保留。</td><td><a href="DKLinks_业务流程.html#FLOW-009-acceptance">报表与达标验收清单</a> · 真实数据对账待联调。</td></tr>
+    <tr><th scope="row">平台治理</th><td>分别用有权限及无权限的运营角色核对配置发布、人工处理、导出与跨品牌查询，校验字典和历史显示。</td><td>角色与数据范围一致，跨范围访问受控，变更和人工操作可按对象追溯。</td><td>以已签认权限矩阵及服务端日志验收；原型仅核对入口和界面行为。</td></tr>
+  </tbody></table></div>
+  <span id="sec-trace"></span>
+  <h3 id="sec-release-gates">分阶段验收与通过条件</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">阶段</th><th scope="col">核对责任</th><th scope="col">通过条件</th><th scope="col">证据状态</th></tr></thead><tbody>
+<tr><th scope="row">原型复核</th><td>运营、产品、测试</td><td>按平台域验收清单核对配置与运营入口。以共享排期样例核对 A 供应商达标停发、B 供应商原传与派生日志及同范围锁单明细。</td><td>已有样例记录，新蓝图的浏览器实屏待补。</td></tr>
+<tr><th scope="row">接口联调</th><td>接口双方、研发、测试</td><td>接收、回调和厂商通道具备配对请求响应；数据组确认锁单标识及归属，以同一批样本验证重复回传、空值与跨排期隔离。</td><td>正式接口和对照证据待接入。</td></tr>
+<tr><th scope="row">生产上线评审</th><td>研发、运维、安全</td><td>提交实际部署与回退步骤、外部凭证和范围核对记录、观察窗口及告警响应安排。用实测确认容量、恢复时长与可恢复时间点。</td><td>环境与质量指标阈值待评审。</td></tr>
+</tbody></table></div>
+  <p><a href="../../../../产品方案/排期项目处理策略配置/回归验证/供应商达标与下发_跨页核验记录_20261118.html#browser-acceptance">查看供应商达标与下发原型验收记录</a></p>
+</section>
+</main>
+</div>
+</div>
+<dialog class="flow-viewer" id="flow-viewer" aria-labelledby="flow-viewer-title">
+  <div class="flow-viewer-shell">
+    <header class="flow-viewer-toolbar">
+      <h2 id="flow-viewer-title">流程图</h2>
+      <div class="flow-viewer-actions" role="group" aria-label="流程图缩放">
+        <button type="button" data-viewer-action="out" aria-label="缩小">−</button>
+        <output id="flow-viewer-scale" aria-label="当前缩放比例"></output>
+        <button type="button" data-viewer-action="in" aria-label="放大">＋</button>
+        <button type="button" data-viewer-action="fit">适合窗口</button>
+        <button type="button" data-viewer-action="actual">100%</button>
+      </div>
+      <button type="button" class="flow-viewer-exit" data-viewer-action="close" autofocus>退出全屏</button>
+    </header>
+    <div class="flow-viewer-viewport" tabindex="0" role="region" aria-label="流程图画布，可以拖动画布或使用方向键浏览">
+      <div class="flow-viewer-canvas"></div>
+    </div>
+  </div>
+</dialog>
+<script src="../../js/flow-viewer.js?v=20261119-flow-viewer"></script>
+</body>
+</html>
