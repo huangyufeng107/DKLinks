@@ -2,13 +2,31 @@
   function doLogin() {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('mainApp').classList.add('active');
-    navigateTo('dashboard');
     var loginUrl = new URL(window.location.href);
-    if (loginUrl.searchParams.has('prototypePage')) {
+    if (loginUrl.searchParams.has('prototypePage') || loginUrl.searchParams.has('prototypeReview')) {
       loginUrl.searchParams.delete('prototypePage');
+      loginUrl.searchParams.delete('prototypeReview');
       try { window.history.replaceState(null, '', loginUrl.href); } catch (error) { /* Local-file URL updates may be restricted. */ }
     }
+    navigateTo('dashboard');
     showToast('登录成功，欢迎回来！', 'success');
+  }
+
+  function openSupplierGoalReview(review) {
+    if (!['schedule', 'supplier-goals', 'supplier-a-log', 'supplier-b-log', 'report'].includes(review)) return false;
+    var sample = scheduleData.find(function (item) { return item.id === 'supplier-goal-review'; });
+    if (!sample) return false;
+    if (review === 'schedule') openScheduleModal('view', sample.id);
+    else if (review === 'report') openScheduleReport(sample.id);
+    else {
+      var supplier = sample.suppliers[review === 'supplier-b-log' ? 1 : 0];
+      if (review !== 'supplier-goals' && !supplier) return false;
+      openScheduleSupplierGoals(sample.id);
+      if (review !== 'supplier-goals') {
+        openSupplierDispatchLogs('', {schedule: sample.name, supplier: supplier.accountName || supplier.accountId});
+      }
+    }
+    return true;
   }
 
   function resetDkAccountFilters() {

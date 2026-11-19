@@ -154,6 +154,8 @@ tr:last-child td { border-bottom: none; }
 .catalog-sidebar .catalog-group-items .tab-btn:hover { border-color: #dce4f0; background: #f4f7fc; }
 .catalog-sidebar .catalog-group-items .tab-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
 .catalog-sidebar-title strong { font-size: 14px; }
+#catalogReleaseContext a{color:inherit;text-underline-offset:3px}
+.tab-content table :is(th,td):nth-child(3),.tab-content table :is(th,td):nth-child(7){display:none}
 .catalog-version-search { padding: 10px 0 11px; border-bottom: 1px solid #dce3ef; }
 .catalog-version-search label { display: block; margin-bottom: 5px; color: #334155; font-size: 11px; font-weight: 700; }
 .catalog-version-search input { width: 100%; height: 36px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; background: #fff; font: inherit; font-size: 12px; }
@@ -183,8 +185,9 @@ html { scrollbar-gutter: stable; }
 <body>
 <div class="page">
 <div class="doc-header">
-  <h1>D客连 · 功能点清单（HTML 阅读版）</h1>
-  <div class="doc-subtitle">系统功能点分解与验收清单 — 全面量化拆解全平台各业务模块的功能项、操作类型、接口关联与完成状态，用于研发排期、范围管控与交付验收核对。</div>
+  <h1>D客连 · 版本范围索引</h1>
+  <div class="doc-subtitle">按版本和模块核对功能范围。</div>
+  <p id="catalogReleaseContext"><a href="DKLinks_版本日志.html">返回版本日志</a></p>
   <div class="doc-meta-list">
     <span><span class="meta-label">系统：</span>D客连 · SaaS平台</span>
     <span><span class="meta-label">板块：</span>多板块</span>
@@ -470,8 +473,17 @@ document.querySelectorAll('[data-export-table]').forEach(function(btn) {
 function revealReleaseFeature(){
  var id;try{id=decodeURIComponent(location.hash.slice(1));}catch(e){return;}
  var target=id&&document.getElementById(id);var panel=target&&target.closest('.tab-content');if(!panel)return;
- var release=new URLSearchParams(location.search).get('release');if(release){catalogVersionSearch.value=release;updateCatalogVersion();}
  var button=Array.from(document.querySelectorAll('.tab-btn')).find(function(b){return 'tab-'+b.dataset.tab===panel.id;});if(button)button.click();target.scrollIntoView({block:'start'});
+}
+var requestedRelease = new URLSearchParams(location.search).get('release');
+if (requestedRelease) {
+  catalogVersionSearch.value = requestedRelease;
+  updateCatalogVersion();
+  if (/^v\d\.\d\.\d$/.test(requestedRelease)) {
+    var releaseLink = document.querySelector('#catalogReleaseContext a');
+    releaseLink.href += '#scope-' + requestedRelease.replace(/\D/g, '');
+    releaseLink.textContent = '查看 ' + requestedRelease + ' 的交付状态与验收依据';
+  }
 }
 window.addEventListener('hashchange',revealReleaseFeature);revealReleaseFeature();
 </script>

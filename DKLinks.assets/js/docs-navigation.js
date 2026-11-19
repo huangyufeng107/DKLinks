@@ -1,10 +1,17 @@
 (() => {
   'use strict';
-  // A fresh prototype load always starts at login, including old workspace links.
+  // Only the version log's sample links open a review page on load.
   document.addEventListener('DOMContentLoaded', () => {
     const login = document.getElementById('loginPage');
     const app = document.getElementById('mainApp');
     if (!login || !app) return;
+    const review = new URLSearchParams(window.location.search).get('prototypeReview');
+    const isPrototypeView = !location.hash || location.hash === '#dk-prototype';
+    if (review && isPrototypeView && typeof openSupplierGoalReview === 'function' && openSupplierGoalReview(review)) {
+      login.style.display = 'none';
+      app.classList.add('active');
+      return;
+    }
     login.style.display = '';
     app.classList.remove('active');
   }, {once:true});
@@ -14,15 +21,23 @@
   const tabs = [
     ['prototype', '产品原型', './DKLinks.html'],
     ['requirements', '需求说明', 'DKLinks.assets/docs/需求说明/index.html?v=20261118-lead-ops-docs'],
-    ['system-blueprint', '系统蓝图', 'DKLinks.assets/docs/核心文档/线索下发与防死循环技术规格方案.html?v=20261118-lead-ops-docs'],
-    ['function-doc', '功能文档', 'DKLinks.assets/docs/核心文档/DKLinks_功能文档.html?v=20261118-lead-ops-docs'],
+    ['system-blueprint', '技术参考 · 系统蓝图', 'DKLinks.assets/docs/核心文档/线索下发与防死循环技术规格方案.html?v=20261119-capability-map'],
+    ['function-doc', '功能说明', 'DKLinks.assets/docs/核心文档/DKLinks_功能文档.html?v=20261119-docs-cleanup'],
     ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_交互流程图.html?v=20261118-lead-ops-docs'],
-    ['business-flow', '业务场景与流程', 'DKLinks.assets/docs/核心文档/业务时序图.html?v=20261119-flow-viewer'],
+    ['business-flow', '业务流程', 'DKLinks.assets/docs/核心文档/业务时序图.html?v=20261119-flow-viewer'],
     ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能清单.html?v=20261118-lead-ops-docs'],
-    ['version-log', '版本号日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261118-schedule-flow-details']
+    ['version-log', '版本日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261119-direct-review']
   ];
+  const primaryTabs = ['prototype', 'function-doc', 'business-flow', 'version-log'];
+  const primaryTabFor = {
+    requirements: 'function-doc',
+    'system-blueprint': 'function-doc',
+    interaction: 'function-doc',
+    'feature-list': 'version-log'
+  };
   const normalizeTabId = (id) => {
     if (id === 'blueprint') return 'system-blueprint';
+    if (id === 'product-map') return 'function-doc';
     if (id === 'manual') return 'function-doc';
     if (id === 'sequence') return 'business-flow';
     if (id === 'features') return 'feature-list';
@@ -34,7 +49,7 @@
   header.id = 'dkDocsHeader';
   header.className = 'dk-docs-header';
   header.innerHTML = `<div class="dk-docs-brand"><span class="dk-docs-logo" aria-hidden="true">D</span><strong>D客连 · SaaS平台</strong></div>
-    <nav class="dk-docs-nav" aria-label="文档与产品导航">${tabs.map(([id,label]) => `<a class="dk-docs-tab" data-docs-tab="${id}" href="#dk-${id}">${label}</a>`).join('')}</nav>
+    <nav class="dk-docs-nav" aria-label="文档与产品导航">${tabs.filter(([id]) => primaryTabs.includes(id)).map(([id,label]) => `<a class="dk-docs-tab" data-docs-tab="${id}" href="#dk-${id}">${label}</a>`).join('')}</nav>
     <div class="dk-docs-tools"><button class="dk-docs-tool dk-docs-refresh" type="button" title="重新加载当前内容">↻ 刷新内容</button><a class="dk-docs-tool" id="dkDocsNewWindow" target="_blank" rel="noopener" href="./DKLinks.html" title="在新窗口打开当前内容">↗ 新窗口</a></div>`;
   const view = document.createElement('section');
   view.className = 'dk-docs-view';
@@ -62,7 +77,7 @@
     if (current === 'prototype' && key !== 'prototype') prototypeScroll = window.scrollY;
     current = key;
     header.querySelectorAll('[data-docs-tab]').forEach(link => {
-      if (link.dataset.docsTab === key) link.setAttribute('aria-current','page');
+      if (link.dataset.docsTab === (primaryTabFor[key] || key)) link.setAttribute('aria-current','page');
       else link.removeAttribute('aria-current');
     });
     view.hidden = key === 'prototype';
@@ -79,7 +94,7 @@
       const frame = document.createElement('iframe');
       frame.className = 'dk-docs-frame';
       frame.title = label;
-      if (key === 'business-flow') frame.allowFullscreen = true;
+      if (key === 'business-flow' || key === 'system-blueprint') frame.allowFullscreen = true;
       frame.addEventListener('load', () => { if (current === key) loading.hidden = true; });
       frame.src = path + (pendingAnchors.has(key) ? '#' + encodeURIComponent(pendingAnchors.get(key)) : '');
       view.append(frame);

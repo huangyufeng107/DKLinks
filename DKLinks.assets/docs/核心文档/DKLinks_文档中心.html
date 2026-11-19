@@ -272,14 +272,10 @@ html, body {
   </div>
 
   <div class="tab-nav" id="tabNav">
-    <button class="tab-btn active" data-tab="0" onclick="switchTab(0)">版本号日志</button>
-    <button class="tab-btn" data-tab="1" onclick="switchTab(1)">功能清单</button>
-    <button class="tab-btn" data-tab="2" onclick="switchTab(2)">产品原型</button>
-    <button class="tab-btn" data-tab="3" onclick="switchTab(3)">功能文档</button>
-    <button class="tab-btn" data-tab="4" onclick="switchTab(4)">交互流程图</button>
-    <button class="tab-btn" data-tab="5" onclick="switchTab(5)">业务场景与流程</button>
-    <button class="tab-btn" data-tab="6" onclick="switchTab(6)">系统蓝图</button>
-    <button class="tab-btn" data-tab="7" onclick="switchTab(7)">需求说明</button>
+    <button class="tab-btn active" data-tab="2" onclick="switchTab(2)">产品原型</button>
+    <button class="tab-btn" data-tab="3" onclick="switchTab(3)">功能说明</button>
+    <button class="tab-btn" data-tab="5" onclick="switchTab(5)">业务流程</button>
+    <button class="tab-btn" data-tab="0" onclick="switchTab(0)">版本日志</button>
   </div>
 
   <div class="toolbar">
@@ -292,7 +288,7 @@ html, body {
 <div class="content-area" id="contentArea">
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text" id="loadingText">正在加载版本号日志…</div>
+    <div class="loading-text" id="loadingText">正在加载产品原型…</div>
   </div>
 
   <iframe id="frame0" class="active" onload="onFrameLoad(0)" onerror="onFrameError(0)"></iframe>
@@ -301,7 +297,7 @@ html, body {
   <iframe id="frame3" onload="onFrameLoad(3)" onerror="onFrameError(3)"></iframe>
   <iframe id="frame4" onload="onFrameLoad(4)" onerror="onFrameError(4)"></iframe>
   <iframe id="frame5" allowfullscreen onload="onFrameLoad(5)" onerror="onFrameError(5)"></iframe>
-  <iframe id="frame6" onload="onFrameLoad(6)" onerror="onFrameError(6)"></iframe>
+  <iframe id="frame6" allowfullscreen onload="onFrameLoad(6)" onerror="onFrameError(6)"></iframe>
   <iframe id="frame7" title="需求说明" onload="onFrameLoad(7)" onerror="onFrameError(7)"></iframe>
 </div>
 
@@ -311,7 +307,7 @@ html, body {
   <span>|</span>
   <span>键盘切换：&larr; &rarr;</span>
   <span>|</span>
-  <span id="footerStatus">当前：版本号日志</span>
+  <span id="footerStatus">当前：产品原型</span>
 </div>
 
 <script>
@@ -319,15 +315,17 @@ var currentTab = -1;
 var tabCount = 8;
 var loadingTimer = null;
 
-var tabNames = ['版本号日志', '功能清单', '产品原型', '功能文档', '交互流程图', '业务场景与流程', '系统蓝图', '需求说明'];
+var primaryTabs = [2, 3, 5, 0];
+var primaryTabFor = {1: 0, 4: 3, 6: 3, 7: 3};
+var tabNames = ['版本日志', '版本范围索引', '产品原型', '功能说明', '历史交互图', '业务流程', '技术参考 · 系统蓝图', '需求说明'];
 var tabUrls = [
-  './DKLinks_版本日志.html?v=20261118-schedule-flow-details',
+  './DKLinks_版本日志.html?v=20261119-direct-review',
   './DKLinks_功能清单.html?v=20261118-lead-ops-docs',
   '../../../DKLinks.html?standalone=1#dk-prototype',
-  './DKLinks_功能文档.html?v=20261118-lead-ops-docs',
+  './DKLinks_功能文档.html?v=20261119-docs-cleanup',
   './DKLinks_交互流程图.html?v=20261118-lead-ops-docs',
   './业务时序图.html?v=20261119-flow-viewer',
-  './线索下发与防死循环技术规格方案.html?v=20261118-lead-ops-docs',
+  './线索下发与防死循环技术规格方案.html?v=20261119-capability-map',
   '../需求说明/index.html?v=20261118-lead-ops-docs'
 ];
 
@@ -337,8 +335,10 @@ function switchTab(index) {
   currentTab = index;
 
   var btns = document.querySelectorAll('.tab-btn');
-  btns.forEach(function(b, i) {
-    b.classList.toggle('active', i === index);
+  btns.forEach(function(b) {
+    var active = Number(b.dataset.tab) === (primaryTabFor[index] ?? index);
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-selected', String(active));
   });
 
   var frames = document.querySelectorAll('.content-area iframe');
@@ -415,20 +415,20 @@ function hideLoading() {
   clearTimeout(loadingTimer);
 }
 
-// Keyboard navigation
+// Keep the historic tab numbers for links and use the visible order for keyboard navigation.
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight' && currentTab < tabCount - 1) {
-    e.preventDefault();
-    switchTab(currentTab + 1);
-  } else if (e.key === 'ArrowLeft' && currentTab > 0) {
-    e.preventDefault();
-    switchTab(currentTab - 1);
-  }
+  var direction = {ArrowLeft: -1, ArrowRight: 1}[e.key];
+  if (!direction || e.target.matches('input, textarea, select, [contenteditable]')) return;
+  var selected = primaryTabs.indexOf(primaryTabFor[currentTab] ?? currentTab);
+  var next = primaryTabs[selected + direction];
+  if (next === undefined) return;
+  e.preventDefault();
+  switchTab(next);
 });
 
-// Initialize; allow the integrated top navigation to deep-link to the logical-flow tab.
-var initialTab = Number(new URLSearchParams(window.location.search).get('tab'));
-if (!Number.isInteger(initialTab) || initialTab < 0 || initialTab >= tabCount) initialTab = 0;
+var tabParam = new URLSearchParams(window.location.search).get('tab');
+var initialTab = tabParam === null ? 2 : Number(tabParam);
+if (!Number.isInteger(initialTab) || initialTab < 0 || initialTab >= tabCount) initialTab = 2;
 switchTab(initialTab);
 </script>
 
