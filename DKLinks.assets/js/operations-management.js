@@ -334,10 +334,10 @@
   }
 
   function handleScheduleEditorTabKeydown(event) {
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
     var tabs = Array.from(document.querySelectorAll('[data-schedule-editor-tab]')), index = tabs.indexOf(document.activeElement);
     if (index < 0) return;
-    var next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    var next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (['ArrowRight', 'ArrowDown'].includes(event.key) ? 1 : -1) + tabs.length) % tabs.length;
     event.preventDefault(); switchScheduleEditorTab(tabs[next].getAttribute('data-schedule-editor-tab')); tabs[next].focus();
   }
 
@@ -748,7 +748,7 @@
     if (budgetEl) budgetEl.textContent = '¥' + totalBudget.toLocaleString();
     if (allocatedEl) allocatedEl.textContent = '¥' + allocated.toLocaleString();
     if (scaleEl) scaleEl.textContent = scheduleSelectedSeries.length + ' 车系 · ' + supplierRows.length + ' 供应商';
-    if (footerEl) footerEl.textContent = scheduleSelectedSeries.length + ' 车系 · ' + supplierRows.length + ' 供应商 · ' + storeCount + ' 家门店 · 已分配 ¥' + allocated.toLocaleString() + ' / ¥' + totalBudget.toLocaleString();
+    if (footerEl) footerEl.textContent = scheduleSelectedSeries.length + ' 车系 · ' + supplierRows.length + ' 供应商 · ' + storeCount + ' 家门店' + (window.ScheduleCommercial && ScheduleCommercial.hasPaymentSelection() ? ' · 已分配 ¥' + allocated.toLocaleString() + ' / ¥' + totalBudget.toLocaleString() : '');
     if (confirmSeriesEl) confirmSeriesEl.textContent = scheduleSelectedSeries.length;
     if (confirmSuppliersEl) confirmSuppliersEl.textContent = supplierRows.length;
     if (confirmStoresEl) confirmStoresEl.textContent = storeCount;
@@ -880,13 +880,14 @@
           '<div class="form-group" style="position:relative;"><label class="form-label">账号ID <span class="required">*</span></label><input type="hidden" id="supAccountId' + idx + '" value="' + (prefill ? escapeHTML(prefill.accountId || '') : '') + '"><input type="text" class="form-input" id="supAccountPicker' + idx + '" value="' + escapeHTML(getScheduleSupplierAccountPickerLabel(prefill)) + '" placeholder="搜索账号ID / 名称" autocomplete="off" onfocus="renderScheduleSupplierAccountDropdown(' + idx + ')" oninput="handleScheduleSupplierAccountSearch(' + idx + ')" onblur="hideScheduleSupplierAccountDropdown(' + idx + ')"><div id="supAccountDropdown' + idx + '" style="display:none;position:absolute;z-index:20;left:0;right:0;top:64px;background:#fff;border:1px solid var(--gray-200);border-radius:8px;box-shadow:0 12px 32px rgba(15,23,42,0.14);max-height:220px;overflow-y:auto;"></div></div>' +
           '<div class="form-group"><label class="form-label">账号全称</label><input type="text" class="form-input" id="supAccountName' + idx + '" value="' + (prefill ? prefill.accountName || '' : '') + '" placeholder="自动填充" readonly style="background:var(--gray-100);" oninput="updateScheduleSupplierCardSummary(' + idx + ')"></div>' +
           '<div class="form-group"><label class="form-label">账号简称</label><input type="text" class="form-input" id="supAccountShort' + idx + '" value="' + (prefill ? prefill.accountShort || '' : '') + '" placeholder="自动填充" readonly style="background:var(--gray-100);"></div>' +
-          '<div class="form-group"><label class="form-label">分配预算 <span class="required">*</span></label><input type="number" class="form-input" id="supBudget' + idx + '" value="' + (prefill ? prefill.budget || '' : '') + '" placeholder="预算" oninput="updateScheduleSupplierCardSummary(' + idx + ')"></div>' +
           '<div class="form-group"><label class="form-label">SMARTCODE <span class="required">*</span></label><select class="form-select" id="supSmartcode' + idx + '" onchange="updateScheduleSupplierCardSummary(' + idx + ')"><option value="">请选择SMARTCODE</option></select></div>' +
           '<div class="form-group"><label class="form-label">结算方式（跟随排期）</label><input class="form-input" id="supSettlement' + idx + '" readonly placeholder="请先在基础信息选择结算方式"></div>' +
+          '<div class="form-group"><label class="form-label">分配预算 <span class="required">*</span></label><input type="number" class="form-input" id="supBudget' + idx + '" value="' + (prefill ? prefill.budget || '' : '') + '" placeholder="预算" oninput="updateScheduleSupplierCardSummary(' + idx + ')"></div>' +
         '</div>' +
       '</div>' +
       '<div class="schedule-panel-section">' +
         '<div class="schedule-panel-section-title">结算价格</div>' +
+        '<p class="form-hint">商机销售价和交车销售价由运营手动填写。</p>' +
         '<div class="schedule-supplier-price-grid" id="supCplPriceGroup' + idx + '"><div class="form-group"><label class="form-label">商机成本价 <span class="required">*</span></label><input type="number" class="form-input" id="supCostPrice' + idx + '" value="' + (prefill && prefill.costPrice ? prefill.costPrice : '') + '" placeholder="商机成本" step="0.01"></div><div class="form-group"><label class="form-label">商机销售价 <span class="required">*</span></label><input type="number" class="form-input" id="supSalePrice' + idx + '" value="' + (prefill && prefill.salePrice ? prefill.salePrice : '') + '" placeholder="商机售价" step="0.01"></div></div>' +
         '<div class="schedule-supplier-price-grid" id="supCpsPriceGroup' + idx + '"><div class="form-group"><label class="form-label">交车成本价 <span class="required">*</span></label><input type="number" class="form-input" id="supDeliveryCost' + idx + '" value="' + (prefill && prefill.deliveryCost ? prefill.deliveryCost : '') + '" placeholder="交车成本" step="0.01"></div><div class="form-group"><label class="form-label">交车销售价 <span class="required">*</span></label><input type="number" class="form-input" id="supDeliverySale' + idx + '" value="' + (prefill && prefill.deliverySale ? prefill.deliverySale : '') + '" placeholder="交车售价" step="0.01"></div></div>' +
         '<div class="schedule-supplier-price-grid" id="supOrderPriceGroup' + idx + '" hidden><div class="form-group"><label class="form-label">锁单／订单成本价</label><input type="number" class="form-input" id="supOrderCost' + idx + '" min="1" step="1" value="' + (prefill && prefill.orderCost ? prefill.orderCost : '') + '"></div><div class="form-group"><label class="form-label">锁单／订单销售价</label><input type="number" class="form-input" id="supOrderSale' + idx + '" min="1" step="1" value="' + (prefill && prefill.orderSale ? prefill.orderSale : '') + '"></div></div>' +
@@ -1279,6 +1280,7 @@
     if (supplierRows.length === 0) { switchScheduleEditorTab('suppliers'); showToast('请至少添加一条供应商信息', 'error'); return; }
 
     var suppliers = [];
+    var previousSchedule = scheduleData.find(function(item) { return item.id === currentEditingScheduleId; }) || {};
     var accountSet = {};
     var smartcodeSet = {};
     var hasSupplierError = false;
@@ -1314,7 +1316,7 @@
         accountId: accountId,
         accountName: document.getElementById('supAccountName' + idx).value,
         accountShort: document.getElementById('supAccountShort' + idx).value,
-        budget: allocation.budget,
+        budget: commercial.payment ? allocation.budget : ((previousSchedule.suppliers || []).find(function (supplier) { return supplier.accountId === accountId && supplier.settlement === settlement; }) || {}).budget || 0,
         expectedSupply: allocation.expectedSupply,
         expectedConversionRate: allocation.expectedConversionRate,
         targetLockedOrders: allocation.targetLockedOrders,
@@ -1326,7 +1328,7 @@
         orderSale: orderSale,
         deliveryCost: deliveryCost,
         deliverySale: deliverySale,
-        appendRules: window.ScheduleDispatch && dispatch.logic !== 'ratio' ? ScheduleDispatch.rules(idx) : [],
+        appendRules: (dispatch ? dispatch.logic !== 'ratio' : !!previousSchedule.dispatch) ? ScheduleDispatch.rules(idx) : [],
         storeScope: document.getElementById('supStoreScope' + idx)?.value === 'allBrand' ? 'allBrand' : 'specified',
         storeIds: (document.getElementById('supStoreIds' + idx)?.value || '').split(',').filter(Boolean)
       });
@@ -1335,13 +1337,12 @@
     var allocationError = ScheduleCommercial.checkTotals(suppliers, commercial);
     if (allocationError) { switchScheduleEditorTab('suppliers'); showToast(allocationError, 'error'); return; }
 
-    var previousSchedule = scheduleData.find(function(item) { return item.id === currentEditingScheduleId; }) || {};
     var scheduleObj = Object.assign({}, previousSchedule, {
       id: currentEditingScheduleId || String(Date.now()).slice(-4),
       name: name, startTime: startTime, endTime: endTime,
-      totalBudget: commercial.payment === 'prepaid' ? totalBudget : 0, status: status,
+      totalBudget: commercial.payment === 'prepaid' ? totalBudget : commercial.payment ? 0 : previousSchedule.totalBudget || 0, status: status,
       commercial: commercial,
-      dispatch: dispatch,
+      dispatch: dispatch || previousSchedule.dispatch || null,
       baseSeries: scheduleSelectedSeries.slice(),
       suppliers: suppliers, storeIds: []
     });
@@ -1357,7 +1358,7 @@
   function getScheduleListMeta(schedule) {
     var c = schedule.commercial || {};
     var methods = c.settlement ? [c.settlement] : Array.from(new Set((schedule.suppliers || []).map(function(s) { return s.settlement; }).filter(Boolean)));
-    return { methods: methods, payment: c.payment || 'prepaid', partner: c.partner || '', target: c.targetLockedOrders };
+    return { methods: methods, payment: methods.some(ScheduleCommercial.usesPayment) ? c.payment || 'prepaid' : null, partner: c.partner || '', target: c.targetLockedOrders };
   }
 
   function renderScheduleTable() {
@@ -1382,26 +1383,19 @@
       tbody.innerHTML = '<tr><td colspan="8" class="schedule-list-empty">' + (scheduleData.length ? '暂无匹配的排期数据' : '暂无排期数据，请点击「新增排期」创建') + '</td></tr>';
     } else tbody.innerHTML = filteredData.map(function(s) {
       var m = getScheduleListMeta(s);
-      var amount = m.payment === 'volume' ? '目标锁单 ' + (Number.isSafeInteger(m.target) && m.target > 0 ? m.target.toLocaleString() + '台' : '—') : '预算 ¥' + Number(s.totalBudget || 0).toLocaleString();
+      var amount = m.payment === 'volume' ? '锁单目标 ' + (Number.isSafeInteger(m.target) && m.target > 0 ? m.target.toLocaleString() + ' 台' : '—') : m.payment || s.totalBudget ? '预算 ¥' + Number(s.totalBudget || 0).toLocaleString() : '—';
       var statusHtml = s.status === 1 ? '<span class="status-badge status-active">启用</span>' : '<span class="status-badge status-inactive">禁用</span>';
       if (typeof getSchedulePolicySummary === 'function') {
         var policyState = getSchedulePolicySummary(s.id);
         if (policyState.blocked.length) statusHtml += '<div class="form-hint" style="color:var(--warning);">处理策略：' + escapeHTML(policyState.blocked[0].label) + '</div>';
       }
       var sid = escapeJS(s.id);
-      return '<tr><td class="schedule-list-name"><strong>' + escapeHTML(s.name) + '</strong></td><td>' + escapeHTML(getScheduleBrandNames(s).join('、') || '—') + '</td><td>' + escapeHTML(m.methods.join('／') || '未配置') + '</td><td>' + (m.payment === 'volume' ? '按量付费' : '预充值') + '</td><td class="schedule-list-amount">' + amount + '</td><td class="schedule-list-time"><span>' + escapeHTML(s.startTime.replace('T', ' ')) + '</span><span>至 ' + escapeHTML(s.endTime.replace('T', ' ')) + '</span></td><td>' + statusHtml + '</td>' +
-        '<td><div class="schedule-list-actions"><button onclick="openScheduleModal(\'view\',\'' + sid + '\')">查看</button><button onclick="openScheduleModal(\'edit\',\'' + sid + '\')">编辑</button><button onclick="openSchedulePolicy(\'' + sid + '\')">处理策略</button><button onclick="navigateTo(\'dk-report\')">查看报表</button><button onclick="navigateTo(\'dk-leaddetail\')">线索明细</button></div></td></tr>';
+      var supplierGoalAction = m.payment === 'volume' ? '<button type="button" onclick="openScheduleSupplierGoals(\'' + sid + '\')">供应商达标</button>' : '';
+
+      return '<tr><td class="schedule-list-name"><strong>' + escapeHTML(s.name) + '</strong></td><td>' + escapeHTML(getScheduleBrandNames(s).join('、') || '—') + '</td><td>' + escapeHTML(m.methods.join('／') || '未配置') + '</td><td>' + (m.payment === 'volume' ? '按量付费' : m.payment === 'prepaid' ? '预充值' : '—') + '</td><td class="schedule-list-amount">' + amount + '</td><td class="schedule-list-time"><span>' + escapeHTML(s.startTime.replace('T', ' ')) + '</span><span>至 ' + escapeHTML(s.endTime.replace('T', ' ')) + '</span></td><td>' + statusHtml + '</td>' +
+        '<td><div class="schedule-list-actions"><button onclick="openScheduleModal(\'view\',\'' + sid + '\')">查看</button><button onclick="openScheduleModal(\'edit\',\'' + sid + '\')">编辑</button><button onclick="openSchedulePolicy(\'' + sid + '\')">处理策略</button>' + supplierGoalAction + '<button onclick="openScheduleReport(\'' + sid + '\')">查看报表</button><button onclick="openScheduleLeadList(\'' + sid + '\')">线索明细</button></div></td></tr>';
     }).join('');
     if (info) info.textContent = '共 ' + filteredData.length + ' 条';
-  }
-
-  function toggleScheduleMoreFilters() {
-    var panel = document.getElementById('scheduleMoreFilters');
-    var button = document.getElementById('scheduleMoreToggle');
-    if (!panel || !button) return;
-    panel.hidden = !panel.hidden;
-    button.setAttribute('aria-expanded', String(!panel.hidden));
-    button.innerHTML = (panel.hidden ? '更多筛选' : '收起筛选') + ' <span aria-hidden="true">' + (panel.hidden ? '⌄' : '⌃') + '</span>';
   }
 
   function filterScheduleList() { renderScheduleTable(); }
@@ -1561,6 +1555,7 @@
           item('到店率', r.arrivalRate) +
           item('线索转化率', r.conversionRate) +
         '</div></div>' +
+      (typeof renderReportSourceStats === 'function' ? renderReportSourceStats(r) : '') +
       '</div></td></tr>';
   }
 
@@ -1583,6 +1578,7 @@
     var dateTo = getReportDateTo();
     if (!dateFrom || !dateTo) { showToast('请选择完整的创建时间范围', 'warning'); return; }
     if (!Number.isFinite(Date.parse(dateFrom)) || !Number.isFinite(Date.parse(dateTo)) || dateFrom > dateTo) { showToast('创建时间范围无效，请核对起止时间', 'warning'); return; }
+    if (typeof applyScheduleReportRange === 'function') applyScheduleReportRange();
     renderReportTable(getReportSource());
     showToast(typeof hasScheduleGoalReportContext === 'function' && hasScheduleGoalReportContext() ? '已刷新会话演示数据；真实报表查询尚未接入' : '查询成功', 'success');
   }

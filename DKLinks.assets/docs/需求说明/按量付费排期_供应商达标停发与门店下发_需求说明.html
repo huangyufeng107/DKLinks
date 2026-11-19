@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>按量付费排期：供应商锁单达标停发与门店下发 · 需求说明</title>
+<style>
+    :root{--ink:#182230;--muted:#667085;--blue:#175cd3;--line:#e4e7ec;--bg:#f5f7fb}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:88px}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+    a{color:var(--blue);text-underline-offset:3px}a:focus-visible{outline:2px solid #84adff;outline-offset:3px}.topbar{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line)}.topbar-inner{max-width:1680px;margin:auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:17px;font-weight:700}.date{color:var(--muted);font-size:12px;white-space:nowrap}
+    .layout{max-width:1680px;margin:auto;padding:20px 24px 60px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:24px}.aside{position:sticky;top:86px;align-self:start;max-height:calc(100vh - 110px);overflow:auto;padding:14px;background:#fff;border:1px solid var(--line);border-radius:10px}.aside strong{display:block;padding:0 8px 8px;color:var(--muted);font-size:12px}.aside a{display:block;padding:6px 8px;color:#475467;text-decoration:none;font-size:13px;border-radius:5px}.aside a:hover{background:#eff6ff;color:var(--blue)}main{min-width:0}.hero,.section{background:#fff;border:1px solid var(--line);border-radius:10px;padding:26px 28px}.hero{background:linear-gradient(125deg,#edf5ff,#fff 75%);border-color:#d1e3ff}.hero h1{font-size:26px;line-height:1.4;margin:10px 0}.hero p{margin:8px 0;color:#475467}.badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:12px;font-weight:600;background:#eaf2ff;color:var(--blue)}.meta{display:flex;gap:10px 22px;flex-wrap:wrap;margin-top:14px;color:var(--muted);font-size:12px}.section{margin-top:16px}.section h2{font-size:20px;margin:0 0 14px}.section h3{font-size:15px;margin:22px 0 8px}.section p{margin:8px 0;color:#475467}.note{padding:12px 14px;margin:14px 0;border:1px solid #b2ddff;border-radius:7px;background:#eff8ff;color:#175cd3}.pending{border-color:#fedf89;background:#fffaeb;color:#93370d}.muted{font-size:12px;color:var(--muted)!important}.table-wrap{overflow:auto;margin:12px 0;border:1px solid var(--line);border-radius:7px}table{border-collapse:collapse;width:100%;font-size:13px;min-width:620px}th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}th{background:#f8fafc;color:#344054}td{color:#475467}th:last-child,td:last-child{border-right:0}tr:last-child td{border-bottom:0}ul,ol{padding-left:22px;color:#475467}li{margin:7px 0}code{font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f2f4f7;padding:2px 5px;border-radius:4px}.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:0;list-style:none;counter-reset:step}.flow li{counter-increment:step;margin:0;padding:14px;border:1px solid #d5e4fb;border-radius:7px;background:#f8fbff}.flow li:before{content:counter(step);display:block;color:var(--blue);font-weight:700;margin-bottom:4px}.copy{padding:12px 14px;background:#f8fafc;border-left:3px solid #84adff;color:#344054}.links{display:flex;gap:16px;flex-wrap:wrap}.footer{padding:20px 0;color:var(--muted);font-size:12px;text-align:center}
+    @media(max-width:960px){.layout{grid-template-columns:1fr;padding:18px}.aside{position:static;max-height:none;display:flex;gap:4px;flex-wrap:wrap}.aside strong{width:100%}.hero,.section{padding:20px}.hero h1{font-size:23px}.flow{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar-inner{padding:12px 18px}}
+    @media(max-width:560px){.topbar-inner{align-items:flex-start;flex-direction:column}.flow{grid-template-columns:1fr}.hero,.section{padding:18px}.brand{font-size:15px}}
+    @media print{.topbar,.aside{display:none}.layout{display:block;padding:0}.hero,.section{box-shadow:none;break-inside:auto}.table-wrap{overflow:visible}table{min-width:0}body{background:#fff;font-size:12px}.hero h1{font-size:22px}a{color:inherit;text-decoration:none}}
+  
+.flow li strong{display:block;margin-bottom:5px}.flow li span{font-size:12px;color:#667085}.flow-branches{display:grid;grid-template-columns:1fr 1fr;gap:14px}.branch{padding:16px;border:1px solid #d5e4fb;border-radius:8px;background:#f8fbff}.branch strong{display:block}.status-confirmed{color:#027a48}.status-pending{color:#93370d}.formula{font-weight:600;color:#003594} .section:target{outline:2px solid #bfdbfe;outline-offset:3px}@media(max-width:650px){.flow-branches{grid-template-columns:1fr}}</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><span class="brand">D客连 · 需求说明</span><span class="date">原型验收通过 · 2026-11-18</span></div></header>
+<div class="layout">
+<nav class="aside" aria-label="需求章节">
+<strong>按量付费排期</strong>
+<a href="#scope">1. 场景目标与交付范围</a>
+<a href="#baseline">2. 现有能力与本次交付</a>
+<a href="#supplier-lock-goal">3. 页面配置与运营操作</a>
+<a href="#flow">4. 新线索如何判断达标</a>
+<a href="#supplier-lock-goal-multi">5. 一发多的候选范围</a>
+<a href="#ratio">6. 按比例下发流程</a>
+<a href="#metrics">7. 指标与统计口径</a>
+<a href="#state">8. 状态与边界</a>
+<a href="#records">9. 线索列表、字段与追溯</a>
+<a href="#acceptance">10. 可执行验收场景</a>
+<a href="#review">11. 待核对事项与交付状态</a>
+<a href="#links">12. 关联材料与维护约定</a>
+</nav>
+<main>
+<p><a href="index.html">← 返回需求目录</a></p>
+<section class="hero">
+<h1>按量付费排期：供应商锁单达标停发与门店下发</h1>
+<p>运营配置供应商锁单目标，系统按各供应商的达标情况控制新线索，并记录原传与派生线索的下发结果。</p>
+<div class="meta"><span>适用：CPQL／CPO 按量付费</span><span>覆盖：一发一／一发多</span></div>
+</section>
+
+<section class="section" id="scope">
+<h2>1. 场景目标与交付范围</h2>
+<p>运营将项目锁单目标分给各供应商。某家供应商达到自己的目标后，系统停止为该供应商的新线索安排下发，其他供应商继续按各自目标处理。</p>
+<div class="note">A 排期目标 10 台，A1 分 3 台，A2 分 7 台。即使 A1 实际锁了 4 台、A2 锁了 6 台，A2 仍可以继续下发，直到自己达到 7 台。</div>
+<p>本文的达标停发规则适用于 CPQL 或 CPO 结算下的按量付费排期，覆盖一发一及一发多的指定门店、随机和按比例下发。预充值内容用于说明表单如何联动。</p>
+</section>
+
+<section class="section" id="baseline">
+<h2>2. 现有能力与本次交付</h2>
+<div class="table-wrap"><table><thead><tr><th scope="col">模块</th><th scope="col">当前原型</th><th scope="col">本需求交付</th></tr></thead><tbody>
+<tr><td>排期配置</td><td>CPQL、CPO 选择支付方式后显示下发规则。预充值分配预算位于「结算方式（跟随排期）」之后。</td><td>按量付费的一发多配置派生上限，指定清单采用本需求约定的候选范围。</td></tr>
+<tr><td>下发与停发</td><td>当前可配置项目目标和供应商分配量。</td><td>接收新线索时按「排期＋供应商」判断达标，按所选逻辑安排原传与派生下发。</td></tr>
+<tr><td>线索与数据追溯</td><td>原型展示表单和配置效果。</td><td>上线后可筛选达标拦截记录，从原线索与派生线索查看相互关联，并核对锁单统计和下发日志。</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="supplier-lock-goal">
+<h2>3. 页面配置与运营操作</h2>
+<p>在排期列表的按量付费记录中在操作列点击「供应商达标」，查看项目目标、已分配量，以及每家供应商的分配量、原传有效锁单量、达标状态和数据记录时间。已达标供应商的新进线索停止下发，已入队任务继续执行。供应商行可跳转下发日志，排期和供应商由入口固定，不在筛选区重复展示。该入口只查询对应供应商在该排期的记录，重置时保留范围，可调整线索编号和处理结果。锁单数据缺失时数量显示「—」，状态显示「待接入锁单数据」。</p>
+
+<p>在「基础信息」选 CPQL（有效线索）或 CPO（锁单／订单）后，「支付与目标」会出现。新增排期时需选择「预充值」或「按量付费」，选好后「车系与下发规则」才会显示下发规则。支付方式未选时仍可关联车系。选择 CPL 或 CPS 时，隐藏「支付与目标」和「下发规则」，保存时跳过这两部分的校验。</p>
+<p>选「预充值」时，在基础信息填总预算，再到「账号与预算」为各供应商分配。字段顺序是「SMARTCODE → 结算方式（跟随排期） → 分配预算」。各供应商分配预算相加须等于总预算。</p>
+<p>选「按量付费」时，在基础信息填写预期供应量和预期锁单转化率，由系统计算项目锁单目标并向上取整。接着在「账号与锁单分配」填写每家供应商的分配锁单量。下文的达标停发规则适用于这种支付方式。</p>
+<ul>
+<li><strong>项目目标锁单量：</strong>例如 A 排期目标是 10 台。可以给 A1 分 3 台、A2 分 7 台。保存时，两家分配量相加必须等于 10 台。实际停发时分别看 A1 和 A2 达到了几台。</li>
+<li><strong>下发方式：</strong>选「一发一」时，原线索按现有规则校验，通过后发给供应商提交时填写的门店。该门店在本文简称「原传门店」。</li>
+<li><strong>一发多的派生上限和下发逻辑：</strong>原线索按现有规则独立下发。平台可另外选店，每选一家就生成一条关联原线索的新记录，称为「派生线索」。派生上限填 3，最多就是原传 1 家加平台另外 3 家，合计 4 家。</li>
+</ul>
+<p>供应商的「结算价格」区域中，商机销售价和交车销售价本期由运营手动填写。</p>
+</section>
+
+<section class="section" id="flow">
+<h2>4. 新线索如何判断达标</h2>
+<ol class="flow">
+<li><strong>先找到排期和来源供应商。</strong>例如线索来自 A 排期的 A1，就只查 A1 在 A 排期的有效锁单。A1 在其他排期的锁单、其他供应商的锁单以及平台派生线索产生的锁单都不计入 A1 的达标量。</li>
+<li><strong>达到分配量就拦截新线索。</strong>A1 分到 3 台，已有 3 台或更多，就保留新线索记录，在线索列表显示「仅接收」，原因是「供应商锁单目标已达成」。这条新线索不创建原传或派生下发任务，也不占用比例名额。</li>
+<li><strong>还差台数就继续处理。</strong>A1 只有 2 台时，按排期配置走一发一或一发多。即使 A1 实际已有 4 台、A2 有 6 台，两家合计已达到项目目标 10 台，A2 仍可继续下发，因为它自己的目标是 7 台。</li>
+</ol>
+<p><strong>达标前已入队的任务照常发送。</strong>例如 A1 的第 3 台锁单入库时，昨天已排队的线索继续发，此后新进的线索拦截。因此实际锁单数可能超过分配量。</p>
+<p><strong>已入库的锁单不冲减。</strong>一期按数据组提供的锁单标识记录入库并保留日志。同一锁单重复同步只算一次。之后收到撤单标识时，已入库记录和计数保留，已达标供应商不会因此恢复下发。</p>
+</section>
+
+<section class="section" id="supplier-lock-goal-multi">
+<h2>5. 一发多的候选范围</h2>
+<p><strong>先处理原线索，再生成派生线索。</strong>原线索按当前策略完成黑名单、接收去重、号码检测和外呼等环节。原线索被拦截或尚未完成处理时，保留对应状态，待满足下发条件后才生成派生记录。</p>
+<p>派生线索关联并引用原线索当时的过滤、号码检测和外呼结果。每家目标门店仍独立校验允许范围、门店可用性，以及同一客户是否已向该门店下发。去重时识别平台派生与原线索的关联，避免被供应商进线去重误拦。各门店的发送成功、失败及重试结果分别记录。</p>
+
+<p>假设 A1 原传 X 店，且 A1 尚未达标。X 店通过现有校验后独立下发。平台选派生门店时始终排除 X 店，同一条原线索也不会重复选中同一家门店。以下例子均以派生上限 3 家为例。</p>
+<div class="table-wrap"><table><thead><tr><th>下发逻辑</th><th>候选范围和选法</th><th>示例</th></tr></thead><tbody>
+<tr><td>指定门店下发</td><td>从运营为排期配置的指定清单中随机选。清单允许包含 A1 自行勾选范围以外的门店。</td><td>清单是 B、C、D、X，均可用。排除 X 后，平台向 B、C、D 各派生一条，X 的原线索另外发送。</td></tr>
+<tr><td>随机下发</td><td>只从 A1 在当前排期关联的可用门店中随机选。</td><td>A1 关联 X、B、C，D 只在排期指定清单。平台只向 B、C 派生，X 的原线索另外发送。</td></tr>
+<tr><td>按比例下发</td><td>只从 A1 在当前排期关联、且能查到转化率的可用门店中选。按下节的轮次和分组规则逐家选店。</td><td>如果当前名额属于高转化组，就先在 A1 的高转化组找店。其他供应商的门店不进入这条线索的候选范围。</td></tr>
+</tbody></table></div>
+<p>可选门店只有两家就派生两条。没有可选门店时，原线索仍按现有规则处理。建议派生结果记为「无可用目标门店」，方便运营区分是没有店可选，还是供应商已达标。</p>
+</section>
+
+<section class="section" id="ratio">
+<h2>6. 按比例下发流程</h2>
+<p><a href="../核心文档/业务时序图.html?v=20261118-schedule-flow-details#FLOW-001-ratio-routing">查看比例名额分配图</a></p>
+<div class="note">系统按门店编码从独立数据表查询转化率，再按运营配置的区间给门店分组。以 60%／40% 为例，同一排期的所有供应商共用一轮 10 个派生名额：第 1 至 6 个优先给高转化组，第 7 至 10 个优先给低转化组。组内可用门店轮流分配，轮满后开始下一轮。原传门店不占这些名额。</div>
+<ul>
+<li><strong>不同供应商接着分：</strong>如果前面已经处理了 5 个名额，A1 接下来有一条线索最多派生 3 家，且两组都有足够的店，就用第 6 个名额选一家高转化门店，用第 7、8 个名额选两家低转化门店。</li>
+<li><strong>本组没店就试别组：</strong>若第 6 个名额对应的高转化组没有可用门店，可以转给低转化组。日志记清计划给哪组、实际给哪组。第 7 个名额仍按原计划处理。</li>
+<li><strong>已经尝试但没选到：</strong>若某个名额实际尝试后，各组都无可用门店，记录「未派生」，该名额算处理过。</li>
+<li><strong>还没尝试的名额留给下一条：</strong>如果 A1 唯一能选的 B 店已用掉第 6 个名额，这条线索到此结束。第 7、8 个名额保留，下一条从第 7 个开始。</li>
+<li><strong>新店从后续名额开始：</strong>新店符合条件后参与轮流，不补领加入前的名额。查不到转化率的店暂不参与派生。</li>
+</ul>
+</section>
+
+<section class="section" id="metrics">
+<h2>7. 指标与统计口径</h2>
+<div class="table-wrap"><table><thead><tr><th scope="col">指标</th><th scope="col">数据来源与统计范围</th><th scope="col">怎么用</th></tr></thead><tbody>
+<tr><td>项目目标锁单量</td><td>预期供应量 × 预期锁单转化率，向上取整。例如 950 × 1% = 9.5，目标为 10 台。</td><td>校验各供应商分配量之和，项目汇总用于查看进度。</td></tr>
+<tr><td>供应商分配锁单量</td><td>运营按当前排期为每家供应商填写。</td><td>作为该供应商的新线索停发门槛。</td></tr>
+<tr><td>供应商有效锁单量</td><td>数据组锁单标识，限同一排期、同一供应商的原线索，按唯一锁单记录计数。</td><td>达到或超过该供应商分配量后拦截新进线索。</td></tr>
+<tr><td>平台派生有效锁单量</td><td>由派生线索关联的有效锁单单独统计。</td><td>用于追溯平台派生结果，不计入来源供应商达标量。</td></tr>
+<tr><td>门店转化率</td><td>按门店编码查询独立数据表。</td><td>用于选择派生门店的比例分组。项目预期锁单转化率用于计算项目目标。</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="state">
+<h2>8. 状态与边界</h2>
+<div class="table-wrap"><table><thead><tr><th scope="col">发生什么</th><th scope="col">系统如何处理</th><th scope="col">运营能看到什么</th></tr></thead><tbody>
+<tr><td>新线索进入时供应商已达标</td><td>保留原线索，跳过下发任务及比例分配。</td><td>仅接收，原因「供应商锁单目标已达成」。</td></tr>
+<tr><td>供应商达标前的任务已经入队</td><td>继续按原流程发送。</td><td>按该任务实际下发结果展示。</td></tr>
+<tr><td>派生候选不足或为空</td><td>按实际可选家数派生。原线索按现有流程处理。</td><td>建议在无派生候选时记录「无可用目标门店」。</td></tr>
+<tr><td>已入库锁单重复同步或收到撤单标识</td><td>保留已计数量和原入库日志，重复同步不增加台数。</td><td>供应商达标状态继续按已入库有效锁单量计算。</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="records">
+<h2>9. 线索列表、字段与追溯</h2>
+<p><a href="../核心文档/业务时序图.html?v=20261118-schedule-flow-details#FLOW-009-source-breakdown">查看达标、锁单及下发追溯流程图</a></p>
+<h3>锁单入库明细与达标数量追溯</h3>
+<p>沿用左侧「锁单排查」入口，同页提供「异常排查」和「锁单入库明细」两个页签。原有异常规则及人工排查功能继续保留，不把异常改判当作撤单或达标量冲减操作。</p>
+<p>从供应商达标页点击「原传有效锁单量」，直接进入该供应商在当前排期的原传有效锁单明细。排期、供应商及原传范围固定，页面副标题说明当前范围，只开放锁单／线索编号查询；重置保留固定范围。点击「返回达标情况」回到原排期。</p>
+<p>从左侧入口进入后，可切换「锁单入库明细」，按排期、供应商、记录来源和编号查询。每行显示锁单唯一标识、排期和供应商、关联线索、目标门店、原传或派生来源、统计归属及入库时间。原传锁单计入对应供应商在该排期的达标量；派生锁单只计入平台派生统计。列表只提供线索详情入口，不提供撤单、删除或修改操作。</p>
+<p>打开线索详情后，可查看「锁单入库与统计归属」，派生记录可继续查看原线索。返回锁单明细时保留页签、查询条件及页码。分页沿用现有样式，默认每页10条，可切换20或50条。锁单唯一标识去重，数据未接入不根据汇总数量补造明细。</p>
+<p class="muted">当前供应商达标样例提供 A 的3条原传、B 的4条原传及另1条平台派生入库记录，原传台数与达标页样例一致。数据和详情为会话样例；正式锁单入库、来源关联、权限、幂等及持久化接口尚未接入。</p>
+<h3>报表在现有基础上补充来源统计</h3>
+<p>保留现有报表主表列、详情指标、排期—账号—大区—小区—门店层级、展开方式及已有汇总口径。在每行「详情」底部增加「原传与派生统计」：供应商传输量、平台派生量、原传有效锁单量、派生有效锁单量。有完整记录的数量可点击查看对应线索，关闭后仍留在原报表详情。</p>
+<p>新增统计沿用当前行和报表查询范围，门店按各条线索的目标门店归属。原传和派生的线索量按线索唯一编号去重，有效锁单量按有效锁单唯一标识去重。供应商达标只计算原传有效锁单；派生线索及其锁单单独统计，不增加供应商传输量和成本。原有预算、单价、利润、线索质量和转化率不因新增展示被重新计算或替换。</p>
+<p>上层汇总需覆盖该行全部下级记录，不能把已接入的部分门店当成全部。缺少完整来源数据时显示「—」，已接入且数量确为零时显示「0」，点击零值显示空记录。</p>
+<p>从排期列表点击「查看报表」时传入排期ID，不展示其他排期的数据。共享达标样例按排期、供应商、区域、门店逐层展示；样例未记录区域时明确显示「未记录」。报表日期按线索接收／创建时间筛选，点击查询后生效，重置恢复当前排期时间；从线索详情返回时保留报表范围和展开状态。</p>
+<p class="muted">共享样例的项目目标10台，A分配3台且已锁3台，B分配7台且已锁4台。样例全排期共有供应商传输9条（7条历史锁单原传线索加2条新进原传线索）、平台派生4条（1条历史锁单派生线索加3条新派生线索）、原传有效锁单7台、派生有效锁单1台。所有关联编号可在线索列表查询。历史样例接收时间为11月17日，两条新进样例为11月18日；仅查询11月18日时来源统计为2条、3条、0台、0台，不影响供应商达标页的累计3台和4台。</p>
+<p class="muted">既有6月报表及「海口东风南方海鹏」门店来源样例继续保留，原有指标及维度不改写。其他无完整来源数据的排期显示「—」，不借用共享样例。正式数据查询、服务端汇总和权限控制需接入后验证。</p>
+
+<p>在线索列表页头点击「下发日志」可打开独立查询页。有下发记录时，也可从线索行「日志」或详情「查看下发日志」进入，自动带入当前线索编号。全局日志支持按排期、供应商、原线索或派生线索编号及处理结果查询。从供应商达标页进入时，排期和供应商范围固定，重置只清除线索编号和处理结果。日志展示记录时间、关联编号、目标门店、当时锁单量与目标、下发规则、比例名额及处理原因。每条已有线索的日志可进入详情，并返回日志继续查看。日志默认每页 10 条，可切换 20 条或 50 条，支持上一页、下一页和跳转页码。查询、重置或切换每页条数后回到第一页，从详情返回时保留查询条件和当前页。</p>
+
+<p>原传详情的处理结论显示当前结果。达标拦截时直接展示供应商在当前排期已锁单台数和分配量。处理进度显示保存的过滤、号码检测、外呼及下发结果。展开「门店下发与来源追溯」可查看原传和派生门店，已有线索的行可进入对应详情。</p>
+<p>平台派生详情标记「平台派生」，原线索编号可点击返回。处理进度展示继承结果的来源及目标门店独立校验，并说明本条产生有效锁单时计入平台派生统计。各门店只按已保存的下发结果展示，等待发送时显示「等待下发」，成功回执后显示「已下发」。</p>
+
+<p><strong>线索列表</strong>　点「达标停发」查看这类仅接收线索，也可从「更多筛选」按记录来源或处理原因查询。从排期打开「线索明细」时按该排期查询。点「详情」可核对当时的供应商、已锁单台数和分配量。已通过的接收检查如实显示，停发后的去重、号码检测、外呼和下发显示「未执行」。</p>
+<p><strong>派生日志：</strong>保留排期、来源供应商、原线索 ID、派生线索 ID、目标门店、生成时间、使用的规则及版本和下发结果。按比例下发时再记录轮次、名额序号、计划组、实际组和未派生或转组原因。可以从原线索查看派生结果，也可以从派生线索查回原线索。</p>
+<p><strong>分别统计：</strong>X 店因供应商原线索产生的有效锁单计入 A1。B、C、D 因平台派生线索产生的有效锁单单独统计，不计入 A1 达标量。派生线索不重复计入供应商传输量或供应商成本。</p>
+</section>
+
+<section class="section" id="acceptance">
+<h2>10. 可执行验收场景</h2>
+<div class="table-wrap"><table><thead><tr><th>给定情况</th><th>应看到的结果</th></tr></thead><tbody>
+<tr><td>新增 CPQL 或 CPO 排期，支付方式从未选切换到预充值或按量付费</td><td>选定支付方式后显示下发规则。预充值显示总预算和分配预算，分配预算排在「结算方式（跟随排期）」后面。按量付费显示项目锁单目标和供应商分配锁单量。</td></tr>
+<tr><td>结算方式选 CPL 或 CPS</td><td>可继续关联车系和配置供应商。保存时无需填写支付方式、预算、锁单目标或下发规则。</td></tr>
+<tr><td>项目目标 10 台，供应商分配量合计 9 台</td><td>不能保存，提醒分配总量须等于项目目标。</td></tr>
+<tr><td>一发一，A1 分配 2 台。本排期已有 1 台，其他排期另有 1 台</td><td>A 排期仍按 1 台判断，原传门店校验通过后可下发。</td></tr>
+<tr><td>一发一或一发多，A1 已达到自己的目标后新收到线索</td><td>列表可查到原线索和达标原因，没有下发任务、派生记录或比例名额消耗。</td></tr>
+<tr><td>A1 分配 3 台、实际 4 台，A2 分配 7 台、实际 6 台</td><td>A1 拦截新进线索，A2 仍可下发。</td></tr>
+<tr><td>第 3 台有效锁单入库时，旧任务已入队，之后有新线索进来</td><td>旧任务照常发送，新线索拦截。该锁单重复同步或收到撤单标识，计数仍为 3 台。</td></tr>
+<tr><td>指定门店、随机、按比例三种逻辑，各跑一次第 5、6 节的选店示例</td><td>目标门店和名额推进与示例一致，派生记录可查回原线索。</td></tr>
+<tr><td>原传门店和派生门店各产生一台有效锁单</td><td>供应商达标量只增加 1 台，另 1 台记为平台派生。</td></tr>
+<tr><td>原线索黑名单拦截或外呼尚未完成</td><td>列表保留拦截或处理中状态，未生成派生记录，比例名额不推进。</td></tr>
+<tr><td>原线索检测及外呼处理完成后生成派生记录</td><td>派生详情可查看引用的原线索处理结果及目标门店独立校验。各门店下发结果分别展示。</td></tr>
+<tr><td>同一条线索重试，或多家供应商同时进入比例分配</td><td>重试不重复派生或重复扣名额，同时处理的线索不占用同一个轮次名额。</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="section" id="review">
+<h2>11. 待核对事项与交付状态</h2>
+<p>2026-11-18 已完成共享样例的代码和交互模拟核验，覆盖达标停发、派生生成、编号追溯、报表统计、锁单明细、日期筛选及返回路径。详见<a href="../../../../产品方案/排期项目处理策略配置/回归验证/供应商达标与下发_跨页核验记录_20261118.html">跨页核验记录</a>。用户已确认样例实屏通过，覆盖 A 的原传锁单和达标拦截、B 的下发日志及报表归属。正式接口待联调。<a href="../核心文档/DKLinks_版本日志.html#version-124">查看 v1.2.4 版本日志</a>。</p>
+<ul>
+<li><strong>原型体验：</strong>按量付费的一发多现可配置派生上限。线索列表直接展示原传、平台派生及达标拦截样例，可按记录来源和下发原因筛选。点击「详情」查看原线索与派生门店的关联及下发记录。「补充下发样例」生成的记录也会加入同一列表。</li>
+<li><strong>销售价动态调整（后续规划）：</strong>后续在供应商「结算价格」区域的商机销售价和交车销售价旁提供「动态调整」勾选项。开启后由数据智能体分析并自动调整对应销售价。具体分析指标、调整频率和生效规则后续明确。</li>
+<li><strong>销售计费：</strong>平台派生线索是否向买方收费、是否占用购买额度，仍按之前决定暂缓确认。</li>
+<li><strong>数据对接：</strong>数据组需提供用于识别同一锁单的唯一标识及排期、线索归属关联方式。独立转化率数据表的字段和更新频率待明确。</li>
+</ul>
+
+<div class="note pending">原型已提供排期配置、线索筛选、处理进度与下发日志联查。正式锁单数据、规则执行、厂商回执和持久日志需在接口接通后验收。三期剩余事项由运营确认有开展必要后再纳入执行。</div>
+</section>
+
+<section class="section" id="links">
+<h2>12. 关联材料与维护约定</h2>
+<p><a href="../核心文档/业务时序图.html?v=20261118-schedule-flow-details#FLOW-004-flow">查看 FLOW-004 投放准备与排期配置</a>，可核对结算、支付方式、供应商分配、下发规则和保存校验。</p>
+<p><a href="../核心文档/业务时序图.html?v=20261118-schedule-flow-details#FLOW-001-flow">查看 FLOW-001 线索接收与下发业务流程图</a>，可核对供应商达标判断、外呼后门店确定及原传与派生下发。</p>
+<p><a href="../../../DKLinks.html?prototypePage=schedule#dk-prototype">打开排期管理原型</a>，可核对支付方式、供应商分配量和下发规则的配置入口。</p>
+</section>
+</main>
+</div>
+</body>
+</html>

@@ -5,12 +5,18 @@
   var checkedProject = new Set();
   function el(id) { return document.getElementById(id); }
   function esc(v) { return escapeHTML(String(v)); }
+  function enabled() { return !!window.ScheduleCommercial && ScheduleCommercial.hasPaymentSelection(); }
+  function derivedLimit() { return ScheduleCommercial.quantityMode(); }
   function multiple() { return el('scheduleDispatchMode').value === 'multiple'; }
   function logic() { return el('scheduleDispatchLogic').value; }
   function load(saved) {
     saved = saved || {}; supplierRules = {}; checkedProject.clear();
     el('scheduleDispatchMode').value = saved.mode || 'single';
-    el('scheduleDispatchMax').value = saved.maxStores || '';
+    var savedLimit = saved.maxStores;
+    if (derivedLimit() && saved.mode === 'multiple') {
+      savedLimit = saved.maxDerivedStores ?? (saved.maxStores > 1 ? saved.maxStores - 1 : '');
+    }
+    el('scheduleDispatchMax').value = savedLimit || '';
     el('scheduleDispatchLogic').value = saved.logic || 'specified';
     el('scheduleSpecifiedRules').innerHTML = '';
     supplier(0, saved.candidates);
@@ -18,13 +24,20 @@
     change();
   }
   function change() {
+    el('scheduleDispatchSection').hidden = !enabled();
     var multi = multiple(), select = el('scheduleDispatchLogic');
     if (!multi) select.value = 'specified';
     select.dataset.followSchedule = multi ? 'false' : 'true';
     select.disabled = !multi || currentScheduleMode === 'view';
     el('scheduleDispatchMaxGroup').hidden = !multi;
-    el('scheduleDispatchMax').required = multi;
+    el('scheduleDispatchMax').required = enabled() && multi;
+    var derived = derivedLimit();
+    el('scheduleDispatchMaxLabel').textContent = derived ? '最多派生门店数' : '最多下发门店数';
+    el('scheduleDispatchMax').placeholder = derived ? '例如 3，不含原传门店' : '例如 2，含原传门店';
+    el('scheduleDispatchScopeHint').textContent = derived ? '原线索通过校验后独立下发，原传门店不占派生名额。' : '本排期所有供应商共同沿用，供应商传入的意向门店作为第一家。';
+
     el('scheduleDispatchHint').textContent = !multi ? '直接采用供应商传入的意向门店，通过校验后只发这一家。' : logic() === 'specified' ? '在下方统一配置指定门店下发清单；从清单内符合条件的门店中随机追加，跳过供应商传入的第一家及已分配门店。' : logic() === 'random' ? '从该供应商关联范围内随机选择其他门店，不重复分配。' : '按下方转化率区间比例配置分配追加名额；每轮10个，组内轮流，新店不补历史名额。';
+    if (derived && multi && logic() === 'specified') el('scheduleDispatchHint').textContent = '从排期指定清单选派生门店，排除原传门店。候选可超出供应商关联范围。';
     el('scheduleSpecifiedRules').hidden = !multi || logic() !== 'specified';
     render(0);
     if (window.ScheduleRatio) ScheduleRatio.change();
@@ -47,11 +60,12 @@
     if (!el('supAppendSection' + idx)) return;
     var multi = multiple(), kind = logic(), view = currentScheduleMode === 'view', rules = supplierRules[idx] || [];
     var project = Number(idx) === 0;
-    var visible = multi && (project ? kind === 'specified' : kind === 'random');
+    var visible = enabled() && multi && (project ? kind === 'specified' : kind === 'random');
     el('supAppendSection' + idx).hidden = !visible;
     if (!visible) return;
     var random = kind === 'random', stores = allowed(idx);
     el('supAppendHint' + idx).textContent = random ? '使用当前关联门店范围；自动排除供应商指定的第一家，数量不足时按实际门店数下发。' : kind === 'ratio' ? '配置参与追加的门店和固定比例，合计须为100%。先排除第一家，再按剩余门店相对比例选择，不重复分配；剩余比例为0时不追加。' : '所有供应商共用这份清单。至少选择' + (el('scheduleDispatchMax').value || '最多下发家数对应数量的') + '家不同门店；先匹配供应商允许范围，排除第一家及不可用门店；符合条件的门店多于剩余名额时随机选择，总家数包含第一家。';
+    if (project && derivedLimit()) el('supAppendHint' + idx).textContent = '所有供应商共用排期指定清单。排除原传门店后随机选店，可用门店不足时按实际家数派生。';
     el('supAppendToolbar' + idx).hidden = random || view || project;
     if (project) { el('projectStorePicker').hidden = view; renderPicker(); el('supAppendTable0').innerHTML = view ? '<div class="store-selection-summary">' + storeSelectionSummary(rules.map(function(r){return r.storeId;}),getAllScheduleStores()) + '</div>' : ''; showError(0); return; }
     el('supAppendSelect' + idx).innerHTML = '<option value="">' + (project ? '选择排期品牌下的门店' : '选择关联范围内的门店') + '</option>' + stores.filter(function(store) { return !rules.some(function(rule) { return rule.storeId === store.id; }); }).map(function(store) { return '<option value="' + esc(store.id) + '">' + esc(store.name) + '</option>'; }).join('');
@@ -120,7 +134,7 @@
     if (!multiple() || logic() === 'ratio' || logic() === 'random' || (logic() === 'specified' && Number(idx) !== 0) || (logic() !== 'specified' && Number(idx) === 0)) return '';
     var rules = supplierRules[idx] || [], stores = allowed(idx);
     if (!rules.length) return Number(idx) === 0 ? '请配置指定门店下发清单' : '请配置追加候选门店';
-    if (Number(idx) === 0 && rules.length < Number(el('scheduleDispatchMax').value)) return '指定门店下发清单至少选择' + el('scheduleDispatchMax').value + '家不同门店';
+    if (Number(idx) === 0 && !derivedLimit() && rules.length < Number(el('scheduleDispatchMax').value)) return '指定门店下发清单至少选择' + el('scheduleDispatchMax').value + '家不同门店';
     if (rules.some(function(rule) { return !stores.some(function(store) { return store.id === rule.storeId; }); })) return Number(idx) === 0 ? '指定门店须属于当前排期品牌范围' : '追加候选门店须在该供应商的关联门店范围内';
     if (logic() === 'ratio') {
       if (rules.some(function(rule) { return !/^(0|[1-9]\d*)(\.\d{1,2})?$/.test(rule.weight) || Number(rule.weight) > 100; })) return '门店比例须为0—100的数字，最多两位小数';
@@ -146,17 +160,18 @@
   function remove(idx, index) { if (currentScheduleMode !== 'view') { var removed = supplierRules[idx].splice(index,1)[0]; if (Number(idx) === 0 && removed) checkedProject.delete(removed.storeId); render(idx); } }
   function weight(idx,index,value) { if (currentScheduleMode !== 'view') { supplierRules[idx][index].weight=value; showError(idx); } }
   function validate() {
+    if (!enabled()) return null;
     if (!['single','multiple'].includes(el('scheduleDispatchMode').value)) return {error:'请选择下发方式',tab:'series'};
     if (!['specified','random','ratio'].includes(logic())) return {error:'请选择下发逻辑',tab:'series'};
     var raw = el('scheduleDispatchMax').value;
-    if (multiple() && (!/^[1-9]\d*$/.test(raw) || !Number.isSafeInteger(Number(raw)) || Number(raw) < 2)) return {error:'一发多的最多下发门店数须为不小于2的整数',tab:'series'};
+    if (multiple() && (!/^[1-9]\d*$/.test(raw) || !Number.isSafeInteger(Number(raw)) || Number(raw) < (derivedLimit() ? 1 : 2))) return {error:derivedLimit() ? '最多派生门店数须为正整数' : '一发多的最多下发门店数须为不小于2的整数',tab:'series'};
     if (logic() === 'specified' && error(0)) { showError(0); return {error:error(0),tab:'series'}; }
     if (window.ScheduleRatio) { var ratioError = ScheduleRatio.validate(); if (ratioError) return {error:ratioError,tab:'series'}; }
     var issue = '';
     document.querySelectorAll('#scheduleSupplierTbody .schedule-supplier-row').forEach(function(row) { var idx = row.id.replace('supplierRow',''); var message = error(idx); if (message && !issue) issue = '供应商' + idx + '：' + message; showError(idx); });
     if (issue) return {error:issue,tab:'suppliers'};
-    return Object.assign({mode:multiple()?'multiple':'single',logic:multiple()?logic():'specified',maxStores:multiple()?Number(raw):1,dynamicPricing:false,dynamicRatio:false,candidates:rules(0),specifiedSelection:'random'}, window.ScheduleRatio ? ScheduleRatio.config() : {});
+    return Object.assign({mode:multiple()?'multiple':'single',logic:multiple()?logic():'specified',maxStores:multiple() ? Number(raw) + (derivedLimit() ? 1 : 0) : 1,maxDerivedStores:derivedLimit() ? (multiple() ? Number(raw) : 0) : null,dynamicPricing:false,dynamicRatio:false,candidates:rules(0),specifiedSelection:'random'}, window.ScheduleRatio ? ScheduleRatio.config() : {});
   }
   function rules(idx) { return (supplierRules[idx] || []).map(function(rule) { return {storeId:rule.storeId,weight:rule.weight}; }); }
-  window.ScheduleDispatch={selectCurrent:selectCurrent,clear:clear,filterStores:filterStores,toggleStore:toggleStore,addFiltered:addFiltered,check:check,bulkRemove:bulkRemove,load:load,change:change,supplier:supplier,render:render,add:add,move:move,remove:remove,weight:weight,validate:validate,rules:rules};
+  window.ScheduleDispatch={enabled:enabled,selectCurrent:selectCurrent,clear:clear,filterStores:filterStores,toggleStore:toggleStore,addFiltered:addFiltered,check:check,bulkRemove:bulkRemove,load:load,change:change,supplier:supplier,render:render,add:add,move:move,remove:remove,weight:weight,validate:validate,rules:rules};
 })();

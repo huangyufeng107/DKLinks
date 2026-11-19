@@ -1974,21 +1974,12 @@
     });
   }
 
-  // Filter by status tab
-  function filterByStatus(btn, status) {
-    document.querySelectorAll('#page-leads .tabs .tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    var statusSelect = document.querySelector('#page-leads .filter-item .filter-select');
+  function filterByStatus(button, status) {
+    var statusSelect = document.getElementById('leadListStatus');
     if (statusSelect) statusSelect.value = status;
-
-    var statusTextMap = {'':'全部','1':'待处理','2':'处理中','3':'已下发','4':'下发失败','5':'仅接收','6':'待人工处理'};
+    var reason = document.getElementById('leadDispatchReasonFilter');
+    // The stop shortcut sets a reason in addition to the tab. Clear that shortcut when leaving its tab.
+    if (reason?.value === 'blocked' && document.getElementById('leadStoppedShortcut')?.getAttribute('aria-pressed') === 'true' && status !== '5') reason.value = '';
     filterClueList();
-
-    if (status) {
-      showToast('已筛选：' + statusTextMap[status], 'info');
-    } else {
-      showToast('显示全部线索', 'info');
-    }
   }
 
-  

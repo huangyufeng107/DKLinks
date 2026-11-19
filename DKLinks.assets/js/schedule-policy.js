@@ -189,9 +189,13 @@
     var s = schedule(); if (!s) return;
     var select = document.getElementById('policySchedule'); if (!select) return;
     select.innerHTML = scheduleData.map(function (item) { return '<option value="' + esc(item.id) + '">' + esc(item.name) + '</option>'; }).join(''); select.value = chosenId;
-    var bs = brands(s), brand = document.getElementById('policyBrand');
-    brand.innerHTML = Object.keys(bs).map(function (code) { return '<option value="' + esc(code) + '">' + esc(bs[code]) + '</option>'; }).join('');
-    brand.value = chosenBrand;
+    var bs = brands(s), codes = Object.keys(bs), brand = document.getElementById('policyBrand');
+    var canSwitchBrand = codes.length > 1;
+    document.getElementById('policyBrandDisplayField').style.display = canSwitchBrand ? 'none' : '';
+    document.getElementById('policyBrandSelectField').style.display = canSwitchBrand ? '' : 'none';
+    document.getElementById('policyBrandDisplay').value = bs[chosenBrand] || '未关联品牌';
+    brand.innerHTML = canSwitchBrand ? codes.map(function (code) { return '<option value="' + esc(code) + '">' + esc(bs[code]) + '</option>'; }).join('') : '';
+    brand.value = canSwitchBrand ? chosenBrand : '';
     var base = defaults(chosenBrand), rec = read();
     draft = explicitSettings(draft, base);
     var values = effective(base, draft);

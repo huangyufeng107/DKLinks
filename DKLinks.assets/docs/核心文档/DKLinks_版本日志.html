@@ -373,8 +373,8 @@ html { scrollbar-gutter: stable; }
     <div class="doc-meta-list">
       <span><span class="meta-label">系统：</span>D客连 · SaaS平台</span>
       <span><span class="meta-label">板块：</span>多板块</span>
-      <span><span class="meta-label">版本：</span>v1.2.3</span>
-      <span><span class="meta-label">日期：</span>2026-11-12</span>
+      <span><span class="meta-label">版本：</span>v1.2.4</span>
+      <span><span class="meta-label">日期：</span>2026-11-18</span>
     </div>
   </div>
 
@@ -382,9 +382,9 @@ html { scrollbar-gutter: stable; }
     <aside class="version-sidebar" aria-label="版本快速索引">
       <div class="version-panel-title"><strong>版本快速索引</strong><button class="sidebar-collapse-unified version-toggle" type="button" id="versionLeftCollapse" aria-label="收起版本快速索引">收起侧栏</button></div>
       <label class="version-search-label" for="versionSearch">按版本号搜索</label>
-      <input class="version-search" id="versionSearch" type="search" placeholder="例如 v1.2.3" autocomplete="off">
+      <input class="version-search" id="versionSearch" type="search" placeholder="例如 v1.2.4" autocomplete="off">
       <p class="version-search-hint" id="versionSearchStatus" role="status">输入版本号，快速定位对应版本日志</p>
-      <nav class="version-nav" aria-label="选择版本"><a href="#version-123" data-version="version-123"><span>v1.2.3</span><small>2026-11-12</small></a><a href="#version-122" data-version="version-122"><span>v1.2.2</span><small>2026-10-26</small></a><a href="#version-121" data-version="version-121"><span>v1.2.1</span><small>2026-10-22</small></a><a href="#version-120" data-version="version-120"><span>v1.2.0</span><small>2026-09-29</small></a><a href="#version-111" data-version="version-111"><span>v1.1.1</span><small>2026-07-16</small></a><a href="#version-110" data-version="version-110"><span>v1.1.0</span><small>2026-07-10</small></a></nav>
+      <nav class="version-nav" aria-label="选择版本"><a href="#version-124" data-version="version-124"><span>v1.2.4</span><small>2026-11-18</small></a><a href="#version-123" data-version="version-123"><span>v1.2.3</span><small>2026-11-12</small></a><a href="#version-122" data-version="version-122"><span>v1.2.2</span><small>2026-10-26</small></a><a href="#version-121" data-version="version-121"><span>v1.2.1</span><small>2026-10-22</small></a><a href="#version-120" data-version="version-120"><span>v1.2.0</span><small>2026-09-29</small></a><a href="#version-111" data-version="version-111"><span>v1.1.1</span><small>2026-07-16</small></a><a href="#version-110" data-version="version-110"><span>v1.1.0</span><small>2026-07-10</small></a></nav>
       <p class="version-search-empty" id="versionSearchEmpty">没有匹配的版本</p>
     </aside>
     <main class="version-main awaiting-selection">
@@ -393,21 +393,34 @@ html { scrollbar-gutter: stable; }
   <div class="summary-strip" id="version-overview">
     <div class="summary-card">
       <div class="summary-label">当前版本</div>
-      <div class="summary-value">v1.2.3</div>
+      <div class="summary-value">v1.2.4</div>
     </div>
     <div class="summary-card">
       <div class="summary-label">本轮更新</div>
-      <div class="summary-value">3<span class="value-sub">组变更</span></div>
+      <div class="summary-value">4<span class="value-sub">组变更</span></div>
     </div>
     <div class="summary-card">
       <div class="summary-label">覆盖板块</div>
-      <div class="summary-value"><span class="value-sub">线索管理</span></div>
+      <div class="summary-value"><span class="value-sub">投放运营／线索管理</span></div>
     </div>
   </div>
 
 <section class="version-landing" id="versionLanding"><h2>请选择版本日志</h2><p>从左侧版本快速索引选择版本，查看对应的更新内容。</p></section>
+<div class="version-card" id="version-124">
+<div class="version-card-header"><div class="version-tag"><span class="v-label">v</span>1.2.4</div><div class="version-date">2026-11-18</div><div class="version-status status-current">当前原型版本</div><a class="release-prototype-button" href="../../../DKLinks.html#dk-prototype" target="_blank" rel="noopener">查看当前原型 ↗</a></div>
+<div class="version-summary"><strong>主题</strong> · 按量付费排期的供应商锁单达标停发与门店下发<br><strong>范围</strong> · 排期配置、门店下发、线索追溯、报表与锁单明细，共 4 组变更<br><strong>交付状态</strong> · 本地原型和文档已更新，用户已确认样例实屏通过。生产接口待联调。</div>
+<div class="change-group"><div class="change-group-title">先看诉求，再看规则和验证</div><div class="release-note">样例排期的目标为 10 台。A 达到分配的 3 台后，新线索仅接收。B 已锁 4 台，低于分配的 7 台，日志显示一条原传和三条待下发的派生记录。报表分别展示原传有效锁单 7 台及派生有效锁单 1 台。</div><div class="release-links"><a href="../需求说明/按量付费排期_供应商达标停发与门店下发_需求说明.html" target="_blank" rel="noopener">需求说明 ↗</a> <a href="../需求说明/按量付费排期_供应商达标停发与门店下发_需求说明.html#acceptance" target="_blank" rel="noopener">验收场景 ↗</a> <a href="../../../../产品方案/排期项目处理策略配置/回归验证/供应商达标与下发_跨页核验记录_20261118.html#browser-acceptance" target="_blank" rel="noopener">实屏验收记录 ↗</a> <a href="业务时序图.html?v=20261118-schedule-flow-details#FLOW-001-flow" target="_blank" rel="noopener">线索接收与下发主图 ↗</a></div><p class="release-scope-note">完整业务规则以需求说明和功能文档为准。</p></div>
+<div class="change-group"><div class="change-group-title">变更追溯表</div><div class="release-scroll"><table class="release-table"><thead><tr><th>编号 / 类型</th><th>变更与结果</th><th>功能规格 / 验收</th><th>功能清单</th><th>页面交互 / 业务流程</th></tr></thead><tbody>
+<tr id="release-124-R1"><td>V124-R1<br>新增</td><td><strong>按量付费与供应商达标</strong><br>配置项目锁单目标及供应商分配量。达标页呈现供应商累计原传锁单量，并可打开对应明细。</td><td><a href="../需求说明/按量付费排期_供应商达标停发与门店下发_需求说明.html#supplier-lock-goal" target="_blank" rel="noopener">配置与操作 ↗</a></td><td><a href="DKLinks_功能清单.html?release=v1.2.4#feature-124-1" target="_blank" rel="noopener">供应商达标 ↗</a></td><td><a href="../../../../产品方案/排期项目处理策略配置/回归验证/供应商达标与下发_跨页核验记录_20261118.html#accept-a-locks" target="_blank" rel="noopener">达标页到锁单明细 ↗</a> · <a href="业务时序图.html?v=20261118-schedule-flow-details#FLOW-001-supplier-gate" target="_blank" rel="noopener">供应商达标判断 ↗</a> · <a href="业务时序图.html?v=20261118-schedule-flow-details#FLOW-004-flow" target="_blank" rel="noopener">排期配置业务流程 ↗</a></td></tr>
+<tr id="release-124-R2"><td>V124-R2<br>新增</td><td><strong>达标停发与门店下发</strong><br>供应商达标后，新线索仅接收。未达标线索按排期规则处理，允许派生时排除原传门店。</td><td><a href="../需求说明/按量付费排期_供应商达标停发与门店下发_需求说明.html#flow" target="_blank" rel="noopener">停发判断 ↗</a> · <a href="../需求说明/按量付费排期_供应商达标停发与门店下发_需求说明.html#supplier-lock-goal-multi" target="_blank" rel="noopener">门店下发规则 ↗</a></td><td><a href="DKLinks_功能清单.html?release=v1.2.4#feature-124-2" target="_blank" rel="noopener">停发与门店下发 ↗</a></td><td><a href="../../../../产品方案/排期项目处理策略配置/回归验证/供应商达标与下发_跨页核验记录_20261118.html#accept-a-log" target="_blank" rel="noopener">达标线索操作路径 ↗</a> · <a href="业务时序图.html?v=20261118-schedule-flow-details#FLOW-001-dispatch-routing" target="_blank" rel="noopener">一发一与一发多 ↗</a> · <a href="业务时序图.html?v=20261118-schedule-flow-details#FLOW-001-ratio-routing" target="_blank" rel="noopener">按比例下发流程 ↗</a></td></tr>
+<tr id="release-124-R3"><td>V124-R3<br>新增</td><td><strong>原传与派生追溯</strong><br>线索详情和下发日志保留排期、供应商、来源及处理依据，派生线索可追溯原线索。</td><td><a href="../需求说明/按量付费排期_供应商达标停发与门店下发_需求说明.html#records" target="_blank" rel="noopener">线索与日志规格 ↗</a></td><td><a href="DKLinks_功能清单.html?release=v1.2.4#feature-124-3" target="_blank" rel="noopener">追溯与下发日志 ↗</a></td><td><a href="../../../../产品方案/排期项目处理策略配置/回归验证/供应商达标与下发_跨页核验记录_20261118.html#accept-b-log" target="_blank" rel="noopener">派生线索操作路径 ↗</a> · <a href="业务时序图.html?v=20261118-schedule-flow-details#FLOW-001-store-routing" target="_blank" rel="noopener">门店确定与派生 ↗</a></td></tr>
+<tr id="release-124-R4"><td>V124-R4<br>新增</td><td><strong>报表来源统计与锁单明细</strong><br>报表按现有维度展示来源统计，点击数量查看对应线索。原传锁单计入供应商达标量，派生锁单单独统计。</td><td><a href="DKLinks_功能文档.html#spec-7-source-stats" target="_blank" rel="noopener">报表来源统计 ↗</a> · <a href="DKLinks_功能文档.html#spec-7-lock-entries" target="_blank" rel="noopener">锁单明细 ↗</a></td><td><a href="DKLinks_功能清单.html?release=v1.2.4#feature-124-4" target="_blank" rel="noopener">报表细分 ↗</a> · <a href="DKLinks_功能清单.html?release=v1.2.4#feature-124-5" target="_blank" rel="noopener">锁单追溯 ↗</a></td><td><a href="../../../../产品方案/排期项目处理策略配置/回归验证/供应商达标与下发_跨页核验记录_20261118.html#accept-report" target="_blank" rel="noopener">报表与明细操作路径 ↗</a> · <a href="业务时序图.html?v=20261118-schedule-flow-details#FLOW-009-source-breakdown" target="_blank" rel="noopener">报表复盘 ↗</a></td></tr>
+</tbody></table></div></div>
+<div class="change-group"><div class="change-group-title">材料同步与验证记录</div><div class="release-note"><ul><li>供应商按本排期的原传有效锁单累计判断达标，派生锁单计入平台统计。</li><li>达标后保留新进线索供追溯，已安排的下发按原计划处理。</li></ul></div><p>关联材料包括需求说明、功能文档、功能清单、业务流程图和跨页验收记录。</p><p>跨页模拟回归通过。用户确认 A 的锁单及停发路径、B 的原传和派生日志、报表锁单归属实屏通过。</p><p class="release-scope-note">真实锁单同步、厂商下发及服务端联调待正式环境验收。</p></div>
+</div>
+
 <div class="version-card" id="version-123">
-<div class="version-card-header"><div class="version-tag"><span class="v-label">v</span>1.2.3</div><div class="version-date">2026-11-12</div><div class="version-status status-current">当前原型版本</div><a class="release-prototype-button" href="../../../DKLinks.html#dk-prototype" target="_blank" rel="noopener" title="登录后进入线索管理 → 线索列表 → 批量导入">查看当前原型 ↗</a></div>
+<div class="version-card-header"><div class="version-tag"><span class="v-label">v</span>1.2.3</div><div class="version-date">2026-11-12</div><div class="version-status">历史版本</div><a class="release-prototype-button" href="../../../DKLinks.html#dk-prototype" target="_blank" rel="noopener" title="登录后进入线索管理 → 线索列表 → 批量导入">查看当前原型 ↗</a></div>
 <div class="version-summary"><strong>主题。</strong> 支持运营通过 Excel 按原供应商补传线索。<br><strong>范围。</strong> 品牌模板与入口、逐行校验与失败行下载、确认提交与统一接收，共 3 组变更。<br><strong>交付状态。</strong> 本地原型及文档已同步，统一接收结果在当前会话模拟，正式服务待实施和联调。</div>
 <div class="change-group"><div class="change-group-title">先看诉求，再看规则和验证</div><div class="release-note">运营补传东风日产线索时，选择原供应商并使用品牌模板。点击「确认提交」后，可用演示数据查看已接收、来源线索 ID 重复及门店超范围三种结果。</div><div class="release-links"><a href="../需求说明/线索批量导入_需求说明.html" target="_blank" rel="noopener">需求说明 ↗</a><a href="DKLinks_功能文档.html#lead-import-spec" target="_blank" rel="noopener">功能规则与验收 ↗</a><a href="DKLinks_交互流程图.html#interaction-lead-import" target="_blank" rel="noopener">页面交互 ↗</a><a href="业务时序图.html#FLOW-001-import" target="_blank" rel="noopener">业务流程 ↗</a></div><p class="release-scope-note">现行字段和操作规则由功能文档维护，本页保留本次变更及追溯入口。</p></div>
 <div class="change-group"><div class="change-group-title">变更追溯表</div><div class="release-scroll"><table class="release-table"><thead><tr><th>编号 / 类型</th><th>变更与结果</th><th>功能规格 / 验收</th><th>功能清单</th><th>页面交互 / 业务流程</th></tr></thead><tbody>
@@ -469,7 +482,7 @@ html { scrollbar-gutter: stable; }
   <!-- ═══ Version Timeline ═══ -->
   <div class="timeline-section" id="version-timeline">
     <div class="timeline-title">版本时间线</div>
-    <div class="timeline"><div class="timeline-item"><div class="timeline-dot dot-current"></div><span class="tl-version">v1.2.3</span><span class="tl-date">2026-11-12</span><p class="tl-summary">线索列表新增批量导入，支持品牌模板、逐行校验与统一接收演示。</p></div><div class="timeline-item"><div class="timeline-dot"></div><span class="tl-version">v1.2.2</span><span class="tl-date">2026-10-26</span><p class="tl-summary">按品牌配置线索列表查询条件和默认列，发布后应用于列表、个人列设置和导出；补齐配置权限与现行文档。</p></div><div class="timeline-item"><div class="timeline-dot"></div><span class="tl-version">v1.2.1</span><span class="tl-date">2026-10-22</span><p class="tl-summary">AI外呼配置与话单、七环节处理进度、人工决定、号码检测与下发映射解耦，以及六份文档同步；原型更新，接口待联调。</p></div>
+    <div class="timeline"><div class="timeline-item"><div class="timeline-dot dot-current"></div><span class="tl-version">v1.2.4</span><span class="tl-date">2026-11-18</span><p class="tl-summary">按量付费排期支持供应商达标停发、原传与派生下发追溯、报表来源统计及锁单明细查询。</p></div><div class="timeline-item"><div class="timeline-dot"></div><span class="tl-version">v1.2.3</span><span class="tl-date">2026-11-12</span><p class="tl-summary">线索列表新增批量导入，支持品牌模板、逐行校验与统一接收演示。</p></div><div class="timeline-item"><div class="timeline-dot"></div><span class="tl-version">v1.2.2</span><span class="tl-date">2026-10-26</span><p class="tl-summary">按品牌配置线索列表查询条件和默认列，发布后应用于列表、个人列设置和导出；补齐配置权限与现行文档。</p></div><div class="timeline-item"><div class="timeline-dot"></div><span class="tl-version">v1.2.1</span><span class="tl-date">2026-10-22</span><p class="tl-summary">AI外呼配置与话单、七环节处理进度、人工决定、号码检测与下发映射解耦，以及六份文档同步；原型更新，接口待联调。</p></div>
       <div class="timeline-item">
         <div class="timeline-dot"></div>
         <span class="tl-version">v1.2.0</span>

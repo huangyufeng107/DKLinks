@@ -51,11 +51,6 @@
     statusCell.replaceChildren(badge, description);
     document.getElementById(prefix + 'LeadActions').innerHTML =
       '<button class="btn btn-secondary btn-sm" type="button" onclick="openLeadDetail(\'' + selected + '\')">详情</button>';
-    var manualCount = document.getElementById('manualDispatchTabCount');
-    manualCount.textContent = String(Math.max(0, Number(manualCount.textContent) - 1));
-    var targetCount = document.getElementById(dispatch ? 'manualDispatchProcessingCount' : 'manualDispatchReceivedCount');
-    targetCount.textContent = String(Number(targetCount.textContent) + 1);
-
     var detail = leadDetailExamples[selected];
     detail.statusHtml = '<span class="status-badge ' + (dispatch ? 'status-primary' : 'status-warning') + '">' + status + '</span>';
     detail.dispatchDecision = dispatch ? '人工确认，已提交厂商下发队列，等待响应' : '人工决定仅接收，不下发';
@@ -70,14 +65,8 @@
       ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
 
     closeModal('manualDispatchReviewModal');
-    var activeTab = document.querySelector('#page-leads .lead-status-tabs .tab-btn.active');
-    if (activeTab) {
-      var action = activeTab.getAttribute('onclick') || '';
-      var match = action.match(/filterByStatus\(this, '([^']*)'\)/);
-      if (match) {
-        filterByStatus(activeTab, match[1]);
-      }
-    }
+    filterClueList(true);
+    if (document.getElementById('page-lead-detail')?.classList.contains('active')) openLeadDetail(selected);
     showToast(dispatch ? '已提交厂商下发队列，等待响应' : '已标记为仅接收', 'success');
   };
 })();

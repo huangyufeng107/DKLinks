@@ -1,7 +1,7 @@
 /* 线索列表视图配置：原型数据保存在当前浏览器。 */
 (function () {
   var baseFilters = [
-    { key: 'search', name: '客户姓名 / 电话 / 线索编号', type: '文本', fixed: true },
+    { key: 'search', name: '姓名 / 电话 / 线索编号 / 来源 ID', type: '文本', fixed: true },
     { key: 'status', name: '线索状态', type: '单选' },
     { key: 'phone', name: '号码状态', type: '单选' },
     { key: 'level', name: '线索等级', type: '单选' },
@@ -23,6 +23,7 @@
   var currentBrand = '';
   var originalHeader = null;
   var originalDropdown = null;
+  var lastListBrand = null;
   window.hasLeadViewConfigPermission = function () {
     if (Array.isArray(window.DKLINKS_PERMISSION_CODES)) return window.DKLINKS_PERMISSION_CODES.includes('clue:list-view-config');
     var role = document.querySelector('.header-role');
@@ -52,7 +53,7 @@
   }
   function available(brand, kind) {
     var extras = fields(brand).filter(function (f) { return kind === 'columns' || [1, 2, 3, 4].includes(f.field.type); });
-    var scheduleField = { key: 'policy:schedule', name: '归属排期', type: '单选', field: { key: 'policy_schedule', type: 4, enumValues: ['2026年10月全国庆典促销', '未记录'] } };
+    var scheduleField = { key: 'policy:schedule', name: '归属排期', type: '单选', field: { key: 'policy_schedule', type: 4, enumValues: Array.from(new Set(['2026年10月全国庆典促销', '未记录'].concat(typeof scheduleData === 'undefined' ? [] : scheduleData.map(function(s) { return s.name; })))) } };
     return (kind === 'columns' ? baseColumns : baseFilters).concat([scheduleField], extras);
   }
   function defaults(brand) {
@@ -111,7 +112,7 @@
     renderConfig(); leadViewApplyList(); showToast('配置已发布，选择该品牌后在线索列表生效', 'success');
   };
   function resetList() {
-    var page = document.getElementById('page-leads'), table = page.querySelector('table');
+    var page = document.getElementById('page-leads'), table = document.getElementById('clue-tbody').closest('table');
     if (!originalHeader) {
       originalHeader = table.tHead.rows[0].innerHTML;
       originalDropdown = document.getElementById('columnSettingsDropdown').innerHTML;
@@ -121,13 +122,13 @@
     document.getElementById('columnSettingsDropdown').innerHTML = originalDropdown;
     var style = document.getElementById('lead-view-style'); if (style) style.textContent = '';
     var legacy = document.getElementById('lead-column-style'); if (legacy) legacy.textContent = '';
-    page.querySelectorAll('.filter-bar > .filter-item').forEach(function (el) { el.style.display = ''; });
+    page.querySelectorAll('#leadListPrimaryFilters > .filter-item').forEach(function (el) { el.style.display = ''; });
     page.querySelector('.search-input-wrapper').style.display = '';
     page.querySelectorAll('.lead-view-extra-filter').forEach(function (el) { el.remove(); });
   }
   function fieldValue(row, f) {
-    var code = row.cells[0].textContent.trim();
-    if (f.key === 'policy:schedule') { var snapshot = window.LeadPolicyEvidence.get(code); return snapshot ? snapshot.scheduleName : '未记录'; }
+    var code = row.dataset?.leadCode || row.cells[0].textContent.trim();
+    if (f.key === 'policy:schedule') { if (row.dataset?.scheduleName) return row.dataset.scheduleName; var snapshot = window.LeadPolicyEvidence.get(code); return snapshot ? snapshot.scheduleName : '未记录'; }
     var examples = {
       'LD2026051400001': { test_drive_intent: '有意试驾', trade_in_need: '有旧车需置换' },
       'LD2026051400002': { store_visit_intent: '本周可到店' },
@@ -136,16 +137,26 @@
     };
     return (examples[code] && examples[code][f.field.key]) || '—';
   }
-  window.leadViewApplyList = function () {
+  window.leadViewApplyList = function (preservePage) {
     var brandSelect = document.getElementById('leadListBrand'); if (!brandSelect) return;
     var brand = brandSelect.value, config = published(brand), page = document.getElementById('page-leads');
+    var previousExtras = new Map();
+    if (lastListBrand === brand) {
+      page.querySelectorAll('.lead-view-extra-filter [data-field-key]').forEach(function (input) {
+        previousExtras.set(input.dataset.fieldKey, input.value);
+      });
+    }
+    lastListBrand = brand;
     resetList();
     document.getElementById('leadViewAppliedLabel').textContent = '当前视图：' + (brand || '全部品牌（公共视图）');
     document.getElementById('leadViewAppliedHint').textContent = brand ? '已应用该品牌发布的查询条件与默认列' : '选择品牌后显示该品牌的查询条件和列表列';
-    var filterKeys = ['status', 'phone', 'level', 'apikey', 'brand', 'series'];
-    page.querySelectorAll('.filter-bar > .filter-item').forEach(function (el, i) { el.style.display = config.filters.includes(filterKeys[i]) ? '' : 'none'; });
+    page.querySelectorAll('[data-lead-view-filter]').forEach(function (el) {
+      var visible = config.filters.includes(el.dataset.leadViewFilter);
+      el.style.display = visible ? '' : 'none';
+      if (!visible && el.dataset.leadViewFilter !== 'status') el.querySelector('select').value = '';
+    });
     page.querySelector('.search-input-wrapper').style.display = config.filters.includes('search') ? '' : 'none';
-    var bar = page.querySelector('.filter-bar');
+    var bar = document.querySelector('#leadListMoreFilters .lead-list-secondary-filters');
     available(brand, 'filters').filter(function (f) { return f.field && config.filters.includes(f.key); }).forEach(function (f) {
       var wrap = document.createElement('div'); wrap.className = 'filter-item lead-view-extra-filter';
       var label = document.createElement('span'); label.className = 'filter-label'; label.textContent = f.name; wrap.appendChild(label);
@@ -154,9 +165,14 @@
         input = document.createElement('select'); input.className = 'filter-select';
         input.innerHTML = '<option value="">全部</option>' + (f.field.enumValues || []).map(function (v) { var s = v.split('='); return '<option value="' + escape(s[s.length - 1]) + '">' + escape(s[s.length - 1]) + '</option>'; }).join('');
       } else { input = document.createElement('input'); input.className = 'filter-input'; input.placeholder = f.name; input.type = f.field.type === 3 ? 'date' : (f.field.type === 2 ? 'number' : 'text'); }
-      input.dataset.fieldKey = f.key; input.oninput = filterClueList; input.onchange = filterClueList; wrap.appendChild(input); bar.insertBefore(wrap, bar.querySelector('.btn'));
+      input.dataset.fieldKey = f.key;
+      input.setAttribute('aria-label', f.name);
+      input.value = previousExtras.get(f.key) || '';
+      input.oninput = filterClueList;
+      wrap.appendChild(input);
+      bar.appendChild(wrap);
     });
-    var table = page.querySelector('table'), head = table.tHead.rows[0], body = table.tBodies[0], allColumns = available(brand, 'columns');
+    var table = document.getElementById('clue-tbody').closest('table'), head = table.tHead.rows[0], body = table.tBodies[0], allColumns = available(brand, 'columns');
     var extraColumns = allColumns.filter(function (f) { return f.field && config.columns.includes(f.key); });
     extraColumns.forEach(function (f) {
       var th = document.createElement('th'); th.className = 'lead-view-extra-col'; th.textContent = f.name; head.insertBefore(th, head.lastElementChild);
@@ -173,7 +189,7 @@
       box.checked = i < 11 ? (config.columns.includes(baseColumns[i].key) && visible[i]) : visible[i];
     });
     leadViewPersonalColumns();
-    filterClueList(); leadViewFilterExtras();
+    filterClueList(preservePage === true);
   };
   window.leadViewPersonalColumns = function () {
     var brand = document.getElementById('leadListBrand').value, boxes = Array.from(document.querySelectorAll('#columnSettingsDropdown input'));
@@ -181,8 +197,8 @@
     var style = document.getElementById('lead-view-style'); if (!style) return;
     var extraCount = boxes.length - 11;
     var css = '';
-    for (var i = 0; i < 10; i++) if (!visible[i]) css += '#page-leads table th:nth-child(' + (i + 1) + '),#page-leads table td:nth-child(' + (i + 1) + '){display:none}\n';
-    for (var j = 0; j < extraCount; j++) if (!visible[11 + j]) css += '#page-leads table th:nth-child(' + (11 + j) + '),#page-leads table td:nth-child(' + (11 + j) + '){display:none}\n';
+    for (var i = 0; i < 10; i++) if (!visible[i]) css += '#leadListTable th:nth-child(' + (i + 1) + '),#leadListTable td:nth-child(' + (i + 1) + '){display:none}\n';
+    for (var j = 0; j < extraCount; j++) if (!visible[11 + j]) css += '#leadListTable th:nth-child(' + (11 + j) + '),#leadListTable td:nth-child(' + (11 + j) + '){display:none}\n';
     style.textContent = css;
     try { localStorage.setItem('dkLeadPersonal:' + (brand || 'all'), JSON.stringify({ visible: visible })); } catch (e) {}
   };
@@ -190,28 +206,31 @@
     var dropdown = document.getElementById('columnSettingsDropdown');
     if (dropdown) dropdown.classList.toggle('show');
   };
-  window.leadViewFilterExtras = function () {
+  window.getLeadViewFilterPredicate = function () {
     var inputs = Array.from(document.querySelectorAll('#page-leads .lead-view-extra-filter input,#page-leads .lead-view-extra-filter select'));
-    var brand = document.getElementById('leadListBrand').value;
-    var fs = available(brand, 'filters');
-    document.querySelectorAll('#clue-tbody tr').forEach(function (row) {
-      if (row.style.display === 'none') return;
-      var ok = inputs.every(function (input) {
-        if (!input.value) return true;
-        var f = fs.find(function (x) { return x.key === input.dataset.fieldKey; });
-        var value = f ? fieldValue(row, f) : '';
-        return value !== '—' && value.toLowerCase().includes(input.value.toLowerCase());
-      });
-      if (!ok) row.style.display = 'none';
+    var brand = document.getElementById('leadListBrand')?.value || '';
+    var fields = new Map(available(brand, 'filters').map(function (field) { return [field.key, field]; }));
+    var criteria = inputs.filter(function (input) { return input.value.trim(); }).map(function (input) {
+      return { field: fields.get(input.dataset.fieldKey), value: input.value.trim().toLowerCase(), exact: input.tagName === 'SELECT' };
     });
-    var count = Array.from(document.querySelectorAll('#clue-tbody tr')).filter(function (row) { return row.style.display !== 'none'; }).length;
-    var info = document.querySelector('#page-leads .pagination-info');
-    if (info) info.textContent = '共 ' + count + ' 条数据';
+    return function (row) {
+      return criteria.every(function (criterion) {
+        var value = criterion.field ? fieldValue(row, criterion.field).toLowerCase() : '';
+        return value !== '—' && (criterion.exact ? value === criterion.value : value.includes(criterion.value));
+      });
+    };
   };
-  window.leadViewOpenList = function () { document.getElementById('leadListBrand').value = currentBrand; leadViewApplyList(); };
+  window.leadViewOpenList = function () {
+    leadListScheduleScope = null;
+    clearClueFilter();
+    document.getElementById('leadListBrand').value = currentBrand;
+    navigateTo('leads');
+  };
   window.exportClueData = function () {
     if (typeof XLSX === 'undefined') { showToast('导出组件未加载，请稍后重试', 'error'); return; }
-    var page = document.getElementById('page-leads'), table = page.querySelector('table');
+    var table = document.getElementById('clue-tbody').closest('table');
+    var rows = typeof getFilteredLeadRows === 'function' ? getFilteredLeadRows() : Array.from(table.tBodies[0].rows).filter(function (row) { return getComputedStyle(row).display !== 'none'; });
+    if (!rows.length) { showToast('当前筛选没有可导出的线索', 'info'); return; }
     var headers = Array.from(table.tHead.rows[0].cells);
     var indexes = headers.map(function (th, i) { return { th: th, i: i }; }).filter(function (item, n) {
       return n < headers.length - 1 && getComputedStyle(item.th).display !== 'none';
@@ -221,7 +240,7 @@
       else out.push(item.th.textContent.trim());
       return out;
     }, [])];
-    Array.from(table.tBodies[0].rows).filter(function (row) { return getComputedStyle(row).display !== 'none'; }).forEach(function (row) {
+    rows.forEach(function (row) {
       data.push(indexes.reduce(function (out, item) {
         var cell = row.cells[item.i];
         if (item.i === 1) {

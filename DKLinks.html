@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="DKLinks.assets/css/app.css?v=20261104-schedule-page-layout">
+<link rel="stylesheet" href="DKLinks.assets/css/app.css?v=20261118-lead-ops">
 <link rel="stylesheet" href="DKLinks.assets/css/lead-import.css?v=20261112-3">
 <link rel="stylesheet" href="DKLinks.assets/css/docs-navigation.css?v=20261020-modal-offset">
-<script defer src="DKLinks.assets/js/docs-navigation.js?v=20261112-lead-import"></script>
+<script defer src="DKLinks.assets/js/docs-navigation.js?v=20261119-flow-viewer"></script>
 <style>
 /* ===== 锁单排查（局部样式） ===== */
 .lock-rule-chip { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; margin: 0 3px 3px 0; border-radius: 5px; background: #fef3c7; color: #b45309; font-size: 11px; font-weight: 700; }
@@ -64,7 +64,7 @@
 @media (max-width: 850px) { .outbound-dictionary-grid, .outbound-dictionary-form-grid { grid-template-columns: minmax(0, 1fr); } .outbound-dictionary-hero { align-items:flex-start; flex-direction:column; } }
 .outbound-walkthrough-controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap}.outbound-walkthrough-controls .form-group{margin:0;min-width:min(100%,340px)}.outbound-walkthrough-meta{margin:16px 0 12px;padding:12px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-50);font-size:13px;line-height:1.7;color:var(--gray-700)}.outbound-walkthrough-steps{display:grid;gap:10px;margin:0;padding:0;list-style:none}.outbound-walkthrough-steps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:12px 14px;border:1px solid var(--gray-200);border-radius:8px;background:#fff}.outbound-walkthrough-steps li.current{border-color:#93b4ff;background:#f4f8ff}.outbound-walkthrough-steps .step-index{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#e8efff;color:#003594;font-size:12px;font-weight:700}.outbound-walkthrough-steps strong{display:block;margin-bottom:3px;color:var(--gray-900);font-size:13px}.outbound-walkthrough-steps p{margin:0;color:var(--gray-700);font-size:13px;line-height:1.65}
 </style>
-<link rel="stylesheet" href="DKLinks.assets/css/schedule-editor.css?v=20261106-compact-store-picker">
+<link rel="stylesheet" href="DKLinks.assets/css/schedule-editor.css?v=shared-filter-disclosure">
 </head>
 <body>
 
@@ -208,7 +208,7 @@
 
       <div class="sidebar-section">
         <div class="sidebar-title">线索管理</div>
-        <div class="sidebar-item" onclick="navigateTo('leads')">
+        <div class="sidebar-item" data-nav-page="leads" onclick="openAllLeadList()">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 0 1 6 0"/><path d="M9 12h6"/><path d="M9 16h6"/></svg></span>
           <span>线索列表</span>
           <span class="sidebar-badge">128</span>
@@ -220,7 +220,7 @@
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.04A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.04A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.04-.04a2 2 0 1 1 2.83-2.83l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.04A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.18.31.4.63.6 1h.04a2 2 0 1 1 0 4H20a1.7 1.7 0 0 0-.6 1Z"/></svg></span>
           <span>线索接收与下发配置</span>
         </div>
-        <div class="sidebar-item" onclick="navigateTo('lock-audit')">
+        <div class="sidebar-item" data-nav-page="lock-audit" onclick="openLockAuditHome()">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4.5"/></svg></span>
           <span>锁单排查</span>
           <span class="sidebar-badge" id="lockAuditSidebarBadge">0</span>
@@ -395,7 +395,7 @@
           </div>
           <div class="card-body">
             <div class="quick-actions">
-              <div class="quick-action" onclick="navigateTo('leads')">
+              <div class="quick-action" onclick="openAllLeadList()">
                 <div class="icon">📋</div>
                 <div class="label">线索列表</div>
               </div>
@@ -451,7 +451,7 @@
                   <td><span class="status-badge status-danger">⚠️ 待下发</span></td>
                   <td>收到来自懂车帝的 12 条新线索需要下发</td>
                   <td>10分钟前</td>
-                  <td><button class="btn btn-primary btn-sm" onclick="navigateTo('leads')">立即处理</button></td>
+                  <td><button class="btn btn-primary btn-sm" onclick="openAllLeadList()">立即处理</button></td>
                 </tr>
               </tbody>
             </table>
@@ -1675,6 +1675,7 @@ X-Signature = HmacSHA256(
 
         <!-- Logs Tab -->
         <div class="card" id="intercept-logs-panel" style="display:none;">
+          <div class="lead-rule-hits-back" id="leadRuleHitsBack" hidden><button class="btn btn-secondary" type="button" onclick="returnFromLeadRuleHits()">返回线索列表</button></div>
           <div class="filter-bar">
             <div style="display: flex; gap: 12px; align-items: center;">
               <select class="filter-select" id="intercept-log-rule-filter" onchange="filterInterceptLogs()" style="width: 200px;">
@@ -2203,43 +2204,61 @@ X-Signature = HmacSHA256(
           <div class="lead-view-toolbar"><label>配置范围 <select id="leadViewConfigBrand" class="filter-select" onchange="leadViewSelectConfig()"><option value="">全部品牌（公共视图）</option><option value="理想汽车">理想汽车</option><option value="问界">问界</option><option value="东风日产">东风日产</option><option value="小鹏">小鹏</option><option value="比亚迪">比亚迪</option></select></label><span id="leadViewStatus" class="status-badge status-active">已发布</span><span id="leadViewMessage" class="lead-view-message"></span></div>
           <div class="lead-view-guide">查询条件和列表列分别配置。品牌专属字段仅在对应品牌中可选。线索编号、客户信息、线索状态和操作为必选列。此原型的发布结果保存在当前浏览器，拓展字段值仅展示示例数据。</div>
           <div class="lead-view-grid"><div><h3>查询条件</h3><p class="form-hint">仅文本、数字、日期、单选字段可用于筛选</p><div id="leadViewFilterItems"></div></div><div><h3>默认列表列</h3><p class="form-hint">用户仍可在列表中调整自己的列显隐</p><div id="leadViewColumnItems"></div></div></div>
-          <div class="lead-view-footer"><button class="btn btn-secondary" onclick="leadViewDiscard()">放弃修改</button><button class="btn btn-primary" onclick="leadViewPublish()">发布配置</button><button class="btn btn-secondary" onclick="navigateTo('leads');leadViewOpenList()">查看线索列表</button></div>
+          <div class="lead-view-footer"><button class="btn btn-secondary" onclick="leadViewDiscard()">放弃修改</button><button class="btn btn-primary" onclick="leadViewPublish()">发布配置</button><button class="btn btn-secondary" onclick="leadViewOpenList()">查看线索列表</button></div>
         </div>
       </div>
       <div class="page" id="page-leads">
-        <div class="page-header">
-          <h1 class="page-title">线索列表</h1>
-          <p class="page-subtitle">全生命周期线索管理，支持多维筛选、下发、查看、批量操作和导出</p>
+        <div class="page-header lead-list-page-heading">
+          <div><h1 class="page-title">线索列表</h1><p class="page-subtitle">查看线索处理进度、门店下发结果及来源记录</p></div>
+          <div class="lead-list-page-actions">
+            <button class="btn btn-secondary" type="button" onclick="openLeadRuleHits()">规则命中记录</button>
+            <button class="btn btn-secondary" type="button" onclick="openSupplierDispatchLogs()">下发日志</button>
+            <details class="lead-list-demo-menu"><summary>演示工具</summary><button id="openSupplierDispatchDemo" class="btn btn-secondary btn-sm" type="button">补充下发样例</button></details>
+            <button class="btn btn-secondary" type="button" id="openLeadImport">批量导入</button>
+            <button class="btn btn-secondary" type="button" onclick="exportClueData()">导出数据</button>
+          </div>
+          <dialog id="supplierDispatchDemo" class="lead-list-sample-dialog" aria-labelledby="supplierDispatchDemoTitle">
+            <form method="dialog" style="float:right;"><button class="btn btn-secondary btn-sm">关闭</button></form>
+            <button type="button" class="btn btn-secondary btn-sm" id="supplierDispatchDemoReturn">返回线索列表查看</button>
+            <h2 id="supplierDispatchDemoTitle">供应商达标与门店下发</h2>
+            <p class="form-hint">演示数据。A 排期目标 10 台，A1 分配 3 台，原传 X 店。比例按 60%／40% 分配，从第 6 个名额开始。</p>
+            <div class="filter-bar" style="flex-wrap:wrap;">
+              <label class="filter-item">已锁单台数 <select id="supplierDispatchDemoCount" class="filter-select"><option>2</option><option>3</option><option>4</option></select></label>
+              <label class="filter-item">下发方式 <select id="supplierDispatchDemoMode" class="filter-select"><option value="single">一发一</option><option value="specified">一发多 · 指定门店</option><option value="random">一发多 · 随机</option><option value="ratio">一发多 · 按比例</option></select></label>
+              <label class="filter-item">原线索处理<select id="supplierDispatchDemoProcessing" class="filter-select"><option value="ready">检测及外呼已完成，可下发</option><option value="waiting">外呼处理中</option><option value="stopped">黑名单拦截</option></select></label>
+              <button class="btn btn-primary btn-sm" type="button" id="supplierDispatchDemoRun">模拟接收一条线索</button>
+            </div>
+            <p class="form-hint" id="supplierDispatchDemoCursor" role="status"></p>
+            <label class="filter-item">处理结果 <select id="supplierDispatchDemoFilter" class="filter-select"><option value="">全部</option><option value="blocked">供应商锁单目标已达成</option></select></label>
+            <div class="table-wrapper"><table><thead><tr><th>线索 ID</th><th>类型</th><th>门店</th><th>下发状态</th><th>操作</th></tr></thead><tbody id="supplierDispatchDemoRows"></tbody></table></div>
+            <section id="supplierDispatchDemoLog" hidden>
+              <h3 id="supplierDispatchDemoLogTitle" tabindex="-1"></h3>
+              <p class="form-hint" id="supplierDispatchDemoLogContext"></p>
+              <div class="table-wrapper"><table><thead><tr><th>关联线索</th><th>门店</th><th>比例名额</th><th>处理记录</th></tr></thead><tbody id="supplierDispatchDemoLogRows"></tbody></table></div>
+            </section>
+          </dialog>
+
         </div>
 
-        <div class="card">
+        <div class="card lead-list-scope" id="leadListScheduleScope" hidden><span id="leadListScheduleScopeName"></span><button class="btn btn-secondary btn-sm" type="button" onclick="navigateTo('schedule')">返回排期列表</button></div>
+        <section class="card filter-search-card lead-list-search-card" aria-labelledby="leadListFilterTitle">
+          <h2 class="filter-search-title" id="leadListFilterTitle">筛选查询</h2>
           <div class="lead-view-list-banner"><span id="leadViewAppliedLabel">当前视图：全部品牌（公共视图）</span><span id="leadViewAppliedHint">选择品牌后显示该品牌的查询条件和列表列</span><button class="btn btn-secondary btn-sm" id="leadViewConfigButton" onclick="openLeadViewConfig()">配置视图</button></div>
-          <div class="filter-bar">
+          <div class="filter-bar" id="leadListPrimaryFilters">
             <div class="search-input-wrapper">
-              <input type="text" class="filter-input search-input" placeholder="客户姓名/电话号码/线索编号" oninput="filterClueList()" onkeydown="if(event.key==='Enter'){event.preventDefault();filterClueList();}">
+              <label class="filter-label" for="leadListKeyword">关键词</label>
+              <input type="search" id="leadListKeyword" class="filter-input search-input" placeholder="姓名／电话／线索编号／来源 ID" oninput="filterClueList()" onkeydown="if(event.key==='Enter'){event.preventDefault();filterClueList();}">
             </div>
-            <div class="filter-item">
-              <span class="filter-label">线索状态</span>
-              <select class="filter-select" onchange="filterClueList()">
-                <option value="">全部</option>
-                <option value="1">待处理</option>
-                <option value="2">处理中</option>
-                <option value="3">已下发</option>
-                <option value="4">下发失败</option>
-                <option value="5">仅接收</option>
-                <option value="6">待人工处理</option>
-              </select>
-            </div>
-            <div class="filter-item">
-              <span class="filter-label">号码状态</span>
+            <div class="filter-item" data-lead-view-filter="phone">
+              <label class="filter-label" for="cluePhoneStatusFilter">号码状态</label>
               <select class="filter-select" id="cluePhoneStatusFilter" onchange="filterClueList()">
                 <option value="">全部</option>
                 <option value="NOT_DETECTED">未检测</option>
               </select>
             </div>
-            <div class="filter-item">
-              <span class="filter-label">线索等级</span>
-              <select class="filter-select" onchange="filterClueList()">
+            <div class="filter-item" data-lead-view-filter="level">
+              <label class="filter-label" for="leadListLevel">线索等级</label>
+              <select class="filter-select" id="leadListLevel" onchange="filterClueList()">
                 <option value="">全部</option>
                 <option>A级(高意向)</option>
                 <option>B级(中意向)</option>
@@ -2247,18 +2266,18 @@ X-Signature = HmacSHA256(
                 <option>D级(无意向)</option>
               </select>
             </div>
-            <div class="filter-item">
-              <span class="filter-label">API Key</span>
-              <select class="filter-select" onchange="filterClueList()">
+            <div class="filter-item" data-lead-view-filter="apikey">
+              <label class="filter-label" for="leadListChannel">API Key</label>
+              <select class="filter-select" id="leadListChannel" onchange="filterClueList()">
                 <option value="">全部</option>
                 <option>懂车帝</option>
                 <option>汽车之家</option>
                 <option>易车</option>
               </select>
             </div>
-            <div class="filter-item">
-              <span class="filter-label">品牌</span>
-              <select class="filter-select" id="leadListBrand" onchange="filterClueList();leadViewApplyList()">
+            <div class="filter-item" data-lead-view-filter="brand">
+              <label class="filter-label" for="leadListBrand">品牌</label>
+              <select class="filter-select" id="leadListBrand" onchange="leadViewApplyList()">
                 <option value="">全部</option>
                 <option>理想汽车</option>
                 <option>问界</option>
@@ -2267,9 +2286,9 @@ X-Signature = HmacSHA256(
                 <option>比亚迪</option>
               </select>
             </div>
-            <div class="filter-item">
-              <span class="filter-label">意向车系</span>
-              <select class="filter-select" onchange="filterClueList()">
+            <div class="filter-item" data-lead-view-filter="series">
+              <label class="filter-label" for="leadListSeries">意向车系</label>
+              <select class="filter-select" id="leadListSeries" onchange="filterClueList()">
                 <option value="">全部</option>
                 <option>理想L9</option>
                 <option>理想L8</option>
@@ -2280,30 +2299,48 @@ X-Signature = HmacSHA256(
                 <option>天籁</option>
               </select>
             </div>
-            <button class="btn btn-secondary" onclick="clearClueFilter()" style="margin-left: 4px;">
-              重置
-            </button>
-            <div class="filter-divider"></div>
-            <div class="lead-list-data-actions">
-              <button class="btn btn-secondary btn-data-action" type="button" id="openLeadImport">批量导入</button>
-              <button class="btn btn-secondary btn-data-action" type="button" onclick="exportClueData()">导出数据</button>
+            <div class="lead-list-search-actions"><button class="btn btn-primary" type="button" onclick="filterClueList()">查询</button><button class="btn btn-secondary" type="button" onclick="clearClueFilter()">重置</button></div>
+          </div>
+          <details class="filter-search-more" id="leadListMoreFilters">
+            <summary>更多筛选 <span class="filter-search-expand" aria-hidden="true">展开</span><span class="filter-search-collapse" aria-hidden="true">收起</span></summary>
+            <div class="lead-list-secondary-filters">
+            <div class="filter-item" data-lead-view-filter="status">
+              <label class="filter-label" for="leadListStatus">线索状态</label>
+              <select class="filter-select" id="leadListStatus" onchange="filterClueList()">
+                <option value="">全部</option>
+                <option value="1">待处理</option>
+                <option value="2">处理中</option>
+                <option value="3">已下发</option>
+                <option value="4">下发失败</option>
+                <option value="5">仅接收</option>
+                <option value="6">待人工处理</option>
+                <option value="7">已锁单</option>
+              </select>
             </div>
+
+            <label class="filter-item">记录来源<select id="leadDispatchOriginFilter" class="filter-select" onchange="filterClueList()"><option value="">全部</option><option value="original">供应商原传</option><option value="derived">平台派生</option></select></label>
+            <label class="filter-item">处理原因<select id="leadDispatchReasonFilter" class="filter-select" onchange="filterClueList()"><option value="">全部</option><option value="blocked">供应商锁单目标已达成</option><option value="blacklist">命中黑名单</option><option value="outbound">等待外呼结果</option></select></label>
+            </div>
+          </details>
+          <div class="lead-active-filters" id="leadListActiveFilters" aria-label="当前筛选条件" hidden></div>
+        </section>
+        <div class="card">
+          <div class="lead-list-status-bar">
+            <div class="tabs lead-status-tabs" aria-label="按状态查看线索">
+              <button type="button" class="tab-btn active" data-lead-status="" aria-pressed="true" onclick="filterByStatus(this, '')">全部 <span data-lead-count>0</span></button>
+              <button type="button" class="tab-btn" data-lead-status="6" aria-pressed="false" onclick="filterByStatus(this, '6')">待人工处理 <span data-lead-count>0</span></button>
+              <button type="button" class="tab-btn" data-lead-status="4" aria-pressed="false" onclick="filterByStatus(this, '4')">下发失败 <span data-lead-count>0</span></button>
+              <button type="button" class="tab-btn" data-lead-status="5" aria-pressed="false" onclick="filterByStatus(this, '5')">仅接收 <span data-lead-count>0</span></button>
+              <button type="button" class="tab-btn" data-lead-status="1" aria-pressed="false" onclick="filterByStatus(this, '1')">待处理 <span data-lead-count>0</span></button>
+              <button type="button" class="tab-btn" data-lead-status="2" aria-pressed="false" onclick="filterByStatus(this, '2')">处理中 <span data-lead-count>0</span></button>
+              <button type="button" class="tab-btn" data-lead-status="3" aria-pressed="false" onclick="filterByStatus(this, '3')">已下发 <span data-lead-count>0</span></button>
+              <button type="button" class="tab-btn" data-lead-status="7" aria-pressed="false" onclick="filterByStatus(this, '7')">已锁单 <span data-lead-count>0</span></button>
+            </div>
+            <button class="btn btn-secondary btn-sm lead-stop-shortcut" type="button" id="leadStoppedShortcut" aria-pressed="false" onclick="showLeadStops()">达标停发</button>
           </div>
-
-          <!-- Tabs -->
-          <div class="tabs lead-status-tabs">
-            <button class="tab-btn active" onclick="filterByStatus(this, '')">全部 <span style="background: var(--gray-200); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">130</span></button>
-            <button class="tab-btn" onclick="filterByStatus(this, '1')">待处理 <span style="background: var(--warning-light); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">12</span></button>
-            <button class="tab-btn" onclick="filterByStatus(this, '2')">处理中 <span id="manualDispatchProcessingCount" style="background: var(--primary-light); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">35</span></button>
-            <button class="tab-btn" onclick="filterByStatus(this, '3')">已下发 <span style="background: var(--warning-light); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">48</span></button>
-            <button class="tab-btn" onclick="filterByStatus(this, '4')">下发失败 <span style="background: var(--gray-200); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">18</span></button>
-            <button class="tab-btn" onclick="filterByStatus(this, '5')">仅接收 <span id="manualDispatchReceivedCount" style="background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">3</span></button>
-            <button class="tab-btn" onclick="filterByStatus(this, '6')">待人工处理 <span id="manualDispatchTabCount" style="background: var(--warning-light); color: var(--warning); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px;">2</span></button>
-          </div>
-
-
+          <div class="lead-list-empty" id="leadListEmpty" hidden><strong>没有符合条件的线索</strong><p>试试清除筛选，或核对输入的线索编号。</p><button type="button" class="btn btn-secondary btn-sm" onclick="clearClueFilter()">清除筛选</button></div>
           <div class="table-wrapper">
-            <table>
+            <table id="leadListTable">
               <thead>
                 <tr>
                   <th>线索编号</th>
@@ -2503,18 +2540,11 @@ X-Signature = HmacSHA256(
               </tbody>
             </table>
           </div>
-          <div class="pagination">
-            <div class="pagination-info">共 12 条数据</div>
-            <div class="pagination-controls">
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <button class="pagination-btn" onclick="goToPage('prev', this.parentNode)">‹</button>
-                <button class="pagination-btn active" onclick="goToPage(1, this.parentNode)">1</button>
-                <button class="pagination-btn" onclick="goToPage(2, this.parentNode)">2</button>
-                <button class="pagination-btn" onclick="goToPage(3, this.parentNode)">3</button>
-                <button class="pagination-btn" onclick="goToPage('...', this.parentNode)">...</button>
-                <button class="pagination-btn" onclick="goToPage(7, this.parentNode)">7</button>
-                <button class="pagination-btn" onclick="goToPage('next', this.parentNode)">›</button>
-              </div>
+          <div class="pagination lead-list-pagination">
+            <div class="pagination-info" id="leadListPageInfo" role="status">共 0 条数据</div>
+            <div class="lead-list-pager-actions">
+              <label>每页 <select id="leadListPageSize" class="filter-select" onchange="filterClueList()"><option value="10">10 条</option><option value="20" selected>20 条</option><option value="50">50 条</option></select></label>
+              <nav id="leadListPages" class="pagination-controls" aria-label="线索分页"></nav>
             </div>
           </div>
         </div>
@@ -2552,6 +2582,55 @@ X-Signature = HmacSHA256(
       </div>
 
       <!-- ===== LEAD DETAIL PAGE ===== -->
+      <div class="page" id="page-schedule-supplier-goals">
+        <section class="card supplier-goals-heading">
+          <div class="supplier-goals-heading-row">
+            <div><h1 class="page-title">供应商达标情况</h1><p class="page-subtitle" id="scheduleSupplierGoalsName"></p></div>
+            <button class="btn btn-secondary" type="button" onclick="navigateTo('schedule')">返回排期列表</button>
+          </div>
+          <div class="supplier-goals-metrics">
+            <div><div class="detail-label">项目目标</div><strong id="scheduleSupplierGoalsTarget"></strong></div>
+            <div><div class="detail-label">已分配锁单量</div><strong id="scheduleSupplierGoalsAllocated"></strong></div>
+            <div><div class="detail-label">供应商数量</div><strong id="scheduleSupplierGoalsCount"></strong></div>
+          </div>
+        </section>
+        <section class="card supplier-goals-table">
+          <div class="supplier-goals-table-heading"><h2 class="card-title">供应商锁单目标</h2><p class="form-hint">各供应商按自己的目标判断达标，平台派生锁单单独统计。已入队任务继续下发。</p></div>
+          <div class="table-wrapper"><table><thead><tr><th>供应商</th><th>分配锁单量</th><th>原传有效锁单量</th><th>达标及下发状态</th><th>数据记录时间</th><th>操作</th></tr></thead><tbody id="scheduleSupplierGoalsRows"></tbody></table></div>
+        </section>
+      </div>
+      <div class="page" id="page-supplier-dispatch-logs">
+        <div class="card dispatch-logs-heading">
+          <div><h1 class="page-title">下发日志</h1><p class="page-subtitle">按排期和供应商查询原传、派生门店的处理依据与下发结果</p></div>
+          <button class="btn btn-secondary" type="button" id="supplierDispatchLogsBack" onclick="returnFromSupplierDispatchLogs()">返回列表</button>
+        </div>
+        <form id="supplierDispatchLogsForm" class="card filter-search-card">
+          <h2 class="filter-search-title">筛选查询</h2>
+          <div class="dispatch-logs-filters">
+            <label>排期<input class="filter-input" name="schedule" placeholder="排期名称"></label>
+            <label>供应商<input class="filter-input" name="supplier" placeholder="供应商名称"></label>
+            <label>线索编号<input class="filter-input" name="lead" placeholder="原线索或派生线索 ID"></label>
+            <label>处理结果<select class="filter-select" name="result"><option value="">全部</option><option>供应商锁单目标已达成</option><option>等待下发</option><option>原线索命中黑名单，停止处理</option><option>等待原线索完成外呼</option><option>未派生</option></select></label>
+            <div class="dispatch-logs-filter-actions"><button class="btn btn-primary" type="submit">查询</button>
+            <button class="btn btn-secondary" type="reset">重置</button></div>
+          </div>
+        </form>
+        <section class="card" aria-labelledby="supplierDispatchLogsTitle">
+          <div class="card-header"><span class="card-title" id="supplierDispatchLogsTitle">下发记录</span><span class="form-hint" id="supplierDispatchLogsCount" role="status"></span></div>
+          <div class="table-wrapper"><table><thead><tr><th>记录时间</th><th>排期／供应商</th><th>原线索</th><th>下发线索</th><th>来源／门店</th><th>处理结果</th><th>当时依据</th><th>操作</th></tr></thead><tbody id="supplierDispatchLogsRows"></tbody></table></div>
+          <div class="pagination dispatch-logs-pagination">
+            <span class="pagination-info" id="supplierDispatchLogsPageInfo" role="status"></span>
+            <div class="dispatch-logs-page-actions">
+              <label>每页 <select id="supplierDispatchLogsSize" class="filter-select" aria-label="每页条数"><option value="10">10 条</option><option value="20">20 条</option><option value="50">50 条</option></select></label>
+              <nav class="pagination-controls" aria-label="下发日志分页">
+                <button class="pagination-btn" id="supplierDispatchLogsPrevious" type="button" aria-label="上一页">‹</button>
+                <span class="pagination-controls" id="supplierDispatchLogsPages"></span>
+                <button class="pagination-btn" id="supplierDispatchLogsNext" type="button" aria-label="下一页">›</button>
+              </nav>
+            </div>
+          </div>
+        </section>
+      </div>
       <div class="page lead-detail-page" id="page-lead-detail">
         <section class="lead-detail-page-head card">
           <div class="lead-detail-page-title-row">
@@ -2575,12 +2654,25 @@ X-Signature = HmacSHA256(
             <div><span>下一步</span><p id="leadTraceNextAction">—</p></div>
           </div>
           <div class="lead-trace-action-bar">
+            <div id="leadDetailDispatchLogEntry" hidden><button type="button" class="btn btn-secondary btn-sm" onclick="openSupplierDispatchLogs(document.getElementById('leadDetailSummaryCode').textContent)">查看下发日志</button></div>
             <div class="lead-trace-overview-actions" id="leadAiCallEntry" hidden><button class="btn btn-secondary btn-sm" type="button" onclick="openAiCallRecordsForLead(document.getElementById('leadDetailSummaryCode').textContent)">查看关联话单</button></div>
-            <div class="lead-trace-overview-actions" id="leadTraceOverviewActions" hidden><button class="btn btn-primary btn-sm" type="button" onclick="navigateToLeadStatus('6', document.getElementById('leadDetailSummaryCode').textContent)">前往待人工处理</button></div>
+            <div class="lead-trace-overview-actions" id="leadTraceOverviewActions" hidden><button id="leadTraceReviewAction" class="btn btn-primary btn-sm" type="button">处理本条线索</button></div>
           </div>
         </section>
         </div>
-        <div class="lead-detail-content card">
+      <details class="card dispatch-evidence-card" id="supplierDispatchEvidence" aria-labelledby="supplierDispatchEvidenceTitle" hidden>
+        <summary id="supplierDispatchEvidenceTitle">门店下发与来源追溯</summary>
+        <div class="dispatch-evidence-heading">
+          <p><span class="status-badge status-pending" id="supplierDispatchRecordType"></span> <span class="form-hint" id="supplierDispatchStatistics"></span></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-secondary btn-sm" id="supplierDispatchEvidenceSource"></button>
+          </div>
+        </div>
+        <p class="dispatch-evidence-summary" id="supplierDispatchEvidenceSummary"></p>
+        <p class="form-hint" id="supplierDispatchProcessing"></p>
+        <div class="table-wrapper"><table><thead><tr><th>线索 ID</th><th>来源</th><th>门店</th><th>下发结果</th><th>比例分配记录</th><th>操作</th></tr></thead><tbody id="supplierDispatchEvidenceRows"></tbody></table></div>
+      </details>
+      <div class="lead-detail-content card">
       <!-- Tabs -->
       <div class="tabs" id="leadDetailTabs" role="tablist" aria-label="线索详情" onkeydown="handleLeadDetailTabKeydown(event)">
         <button class="tab-btn" id="leadDetailTab-basic" type="button" role="tab" aria-controls="leadTab-basic" aria-selected="false" tabindex="-1" data-tab="basic" onclick="switchLeadTab('basic')">基本信息</button>
@@ -2965,11 +3057,22 @@ X-Signature = HmacSHA256(
 
       <!-- ===== 锁单排查 ===== -->
       <div class="page" id="page-lock-audit">
-        <div class="page-header">
-          <h1 class="page-title">锁单排查</h1>
-          <p class="page-subtitle">系统按排查规则自动筛查疑似虚假锁单，命中即标记为待排查，人工核实改判后状态锁定 · 数据由数据室每日同步更新</p>
+        <section class="card lock-entry-page-heading"><div><h1 class="page-title">锁单排查</h1><p class="page-subtitle" id="lockAuditPageSubtitle">查询锁单入库记录与统计归属，或按规则排查疑似异常锁单</p></div><button class="btn btn-secondary" type="button" id="lockEntriesBack" hidden onclick="returnFromLockEntries()">返回达标情况</button></section>
+        <div class="card lock-entry-tabs" role="tablist" aria-label="锁单记录视图"><button class="tab-btn active" type="button" id="lockAuditReviewTab" role="tab" aria-controls="lockAuditReviewPanel" aria-selected="true" onclick="switchLockAuditPanel('review')">异常排查</button><button class="tab-btn" type="button" id="lockAuditEntriesTab" role="tab" aria-controls="lockAuditEntriesPanel" aria-selected="false" onclick="switchLockAuditPanel('entries')">锁单入库明细</button></div>
+        <div id="lockAuditEntriesPanel" role="tabpanel" aria-labelledby="lockAuditEntriesTab" hidden>
+          <form id="lockEntriesForm" class="card filter-search-card"><h2 class="filter-search-title">筛选查询</h2><div class="lock-entry-filters">
+            <label id="lockEntriesScheduleField">排期<select class="filter-select" name="schedule" id="lockEntriesSchedule"><option value="">全部排期</option></select></label>
+            <label id="lockEntriesSupplierField">供应商<select class="filter-select" name="supplier" id="lockEntriesSupplier"><option value="">全部供应商</option></select></label>
+            <label id="lockEntriesOriginField">记录来源<select class="filter-select" name="origin" id="lockEntriesOrigin"><option value="">全部</option><option value="original">供应商原传</option><option value="derived">平台派生</option></select></label>
+            <label class="lock-entry-search">锁单／线索编号<input class="filter-input" name="keyword" id="lockEntriesKeyword" placeholder="锁单标识、线索编号或原线索编号"></label>
+            <div class="lock-entry-actions"><button class="btn btn-primary" type="submit">查询</button><button class="btn btn-secondary" type="reset">重置</button></div>
+          </div></form>
+          <section class="card lock-entry-list"><div class="card-header"><div><h2 class="card-title">锁单入库记录</h2><p class="form-hint" id="lockEntriesDescription">原传锁单计入对应供应商达标量，派生锁单单独统计。已入库记录仅供查询和追溯。</p></div><span class="lock-entry-sample">样例数据</span></div>
+            <div class="table-wrapper"><table><thead><tr><th>锁单标识</th><th>排期／供应商</th><th>关联线索</th><th>目标门店</th><th>记录来源</th><th>统计归属</th><th>入库时间</th><th>操作</th></tr></thead><tbody id="lockEntriesRows"></tbody></table></div>
+            <div class="pagination"><span class="pagination-info" id="lockEntriesPageInfo" role="status"></span><div class="lock-entry-page-actions"><label>每页 <select class="filter-select" id="lockEntriesPageSize" aria-label="每页条数"><option value="10">10 条</option><option value="20">20 条</option><option value="50">50 条</option></select></label><nav class="pagination-controls" aria-label="锁单入库明细分页"><button class="pagination-btn" type="button" id="lockEntriesPrevious" aria-label="上一页">‹</button><span class="pagination-controls" id="lockEntriesPages"></span><button class="pagination-btn" type="button" id="lockEntriesNext" aria-label="下一页">›</button></nav></div></div>
+          </section>
         </div>
-
+        <div id="lockAuditReviewPanel" role="tabpanel" aria-labelledby="lockAuditReviewTab">
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-value" id="lockStatTotal">-</div>
@@ -3070,6 +3173,7 @@ X-Signature = HmacSHA256(
             <div class="modal-body" id="lockJudgeBody"></div>
             <div class="modal-footer" id="lockJudgeFooter"></div>
           </div>
+        </div>
         </div>
       </div>
 
@@ -3623,22 +3727,29 @@ X-Signature = HmacSHA256(
           <p class="page-subtitle">管理线索投放排期，查看关联报表与线索明细</p>
         </div>
         <div class="tabs" id="scheduleBrandTabs" style="padding: 6px; margin: 12px 0;"></div>
-        <div class="card">
-          <div class="filter-bar schedule-list-filters">
-            <input type="text" class="filter-input" id="scheduleSearchName" aria-label="排期名称" placeholder="搜索排期名称" oninput="filterScheduleList()">
+        <section class="card filter-search-card" aria-labelledby="scheduleFilterTitle">
+          <h2 class="filter-search-title" id="scheduleFilterTitle">筛选查询</h2>
+          <div class="schedule-list-filters">
+            <label class="filter-item"><span class="filter-label">排期名称</span><input type="text" class="filter-input" id="scheduleSearchName" placeholder="搜索排期名称" oninput="filterScheduleList()"></label>
             <label class="filter-item"><span class="filter-label">结算方式</span><select class="filter-select" id="scheduleSettlementFilter" onchange="filterScheduleList()"><option value="">全部</option><option>CPL</option><option>CPQL</option><option>CPO</option><option>CPS</option></select></label>
             <label class="filter-item"><span class="filter-label">支付方式</span><select class="filter-select" id="schedulePaymentFilter" onchange="filterScheduleList()"><option value="">全部</option><option value="prepaid">预充值</option><option value="volume">按量付费</option></select></label>
             <label class="filter-item"><span class="filter-label">启用状态</span><select class="filter-select" id="scheduleStatusFilter" onchange="filterScheduleList()"><option value="">全部</option><option value="1">启用</option><option value="0">禁用</option></select></label>
-            <button class="btn btn-primary" onclick="filterScheduleList()">查询</button>
-            <button class="btn btn-secondary" onclick="clearScheduleFilter()">重置</button>
-            <button class="schedule-filter-toggle" id="scheduleMoreToggle" type="button" aria-expanded="false" aria-controls="scheduleMoreFilters" onclick="toggleScheduleMoreFilters()">更多筛选 <span aria-hidden="true">⌄</span></button>
-            <button class="btn btn-primary schedule-create-btn" onclick="openScheduleModal('add')">+ 新增排期</button>
+            <div class="schedule-filter-actions">
+              <button class="btn btn-primary" onclick="filterScheduleList()">查询</button>
+              <button class="btn btn-secondary" onclick="clearScheduleFilter()">重置</button>
+            </div>
           </div>
-          <div class="schedule-more-filters" id="scheduleMoreFilters" hidden><div class="schedule-more-fields">
+          <details class="filter-search-more" id="scheduleMoreFilters">
+            <summary>更多筛选 <span class="filter-search-expand" aria-hidden="true">展开</span><span class="filter-search-collapse" aria-hidden="true">收起</span></summary>
+            <div class="schedule-more-fields">
             <label class="filter-item"><span class="filter-label">合作方</span><select class="filter-select" id="schedulePartnerFilter" onchange="filterScheduleList()"><option value="">全部</option><option value="headquarters">总部</option><option value="store">门店</option></select></label>
             <label class="filter-item"><span class="filter-label">排期时间</span><input type="date" class="filter-input" id="scheduleRangeStart" aria-label="排期范围开始日期" onchange="filterScheduleList()"><span>至</span><input type="date" class="filter-input" id="scheduleRangeEnd" aria-label="排期范围结束日期" onchange="filterScheduleList()"></label>
             <span class="form-hint">按排期起止时间与所选范围重叠查询</span>
-          </div></div>
+            </div>
+          </details>
+        </section>
+        <div class="card">
+          <div class="card-header"><span class="card-title">排期列表</span><button class="btn btn-primary" type="button" onclick="openScheduleModal('add')">+ 新增排期</button></div>
           <div class="table-wrapper">
             <table>
               <thead>
@@ -3657,7 +3768,7 @@ X-Signature = HmacSHA256(
       <div class="page" id="page-schedule-policy">
         <div class="page-header policy-heading"><div><h1 class="page-title">排期处理策略</h1><p class="page-subtitle">在品牌已开放的能力范围内，明确设置本项目是否执行</p></div><button type="button" class="btn btn-secondary" onclick="navigateTo('schedule')">返回排期列表</button></div>
         <section class="card policy-card">
-          <div class="policy-context-fields"><label>排期<select id="policySchedule" class="form-input" onchange="changeSchedulePolicyScope()"></select></label><label>适用品牌<select id="policyBrand" class="form-input" onchange="changeSchedulePolicyBrand()"></select></label><span id="policyVersion" class="status-badge status-warning"></span><span id="policyDraftStatus" class="status-badge status-warning" role="status" hidden></span></div>
+          <div class="policy-context-fields"><label>排期<select id="policySchedule" class="form-input" onchange="changeSchedulePolicyScope()"></select></label><label id="policyBrandDisplayField">适用品牌<input id="policyBrandDisplay" class="form-input" type="text" value="未关联品牌" readonly tabindex="-1"></label><label id="policyBrandSelectField" style="display:none;min-width:150px">适用品牌<select id="policyBrand" class="form-input" onchange="changeSchedulePolicyBrand()"></select></label><span id="policyVersion" class="status-badge status-warning"></span><span id="policyDraftStatus" class="status-badge status-warning" role="status" hidden></span></div>
           <p id="policyContext" class="form-hint"></p><p id="policyExecutionStatus" class="policy-notice" role="status"></p>
           <p id="policyScenarioNote" class="policy-notice"></p>
         </section>
@@ -3684,26 +3795,26 @@ X-Signature = HmacSHA256(
       </div>
       
           </section>
-          <section class="card schedule-editor-workspace">
-            <nav class="schedule-editor-tabs" role="tablist" aria-label="排期配置分组" onkeydown="handleScheduleEditorTabKeydown(event)"><button class="tab-btn active" id="scheduleEditorTab-basic" data-schedule-editor-tab="basic" type="button" role="tab" aria-controls="scheduleEditorPanel-basic" aria-selected="true" onclick="switchScheduleEditorTab('basic')">基础信息</button><button class="tab-btn" id="scheduleEditorTab-series" data-schedule-editor-tab="series" type="button" role="tab" aria-controls="scheduleEditorPanel-series" aria-selected="false" onclick="switchScheduleEditorTab('series')">车系与下发规则</button><button class="tab-btn" id="scheduleEditorTab-suppliers" data-schedule-editor-tab="suppliers" type="button" role="tab" aria-controls="scheduleEditorPanel-suppliers" aria-selected="false" onclick="switchScheduleEditorTab('suppliers')">账号与预算</button></nav>
+          <section class="schedule-editor-workspace">
+            <nav class="card schedule-editor-tabs" role="tablist" aria-label="排期配置分组" onkeydown="handleScheduleEditorTabKeydown(event)"><button class="tab-btn active" id="scheduleEditorTab-basic" data-schedule-editor-tab="basic" type="button" role="tab" aria-controls="scheduleEditorPanel-basic" aria-selected="true" onclick="switchScheduleEditorTab('basic')">基础信息</button><button class="tab-btn" id="scheduleEditorTab-series" data-schedule-editor-tab="series" type="button" role="tab" aria-controls="scheduleEditorPanel-series" aria-selected="false" onclick="switchScheduleEditorTab('series')">车系与下发规则</button><button class="tab-btn" id="scheduleEditorTab-suppliers" data-schedule-editor-tab="suppliers" type="button" role="tab" aria-controls="scheduleEditorPanel-suppliers" aria-selected="false" onclick="switchScheduleEditorTab('suppliers')">供应商配置</button></nav>
             <div class="schedule-editor-panels">
-              <div class="schedule-editor-tab-panel" id="scheduleEditorPanel-basic" role="tabpanel" aria-labelledby="scheduleEditorTab-basic"><div class="card" id="scheduleBasicSection" style="border:1px solid var(--gray-200);">
+              <div class="card schedule-editor-tab-panel" id="scheduleEditorPanel-basic" role="tabpanel" aria-labelledby="scheduleEditorTab-basic"><div class="card" id="scheduleBasicSection" style="border:1px solid var(--gray-200);">
         <div class="card-header"><span class="card-title">基础信息</span></div>
         <div class="card-body">
           <section class="schedule-form-section"><div class="schedule-section-heading"><h3>排期信息</h3><p>设置名称、状态与执行时间</p></div><div class="schedule-basic-grid schedule-identity-grid"><div class="form-group schedule-field-id" aria-hidden="true"><label class="form-label">主键ID</label><div class="view-value" style="color:var(--gray-400)" id="scheduleIdDisplay">系统自动生成</div></div>
-            <div class="form-group schedule-field-name"><label class="form-label">排期名称 <span class="required">*</span></label><input type="text" class="form-input" id="scheduleName" placeholder="请输入排期名称"></div>
-            <div class="form-group schedule-field-status"><label class="form-label">状态 <span class="required">*</span></label><select class="form-select" id="scheduleStatus"><option value="1">启用</option><option value="0">禁用</option></select></div>
-            </div><div class="schedule-form-grid schedule-date-grid"><div class="form-group schedule-field-start"><label class="form-label">开始时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleStartTime"></div>
-            <div class="form-group schedule-field-end"><label class="form-label">结束时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleEndTime"></div>
+            <div class="form-group schedule-field-name"><label class="form-label" for="scheduleName">排期名称 <span class="required">*</span></label><input type="text" class="form-input" id="scheduleName" placeholder="请输入排期名称"></div>
+            <div class="form-group schedule-field-status"><label class="form-label" for="scheduleStatus">状态 <span class="required">*</span></label><select class="form-select" id="scheduleStatus"><option value="1">启用</option><option value="0">禁用</option></select></div>
+            </div><div class="schedule-form-grid schedule-date-grid"><div class="form-group schedule-field-start"><label class="form-label" for="scheduleStartTime">开始时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleStartTime"></div>
+            <div class="form-group schedule-field-end"><label class="form-label" for="scheduleEndTime">结束时间 <span class="required">*</span></label><input type="datetime-local" class="form-input" id="scheduleEndTime"></div>
             </div></section>
           <section class="schedule-form-section"><div class="schedule-section-heading"><h3>合作与结算</h3><p>明确合作对象、结算方式及费用承担比例</p></div><div class="schedule-form-grid"><div class="form-group"><label class="form-label" for="schedulePartner">合作方 <span class="required">*</span></label><select class="form-select" id="schedulePartner"><option value="">请选择合作方</option><option value="headquarters">总部</option><option value="store">门店</option></select></div>
             <div class="form-group"><label class="form-label" for="scheduleSettlement">结算方式 <span class="required">*</span></label><select class="form-select" id="scheduleSettlement" onchange="ScheduleCommercial.change()"><option value="">请选择结算方式</option><option value="CPL">CPL（沿用现有模式）</option><option value="CPQL">CPQL（有效线索）</option><option value="CPO">CPO（锁单／订单）</option><option value="CPS">CPS（交车）</option></select></div>
             <div class="form-group"><label class="form-label" for="scheduleHeadShare">总部承担比例（%） <span class="required">*</span></label><input class="form-input" id="scheduleHeadShare" type="text" inputmode="decimal" oninput="ScheduleCommercial.shareInput()" onblur="if(this.value.endsWith('.'))this.value=this.value.slice(0,-1);ScheduleCommercial.shareInput()" aria-describedby="scheduleShareError"><p id="scheduleShareError" class="schedule-field-error" role="status" aria-live="polite"></p></div>
             <div class="form-group"><label class="form-label" for="scheduleStoreShare">门店承担比例（%，自动计算）</label><input class="form-input" id="scheduleStoreShare" readonly></div>
           </div><p id="scheduleLegacyNote" class="policy-notice policy-warning" hidden>此历史排期的供应商结算方式不一致。查看时保留原值；编辑保存前请明确选择结算方式，并核对各供应商单价。</p>
-          <div class="schedule-price-adjustment"><div class="form-group"><label class="form-label">结算价格动态调整</label><input class="form-input" value="不支持（本期由运营手动配置价格）" readonly></div></div>          <p class="schedule-section-caption">总部与门店承担比例合计100%；供应商结算方式跟随排期，单价分别配置。</p></section>
-          <section class="schedule-form-section"><div class="schedule-section-heading"><h3>支付与目标</h3><p>选择支付方式后，配置预算或项目锁单目标</p></div><div class="schedule-payment-grid"><div class="form-group"><label class="form-label" for="schedulePayment">支付方式 <span class="required" id="schedulePaymentRequired">*</span></label><select class="form-select" id="schedulePayment" onchange="ScheduleCommercial.change()"><option value="prepaid">预充值</option><option value="volume">按量付费</option></select><input class="form-input" id="schedulePaymentReadonly" readonly hidden><p id="schedulePaymentLockHint" class="form-hint" hidden>支付方式创建后不可修改</p></div>
-            <div class="form-group schedule-field-budget"><label class="form-label">总预算 <span class="required">*</span></label><input type="number" class="form-input" id="scheduleTotalBudget" placeholder="请输入总预算" min="0" step="0.01"></div>
+          <p class="schedule-section-caption">总部与门店承担比例合计100%；供应商结算方式跟随排期，单价分别配置。</p></section>
+          <section class="schedule-form-section" id="schedulePaymentSection" hidden><div class="schedule-section-heading"><h3>支付与目标</h3><p>选择支付方式后，配置预算或项目锁单目标</p></div><div class="schedule-payment-grid"><div class="form-group"><label class="form-label" for="schedulePayment">支付方式 <span class="required" id="schedulePaymentRequired">*</span></label><select class="form-select" id="schedulePayment" onchange="ScheduleCommercial.change()"><option value="" disabled>请选择支付方式</option><option value="prepaid">预充值</option><option value="volume">按量付费</option></select><input class="form-input" id="schedulePaymentReadonly" readonly hidden><p id="schedulePaymentLockHint" class="form-hint" hidden>支付方式创建后不可修改</p></div>
+            <div class="form-group schedule-field-budget"><label class="form-label" for="scheduleTotalBudget">总预算 <span class="required">*</span></label><input type="number" class="form-input" id="scheduleTotalBudget" placeholder="请输入总预算" min="0" step="0.01"></div>
             <div class="schedule-volume-project-fields" id="scheduleVolumeProjectGroup" hidden>
             <div class="form-group" id="scheduleSupplyGroup" hidden><label class="form-label" for="scheduleExpectedSupply">预期供应量（条） <span class="required">*</span></label><input class="form-input" id="scheduleExpectedSupply" type="number" min="1" step="1" placeholder="例如10000" oninput="ScheduleCommercial.change()"></div>
             <div class="form-group" id="scheduleRateGroup" hidden><label class="form-label" for="scheduleExpectedRate">预期锁单转化率（%） <span class="required">*</span></label><input class="form-input" id="scheduleExpectedRate" type="number" min="0" max="100" step="any" placeholder="1代表1%" oninput="ScheduleCommercial.change()"></div>
@@ -3714,10 +3825,10 @@ X-Signature = HmacSHA256(
         </div>
       </div>
       </div>
-      <div class="schedule-editor-tab-panel" id="scheduleEditorPanel-series" role="tabpanel" aria-labelledby="scheduleEditorTab-series" hidden>
+      <div class="card schedule-editor-tab-panel" id="scheduleEditorPanel-series" role="tabpanel" aria-labelledby="scheduleEditorTab-series" hidden>
       <div class="card" id="scheduleSeriesSection" style="border:1px solid var(--gray-200);">
         <div class="card-header"><span class="card-title">车系与下发规则</span></div>
-        <div class="card-body"><div class="schedule-section-heading"><h3>关联车系</h3><p>先选择品牌及车系，下方指定门店和供应商关联门店同步使用该品牌范围</p></div>
+        <div class="card-body"><section class="schedule-form-section schedule-series-form"><div class="schedule-section-heading"><h3>关联车系</h3><p>先选择品牌及车系，下方指定门店和供应商关联门店同步使用该品牌范围</p></div>
           <div class="form-group full">
             <label class="form-label">关联车系 <span class="required">*</span></label>
             <div id="scheduleBaseSeriesTags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:40px;padding:8px 12px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;">
@@ -3730,7 +3841,7 @@ X-Signature = HmacSHA256(
               </div>
               <div class="schedule-inline-series-main">
                 <div class="schedule-inline-series-toolbar">
-                  <input class="form-input" id="scheduleInlineSeriesSearch" placeholder="搜索车系名称或编码" oninput="renderScheduleInlineSeriesList()">
+                  <input class="form-input" id="scheduleInlineSeriesSearch" aria-label="搜索车系" placeholder="搜索车系名称或编码" oninput="renderScheduleInlineSeriesList()">
                   <span id="scheduleInlineSeriesCount" style="font-size:12px;color:var(--gray-500);"></span>
                   <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllScheduleInlineSeries()">全选当前</button>
                   <button type="button" class="btn btn-secondary btn-sm" onclick="clearScheduleInlineSeries()">清空已选</button>
@@ -3739,16 +3850,17 @@ X-Signature = HmacSHA256(
               </div>
             </div>
           </div>
-          <section class="schedule-form-section"><div class="schedule-section-heading"><h3>下发规则</h3><p>本排期所有供应商共同沿用；供应商传入的意向门店固定作为第一家</p></div><div class="schedule-form-grid">
+          </section>
+          <section class="schedule-form-section" id="scheduleDispatchSection" hidden><div class="schedule-section-heading"><h3>下发规则</h3><p id="scheduleDispatchScopeHint">本排期所有供应商共同沿用</p></div><div class="schedule-form-grid">
             <div class="form-group"><label class="form-label" for="scheduleDispatchMode">下发方式 <span class="required">*</span></label><select class="form-select" id="scheduleDispatchMode" onchange="ScheduleDispatch.change()"><option value="single">一发一</option><option value="multiple">一发多</option></select></div>
-            <div class="form-group" id="scheduleDispatchMaxGroup" hidden><label class="form-label" for="scheduleDispatchMax">最多下发门店数 <span class="required">*</span></label><input class="form-input" id="scheduleDispatchMax" type="text" inputmode="numeric" oninput="ScheduleDispatch.change()" placeholder="例如2，含供应商指定的第一家"></div>
+            <div class="form-group" id="scheduleDispatchMaxGroup" hidden><label class="form-label" for="scheduleDispatchMax"><span id="scheduleDispatchMaxLabel">最多下发门店数</span> <span class="required">*</span></label><input class="form-input" id="scheduleDispatchMax" type="text" inputmode="numeric" oninput="ScheduleDispatch.change()" placeholder="例如2，含供应商指定的第一家"></div>
             <div class="form-group"><label class="form-label" for="scheduleDispatchLogic">下发逻辑 <span class="required">*</span></label><select class="form-select" id="scheduleDispatchLogic" onchange="ScheduleDispatch.change()"><option value="specified">指定门店下发</option><option value="random">随机下发</option><option value="ratio">按比例下发</option></select><p class="form-hint" id="scheduleDispatchHint"></p></div>
             
           </div><div id="scheduleSpecifiedRules" hidden></div><div id="scheduleRatioRules" hidden></div><div class="schedule-rule-note"><strong>执行边界</strong><p>先校验有效排期、供应商及门店范围，不符合则拒收。追加线索各自生成线索ID，关联原线索并标记“平台追加分配”；不计入供应商原始传输量，不重复产生供应商成本。</p></div></section>
         </div>
       </div>
       </div>
-              <div class="schedule-editor-tab-panel" id="scheduleEditorPanel-suppliers" role="tabpanel" aria-labelledby="scheduleEditorTab-suppliers" hidden><div class="card schedule-supplier-workspace" id="scheduleSupplierSection" style="border:1px solid var(--gray-200);">
+              <div class="card schedule-editor-tab-panel" id="scheduleEditorPanel-suppliers" role="tabpanel" aria-labelledby="scheduleEditorTab-suppliers" hidden><div class="card schedule-supplier-workspace" id="scheduleSupplierSection" style="border:1px solid var(--gray-200);">
         <div class="card-header">
           <span class="card-title">供应商配置</span>
           <button class="btn btn-primary btn-sm" id="scheduleAddSupplierBtn" onclick="addScheduleSupplierRow()">＋ 添加供应商</button>
@@ -3762,12 +3874,14 @@ X-Signature = HmacSHA256(
       </div>
             </div>
           </section>
-<p id="scheduleAllocationFeedback" class="schedule-allocation-feedback" role="status" aria-live="polite"></p>
 <div class="schedule-editor-footer">
+      <p id="scheduleAllocationFeedback" class="schedule-allocation-feedback" role="status" aria-live="polite"></p>
       <div class="schedule-footer-summary" id="scheduleFooterSummary">0 车系 · 0 供应商 · 0 家门店 · 已分配 ¥0 / ¥0</div>
+      <div class="schedule-editor-footer-actions">
       <button class="btn btn-secondary" id="scheduleCancelBtn" onclick="closeSchedulePage()">取消</button>
       <button class="btn btn-primary" id="scheduleEditBtn" onclick="openScheduleModal('edit', currentEditingScheduleId)" style="display:none;">编辑排期</button>
       <button class="btn btn-primary" id="scheduleSaveBtn" onclick="saveSchedule()">确认保存</button>
+      </div>
     </div>
   
         </div>
@@ -3844,7 +3958,7 @@ X-Signature = HmacSHA256(
         <div class="card detail-page-summary">
           <div>
             <h1 class="page-title">线索明细</h1>
-            <p class="page-subtitle">查看排期下的线索明细数据（来源排期：高德地图）</p>
+            <p class="page-subtitle">查看该排期已有的演示明细</p>
           </div>
           <button class="btn btn-secondary" onclick="navigateTo('schedule')">返回列表</button>
         </div>
@@ -3854,23 +3968,22 @@ X-Signature = HmacSHA256(
           <span>门店角色隐藏金额成本类字段</span>
           <span>电话号码按 138****8000 格式脱敏</span>
         </div>
-        <div class="card lead-detail-filter-card">
-          <div class="filter-bar">
-            <div class="lead-detail-filter-primary">
+        <form class="card filter-search-card lead-detail-filter-card" aria-labelledby="leadDetailFilterTitle" onreset="resetLeadDetailAccountFilter()" onsubmit="event.preventDefault();showToast('查询成功','success')">
+          <h2 class="filter-search-title" id="leadDetailFilterTitle">筛选查询</h2>
+          <div class="lead-detail-filter-primary">
               <div class="lead-detail-filter-field"><span class="filter-label">线索系统编码</span><input type="text" class="filter-input" placeholder="请输入编码"></div>
               <div class="lead-detail-filter-field"><span class="filter-label">客户姓名</span><input type="text" class="filter-input" placeholder="请输入客户姓名"></div>
               <div class="lead-detail-filter-field"><span class="filter-label">电话号码</span><input type="text" class="filter-input" placeholder="请输入电话号码"></div>
               <div class="lead-detail-filter-field"><span class="filter-label">意向车系</span><select class="filter-select"><option value="">全部车系</option><option>新楼兰</option><option>天籁</option><option>轩逸</option><option>逍客</option></select></div>
               <div class="lead-detail-filter-field"><span class="filter-label">创建时间<span style="color:var(--danger)">*</span></span><div class="lead-detail-date-range"><input type="date" class="filter-input" value="2026-01-01"><span>至</span><input type="date" class="filter-input" value="2026-01-31"></div></div>
               <div class="lead-detail-filter-actions lead-detail-primary-actions">
-                <button class="btn btn-primary" onclick="showToast('查询成功','success')">查询</button>
-                <button class="btn btn-secondary">重置</button>
+                <button class="btn btn-primary" type="submit">查询</button>
+                <button class="btn btn-secondary" type="reset">重置</button>
               </div>
             </div>
-            <div class="lead-detail-filter-footer">
-              <button class="lead-detail-filter-toggle" id="leadDetailFilterToggle" onclick="toggleLeadDetailFilters()">更多筛选 <span>⌄</span></button>
-            </div>
-            <div class="lead-detail-filter-more is-collapsed" id="leadDetailFilterMore">
+          <details class="filter-search-more" id="leadDetailFilterMore">
+            <summary>更多筛选 <span class="filter-search-expand" aria-hidden="true">展开</span><span class="filter-search-collapse" aria-hidden="true">收起</span></summary>
+            <div class="lead-detail-filter-more">
               <div class="lead-detail-filter-field"><span class="filter-label">意向门店</span><select class="filter-select"><option value="">暂未选择门店</option><option>广州东风日产门店</option><option>上海东风日产门店</option></select></div>
               <div class="lead-detail-filter-field"><span class="filter-label">SmartCode</span><input type="text" class="filter-input" placeholder="请输入 SmartCode"></div>
               <div class="lead-detail-filter-field"><span class="filter-label">来源线索ID</span><input type="text" class="filter-input" placeholder="请输入来源ID"></div>
@@ -3882,8 +3995,8 @@ X-Signature = HmacSHA256(
                 <div class="lead-account-dropdown" id="leadDetailAccountDropdown"></div>
               </div>
             </div>
-          </div>
-        </div>
+          </details>
+        </form>
         <div class="card">
           <div class="card-header lead-detail-list-header">
             <span class="card-title">明细列表</span>
@@ -6104,27 +6217,42 @@ X-Signature = HmacSHA256(
 
 <!-- SheetJS Library for Excel Import -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-<script src="DKLinks.assets/js/core-navigation.js?v=20261104-login-dashboard"></script>
+<script src="DKLinks.assets/js/core-navigation.js?v=20261118-lead-ops"></script>
 <script src="DKLinks.assets/js/vehicle-series.js?v=20261106-store-terminology"></script>
-<script src="DKLinks.assets/js/region-management.js?v=20261106-store-terminology"></script>
-<script src="DKLinks.assets/js/store-management.js?v=20261106-store-terminology"></script>
+<script src="DKLinks.assets/js/region-management.js?v=20261118-lead-ops"></script>
+<script src="DKLinks.assets/js/store-management.js?v=20261118-lead-ops"></script>
 <div class="modal-overlay" id="scheduleConfigIssueModal" role="dialog" aria-modal="true" aria-labelledby="scheduleConfigIssueTitle"><div class="modal"><div class="modal-header"><span class="modal-title" id="scheduleConfigIssueTitle">请检查排期配置</span><button class="modal-close" type="button" onclick="closeModal('scheduleConfigIssueModal')" aria-label="关闭">×</button></div><div class="modal-body"><p id="scheduleConfigIssueText"></p><p class="form-hint">请调整对应字段后重新保存，已填写的内容会保留。</p></div><div class="modal-footer"><button class="btn btn-primary" type="button" onclick="closeModal('scheduleConfigIssueModal')">返回修改</button></div></div></div>
-<script src="DKLinks.assets/js/operations-management.js?v=20261106-store-terminology"></script>
-<script src="DKLinks.assets/js/schedule-commercial.js?v=20261106-store-terminology"></script>
-<script src="DKLinks.assets/js/schedule-ratio.js?v=20261106-store-terminology"></script>
-<script src="DKLinks.assets/js/schedule-dispatch.js?v=20261106-store-terminology"></script>
+<script src="DKLinks.assets/js/operations-management.js?v=20261118-lead-ops"></script>
+<div class="modal-overlay" id="reportSourceRecordsModal" role="dialog" aria-modal="true" aria-labelledby="reportSourceRecordsTitle" aria-describedby="reportSourceRecordsNote">
+  <div class="modal report-source-modal">
+    <div class="modal-header"><div class="report-source-heading"><span class="report-source-eyebrow">原传与派生统计</span><h2 class="modal-title" id="reportSourceRecordsTitle">对应线索</h2></div><button class="modal-close" type="button" onclick="closeModal('reportSourceRecordsModal')" aria-label="关闭">×</button></div>
+    <div class="modal-body">
+      <section class="report-source-summary" aria-label="当前统计范围与数量"><div class="report-source-summary-context"><span class="report-source-label">统计范围</span><p id="reportSourceRecordsScope" class="report-source-scope"></p><p id="reportSourceRecordsNote" class="form-hint"></p></div><div class="report-source-total"><span class="report-source-label">统计数量</span><div><strong id="reportSourceRecordsTotal">0</strong><span id="reportSourceRecordsUnit">条</span></div></div></section>
+      <div class="report-source-list-heading"><h3>对应记录</h3><span id="reportSourceRecordsSample" class="report-source-sample" hidden>样例数据</span></div>
+      <div class="table-wrapper report-source-table"><table><colgroup><col style="width:20%"><col style="width:12%"><col style="width:20%"><col style="width:20%"><col style="width:14%"><col style="width:14%"></colgroup><thead><tr><th>线索编号</th><th>记录来源</th><th>原线索编号</th><th>目标门店</th><th>有效锁单</th><th>锁单统计归属</th></tr></thead><tbody id="reportSourceRecordsRows"></tbody></table></div>
+    </div>
+    <div class="modal-footer"><span class="form-hint" id="reportSourceRecordsCount" role="status"></span><button class="btn btn-secondary" type="button" onclick="closeModal('reportSourceRecordsModal')">关闭</button></div>
+  </div>
+</div>
+<script src="DKLinks.assets/js/report-source-stats.js?v=review-cross-page"></script>
+<script src="DKLinks.assets/js/schedule-commercial.js?v=payment-dispatch-link"></script>
+<script src="DKLinks.assets/js/schedule-ratio.js?v=payment-dispatch-link"></script>
+<script src="DKLinks.assets/js/schedule-dispatch.js?v=derived-store-limit"></script>
+<script src="DKLinks.assets/js/supplier-dispatch-demo.js?v=20261118-lead-ops"></script>
+<script src="DKLinks.assets/js/supplier-dispatch-logs.js?v=20261118-lead-ops"></script>
+<script src="DKLinks.assets/js/schedule-supplier-goals.js?v=lock-entry-link"></script>
 <script src="DKLinks.assets/js/lead-policy-evidence.js?v=20261104-brand-manual-demo"></script>
-<script src="DKLinks.assets/js/custom-fields.js?v=20261106-store-terminology"></script>
+<script src="DKLinks.assets/js/custom-fields.js?v=20261118-lead-ops"></script>
 <script src="DKLinks.assets/js/ai-call-records.js?v=20261022-ops-cleanup"></script>
-<script src="DKLinks.assets/js/lead-trace.js?v=20261104-brand-manual-demo"></script>
-<script src="DKLinks.assets/js/manual-dispatch-review.js?v=20261104-brand-manual-demo"></script>
+<script src="DKLinks.assets/js/lead-trace.js?v=20261118-lead-ops"></script>
+<script src="DKLinks.assets/js/manual-dispatch-review.js?v=20261118-lead-ops"></script>
 <script src="DKLinks.assets/js/outbound-config.js?v=20261027-regression-close"></script>
 <script src="DKLinks.assets/js/outbound-config-tabs.js?v=20261022-four-tabs"></script>
 <script src="DKLinks.assets/js/outbound-flow-walkthrough.js?v=20261021-nissan-flow-data"></script>
 <script src="DKLinks.assets/js/lead-intercept-smartcode.js?v=20261027-regression-close"></script>
-<script src="DKLinks.assets/js/lead-view-config.js?v=20261027-policy-evidence"></script>
+<script src="DKLinks.assets/js/lead-view-config.js?v=20261118-lead-ops"></script>
 <script defer src="DKLinks.assets/js/lead-import.js?v=20261112-2"></script>
-<script src="DKLinks.assets/js/schedule-policy.js?v=20261104-brand-manual-demo"></script>
+<script src="DKLinks.assets/js/schedule-policy.js?v=20261116-brand-readonly"></script>
 
 
 <script>
@@ -6410,5 +6538,7 @@ lockInitSelects();
 lockRenderTable();
 lockRenderRules();
 </script>
+<script src="DKLinks.assets/js/lock-entry-records.js?v=20261118-lead-ops"></script>
+<script src="DKLinks.assets/js/supplier-review-report.js?v=review-cross-page"></script>
 </body>
 </html>

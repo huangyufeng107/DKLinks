@@ -5,7 +5,9 @@
   var savedPayment = null;
   function el(id) { return document.getElementById(id); }
   function value(id) { return el(id).value; }
-  function quantityMode() { return value('schedulePayment') === 'volume'; }
+  function usesPayment(method) { return method === 'CPQL' || method === 'CPO'; }
+  function hasPaymentSelection() { return usesPayment(value('scheduleSettlement')) && ['prepaid', 'volume'].includes(value('schedulePayment')); }
+  function quantityMode() { return usesPayment(value('scheduleSettlement')) && value('schedulePayment') === 'volume'; }
   function target(supply, rate) {
     var q = String(supply).trim(), r = String(rate).trim();
     if (!/^\d+$/.test(q) || !Number.isSafeInteger(Number(q)) || Number(q) <= 0) return { error: '预期供应量须为正整数' };
@@ -40,8 +42,8 @@
     el('scheduleHeadShare').value = c.headShare == null ? 100 : c.headShare;
     el('scheduleHeadShare').dataset.lastShare = String(el('scheduleHeadShare').value);
     el('scheduleStoreShare').value = 100 - Number(el('scheduleHeadShare').value);
-    el('schedulePayment').value = c.payment || 'prepaid';
-    savedPayment = mode === 'add' ? null : el('schedulePayment').value;
+    el('schedulePayment').value = c.payment || (mode !== 'add' && usesPayment(el('scheduleSettlement').value) ? 'prepaid' : '');
+    savedPayment = mode === 'add' ? null : c.payment || (usesPayment(el('scheduleSettlement').value) ? 'prepaid' : null);
     el('schedulePayment').dataset.immutableAfterCreate = savedPayment ? 'true' : 'false';
     el('schedulePayment').hidden = !!savedPayment;
     el('schedulePaymentReadonly').hidden = !savedPayment;
@@ -81,13 +83,14 @@
     change();
   }
   function change() {
-    var volume = quantityMode(), method = value('scheduleSettlement');
+    var method = value('scheduleSettlement'), paymentEnabled = hasPaymentSelection(), volume = quantityMode();
+    el('schedulePaymentSection').hidden = !usesPayment(method);
     var shares = shareState();
     el('scheduleStoreShare').value = shares.error ? '' : shares.store;
     el('scheduleShareError').textContent = shares.error ? shares.error : '';
     el('scheduleHeadShare').style.borderColor = shares.error ? '#dc2626' : '';
     el('scheduleHeadShare').setAttribute('aria-invalid', shares.error ? 'true' : 'false');
-    el('scheduleTotalBudget').closest('.form-group').hidden = volume;
+    el('scheduleTotalBudget').closest('.form-group').hidden = !paymentEnabled || volume;
     el('scheduleSupplyGroup').hidden = !volume;
     el('scheduleVolumeProjectGroup').hidden = !volume;
     el('scheduleRateGroup').hidden = !volume;
@@ -97,8 +100,9 @@
     el('scheduleProjectTarget').value = projectTarget.error ? '—' : projectTarget.target.toLocaleString() + ' 台';
     el('scheduleProjectTarget').classList.toggle('is-calculated', !projectTarget.error);
     el('scheduleProjectTargetHint').textContent = projectTarget.error ? '填写供应量和转化率后自动计算' : '供应量 × 转化率，向上取整';
-    el('scheduleTotalBudget').required = !volume;
+    el('scheduleTotalBudget').required = paymentEnabled && !volume;
     el('scheduleExpectedSupply').required = volume;
+    el('schedulePaymentRule').closest('.schedule-rule-note').hidden = !paymentEnabled;
     el('schedulePaymentRule').textContent = volume ? '项目目标＝预期供应量×预期锁单转化率，向上取整。供应商手动分配锁单量，合计须等于项目目标；各自达标分别停发。供应量超出预期但有效锁单未达标，继续下发。' : '总预算与供应商分配预算合计须相等。此处配置计划额度；实际充值、余额扣减与停发服务另行接入。';
     document.querySelectorAll('#scheduleSupplierTbody .schedule-supplier-row').forEach(function (row) {
       var idx = row.id.replace('supplierRow', '');
@@ -107,21 +111,26 @@
       el('supSettlement' + idx).title = '跟随基础信息中的统一结算方式';
       var sectionTitle = row.querySelector('.schedule-panel-section-title');
       if (sectionTitle) {
-        sectionTitle.textContent = volume ? '账号与锁单分配' : '账号与预算';
-        if (sectionTitle.nextElementSibling) sectionTitle.nextElementSibling.textContent = volume ? '手动分配本供应商的有效锁单目标，合计须与项目目标一致' : '每个供应商独立维护分配预算、SMARTCODE与关联门店';
+        sectionTitle.textContent = volume ? '账号与锁单分配' : paymentEnabled ? '账号与预算' : '供应商配置';
+        if (sectionTitle.nextElementSibling) sectionTitle.nextElementSibling.textContent = volume ? '手动分配本供应商的有效锁单目标，合计须与项目目标一致' : paymentEnabled ? '每个供应商独立维护分配预算、SMARTCODE与关联门店' : '维护供应商账号、SMARTCODE与关联门店';
       }
-      el('supBudget' + idx).closest('.form-group').hidden = volume;
-      el('supBudget' + idx).required = !volume;
+      el('supBudget' + idx).closest('.form-group').hidden = !paymentEnabled || volume;
+      el('supBudget' + idx).required = paymentEnabled && !volume;
       el('supLockedTarget' + idx).required = volume;
       row.querySelectorAll('.schedule-volume-field').forEach(function (f) { f.hidden = !volume; });
       onScheduleSettlementChange(idx);
       updateScheduleSupplierCardSummary(idx);
     });
-    el('scheduleEditorTab-suppliers').textContent = volume ? '账号与锁单分配' : '账号与预算';
+    el('scheduleEditorTab-suppliers').textContent = volume ? '账号与锁单分配' : paymentEnabled ? '账号与预算' : '供应商配置';
+    if (window.ScheduleDispatch) ScheduleDispatch.change();
     updateScheduleDrawerSummary();
   }
   function summary() {
     var volume = quantityMode(), sum = 0;
+    var paymentEnabled = hasPaymentSelection();
+    ['scheduleSummaryBudget', 'scheduleSummaryAllocated'].forEach(function (id) {
+      el(id).closest('.schedule-summary-item').hidden = !paymentEnabled;
+    });
     document.querySelectorAll('#scheduleSupplierTbody .schedule-supplier-row').forEach(function (row) {
       var idx = row.id.replace('supplierRow', '');
       sum += Number(value(volume ? 'supLockedTarget' + idx : 'supBudget' + idx)) || 0;
@@ -154,23 +163,25 @@
     return error;
   }
   function liveValidation() {
+    var paymentEnabled = hasPaymentSelection();
     var volume = quantityMode(), total = volume ? target(value('scheduleExpectedSupply'), value('scheduleExpectedRate')).target || 0 : Number(value('scheduleTotalBudget')) || 0, sum = 0, priceInvalid = false;
     var all = Array.from(document.querySelectorAll('#scheduleSupplierTbody .schedule-supplier-row'));
     all.forEach(function (row) { var idx = row.id.replace('supplierRow',''); sum += Number(value((volume ? 'supLockedTarget' : 'supBudget') + idx)) || 0; var error = priceError(idx, false); priceInvalid = priceInvalid || !!error; });
     if (!volume) sum = Number(sum.toFixed(2));
-    var exceeded = total > 0 && sum > total;
+    var exceeded = paymentEnabled && total > 0 && sum > total;
     var feedback = el('scheduleAllocationFeedback');
-    if (feedback) { feedback.textContent = total > 0 ? exceeded ? '分配超额：已分配 ' + sum.toLocaleString() + '，总额 ' + total.toLocaleString() + '，超出 ' + Number((sum-total).toFixed(2)).toLocaleString() + (volume ? ' 台' : ' 元') + '。请调整后保存。' : '已分配 ' + sum.toLocaleString() + ' / ' + total.toLocaleString() + (volume ? ' 台' : ' 元') + '；剩余可分配 ' + Number((total-sum).toFixed(2)).toLocaleString() + '，保存时合计须相等。' : '请先在基础信息填写' + (volume ? '预期供应量和转化率。' : '总预算。'); feedback.className = exceeded ? 'schedule-allocation-feedback is-error' : 'schedule-allocation-feedback'; }
+    if (feedback) { feedback.hidden = !paymentEnabled; feedback.textContent = total > 0 ? exceeded ? '分配超额：已分配 ' + sum.toLocaleString() + '，总额 ' + total.toLocaleString() + '，超出 ' + Number((sum-total).toFixed(2)).toLocaleString() + (volume ? ' 台' : ' 元') + '。请调整后保存。' : '已分配 ' + sum.toLocaleString() + ' / ' + total.toLocaleString() + (volume ? ' 台' : ' 元') + '；剩余可分配 ' + Number((total-sum).toFixed(2)).toLocaleString() + '，保存时合计须相等。' : '请先在基础信息填写' + (volume ? '预期供应量和转化率。' : '总预算。'); feedback.className = exceeded ? 'schedule-allocation-feedback is-error' : 'schedule-allocation-feedback'; }
     all.forEach(function (row) { var idx = row.id.replace('supplierRow',''), input = el((volume ? 'supLockedTarget' : 'supBudget') + idx); input.max = String(Math.max(0,total - sum + (Number(input.value)||0))); input.style.borderColor = exceeded ? '#dc2626' : ''; });
     el('scheduleSaveBtn').disabled = exceeded || priceInvalid || !!shareState().error;
   }
   function showError(message) { el('scheduleConfigIssueText').textContent = message; openModal('scheduleConfigIssueModal'); }
   function validate() {
     var settlement = value('scheduleSettlement'), payment = value('schedulePayment'), share = Number(value('scheduleHeadShare'));
-    if (savedPayment && payment !== savedPayment) return { error: '支付方式在排期创建后不可修改，请恢复原支付方式。' };
+    if (usesPayment(settlement) && savedPayment && payment !== savedPayment) return { error: '支付方式在排期创建后不可修改，请恢复原支付方式。' };
     if (!methods.includes(settlement)) return { error: '请在基础信息中选择结算方式' };
     if (!['headquarters', 'store'].includes(value('schedulePartner'))) return { error: '请选择合作方' };
     if (shareState().error) return shareState();
+    if (!usesPayment(settlement)) return { settlement: settlement, partner: value('schedulePartner'), headShare: share, storeShare: shareState().store, payment: null, expectedSupply: null, expectedConversionRate: null, targetLockedOrders: null };
     if (!['prepaid', 'volume'].includes(payment)) return { error: '请选择支付方式' };
     if (payment === 'prepaid' && (cents(value('scheduleTotalBudget')) === null || cents(value('scheduleTotalBudget')) <= 0n)) return { error: '总预算须大于0，最多两位小数' };
     if (payment === 'volume' && target(value('scheduleExpectedSupply'), '100').error) return { error: '预期供应总量须为正整数' };
@@ -179,6 +190,7 @@
     return { settlement: settlement, partner: value('schedulePartner'), headShare: share, storeShare: shareState().store, payment: payment, expectedSupply: payment === 'volume' ? Number(value('scheduleExpectedSupply')) : null, expectedConversionRate: payment === 'volume' ? value('scheduleExpectedRate') : null, targetLockedOrders: payment === 'volume' ? calculated.target : null };
   }
   function readSupplier(idx, commercial) {
+    if (!commercial.payment) return { budget: 0, expectedSupply: null, expectedConversionRate: null, targetLockedOrders: null };
     if (commercial.payment === 'prepaid') {
       var amount = cents(value('supBudget' + idx));
       return amount === null || amount <= 0n ? { error: '各供应商分配预算须大于0，最多两位小数' } : { budget: Number(value('supBudget' + idx)), expectedSupply: null, expectedConversionRate: null, targetLockedOrders: null };
@@ -188,9 +200,10 @@
     return { budget: 0, expectedSupply: null, expectedConversionRate: null, targetLockedOrders: result.target };
   }
   function checkTotals(suppliers, commercial) {
+    if (!commercial.payment) return '';
     if (commercial.payment === 'volume') return suppliers.reduce(function (sum, s) { return sum + s.targetLockedOrders; }, 0) === commercial.targetLockedOrders ? '' : '供应商分配锁单量合计必须等于项目目标锁单量';
     var sum = suppliers.reduce(function (v, s) { return v + cents(s.budget); }, 0n);
     return sum === cents(value('scheduleTotalBudget')) ? '' : '供应商分配预算合计必须等于排期总预算';
   }
-  window.ScheduleCommercial = { load: load, supplier: supplier, shareInput: shareInput, change: change, summary: summary, validate: validate, readSupplier: readSupplier, checkTotals: checkTotals, target: target, cents: cents, quantityMode: quantityMode, priceError: priceError, showError: showError };
+  window.ScheduleCommercial = { usesPayment: usesPayment, hasPaymentSelection: hasPaymentSelection, load: load, supplier: supplier, shareInput: shareInput, change: change, summary: summary, validate: validate, readSupplier: readSupplier, checkTotals: checkTotals, target: target, cents: cents, quantityMode: quantityMode, priceError: priceError, showError: showError };
 })();

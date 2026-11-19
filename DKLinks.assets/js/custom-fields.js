@@ -2076,10 +2076,10 @@
     // 显示确认弹窗
     var confirmHtml = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:400px;width:90%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei,sans-serif;">' +
       '<div style="font-size:16px;font-weight:600;color:#1f2937;margin-bottom:12px;">确认重新下发</div>' +
-      '<div style="font-size:14px;color:#6b7280;margin-bottom:20px;">确定要重新下发线索 <strong style="color:#1f2937;">' + leadCode + '</strong> 吗？</div>' +
+      '<div style="font-size:14px;color:#6b7280;margin-bottom:20px;">线索 <strong style="color:#1f2937;">' + leadCode + '</strong>。当前仅演示确认步骤，厂商下发需接入正式服务。</div>' +
       '<div style="display:flex;gap:12px;justify-content:flex-end;">' +
         '<button id="_reDispatchCancel" style="padding:8px 20px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;cursor:pointer;font-size:14px;">取消</button>' +
-        '<button id="_reDispatchConfirm" style="padding:8px 20px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer;font-size:14px;">确认下发</button>' +
+        '<button id="_reDispatchConfirm" style="padding:8px 20px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer;font-size:14px;">确认演示</button>' +
       '</div>' +
     '</div>';
 
@@ -2094,9 +2094,7 @@
     });
     document.getElementById('_reDispatchConfirm').addEventListener('click', function() {
       document.body.removeChild(overlay);
-      // 模拟重新下发成功
-      showToast('线索 ' + leadCode + ' 重新下发成功', 'success');
-      // 实际项目中此处调用API
+      showToast('已完成确认演示，线索仍为下发失败', 'info');
     });
   }
 
@@ -2307,10 +2305,16 @@
 
   var leadDetailReturnPage = 'leads';
   var leadDetailReturnScrollY = 0;
+  var leadDetailReturnFocus = null;
+
+  function getLeadDetailReturnContext() {
+    return {page:leadDetailReturnPage, scroll:leadDetailReturnScrollY, focus:leadDetailReturnFocus};
+  }
 
   function returnFromLeadDetail() {
     navigateTo(leadDetailReturnPage);
     window.scrollTo(0, leadDetailReturnScrollY);
+    if (leadDetailReturnFocus?.isConnected) leadDetailReturnFocus.focus({preventScroll:true});
   }
 
   // 原型详情目录只返回已存在且允许查看的记录；生产接口须按当前用户权限查询。
@@ -2322,20 +2326,27 @@
       });
     }).map(function (id) { return { id: id }; });
   }
-  function openLeadDetailById(leadId) {
+  function openLeadDetailById(leadId, returnContext) {
     var key = Object.keys(leadDetailExamples).find(function (key) {
       var data = leadDetailExamples[key];
       return data && data.code === leadId && data.canView !== false;
     });
     if (!key) return false;
-    openLeadDetail(key);
+    openLeadDetail(key, returnContext);
     return true;
   }
 
-  function openLeadDetail(type) {
+  function openLeadDetail(type, returnContext) {
     var data = leadDetailExamples[type] || leadDetailExamples.normal;
+    if (window.renderSupplierDispatchEvidence) renderSupplierDispatchEvidence(data);
+    if (window.renderLockEntryEvidence) renderLockEntryEvidence(data);
     var currentPage = document.querySelector('.page.active');
-    if (currentPage && currentPage.id !== 'page-lead-detail') {
+    if (returnContext) {
+      leadDetailReturnPage = returnContext.page;
+      leadDetailReturnScrollY = returnContext.scroll;
+      leadDetailReturnFocus = returnContext.focus;
+    } else if (currentPage && currentPage.id !== 'page-lead-detail') {
+      leadDetailReturnFocus = currentPage.contains?.(document.activeElement) ? document.activeElement : null;
       leadDetailReturnPage = currentPage.id.replace(/^page-/, '');
       leadDetailReturnScrollY = window.scrollY || 0;
     }
@@ -2343,20 +2354,23 @@
     var fromAiCall = leadDetailReturnPage === 'ai-call-record-detail';
     var fromScheduleReport = leadDetailReturnPage === 'dk-report';
     var fromScheduleLeads = leadDetailReturnPage === 'dk-leaddetail';
-    setTextById('leadDetailBreadcrumbOrigin', fromIntercept ? '拦截管理' : fromAiCall ? 'AI 外呼话单' : fromScheduleReport ? '排期报表' : fromScheduleLeads ? '排期线索明细' : '线索列表');
-    setTextById('leadDetailBackButton', fromIntercept ? '返回拦截管理' : fromAiCall ? '返回话单详情' : fromScheduleReport ? '返回报表' : fromScheduleLeads ? '返回排期线索明细' : '返回列表');
+    var fromLockEntries = leadDetailReturnPage === 'lock-audit';
+    var fromDispatchLogs = leadDetailReturnPage === 'supplier-dispatch-logs';
+    setTextById('leadDetailBreadcrumbOrigin', fromIntercept ? '拦截管理' : fromAiCall ? 'AI 外呼话单' : fromScheduleReport ? '排期报表' : fromScheduleLeads ? '排期线索明细' : fromDispatchLogs ? '下发日志' : fromLockEntries ? '锁单入库明细' : '线索列表');
+    setTextById('leadDetailBackButton', fromIntercept ? '返回拦截管理' : fromAiCall ? '返回话单详情' : fromScheduleReport ? '返回报表' : fromScheduleLeads ? '返回排期线索明细' : fromDispatchLogs ? '返回下发日志' : fromLockEntries ? '返回锁单明细' : '返回列表');
     setTextById('leadDetailTitle', '线索详情 - ' + data.code);
     setTextById('leadDetailBreadcrumbCode', data.code);
     setTextById('leadDetailSummaryCode', data.code);
     var evidence = data.policyEvidenceSnapshot;
-    setTextById('leadPolicySchedule', evidence ? (evidence.scheduleName || '未归属排期') : '未记录');
+    var linkedScheduleName = data.scheduleName || data.lockEntry?.scheduleName || data.supplierDispatchEvidence?.lead.scheduleName;
+    setTextById('leadPolicySchedule', evidence ? (evidence.scheduleName || '未归属排期') : linkedScheduleName || '未记录');
     setTextById('leadPolicySource', evidence ? evidence.source : '未记录');
     setTextById('leadPolicyVersion', evidence ? (evidence.version ? '策略第 ' + evidence.version + ' 版' : (evidence.source === '排期停发闸口（演示）' ? '不适用（停发依据）' : evidence.source === '品牌默认' ? '不适用（品牌默认）' : '不适用（接收时无项目发布）')) : '未记录');
     document.getElementById('leadPolicyVersion').hidden = !evidence;
     setTextById('leadPolicyCapturedAt', evidence ? evidence.capturedAt : '未记录');
     window.LeadPolicyEvidence.renderStages(evidence);
     var historyConfig = document.getElementById('leadPolicyConfigDetails'); if (historyConfig) historyConfig.open = false;
-    setTextById('leadBasicSchedule', evidence ? (evidence.scheduleName || '未归属排期') : '未记录');
+    setTextById('leadBasicSchedule', evidence ? (evidence.scheduleName || '未归属排期') : linkedScheduleName || '未记录');
 
     var aiCallEntry = document.getElementById('leadAiCallEntry');
     if (aiCallEntry) aiCallEntry.hidden = !data.linkedTask && !data.resultDecisionSnapshot?.sourceTaskId;

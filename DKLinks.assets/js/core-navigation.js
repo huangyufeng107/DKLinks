@@ -87,6 +87,7 @@
       'store': '基础数据 / 门店管理',
       'supplier': '基础数据 / 开发者管理',
       'leads': '线索管理 / 线索列表',
+      'supplier-dispatch-logs': '线索管理 / 下发日志',
       'lead-view-config': '线索管理 / 线索列表配置',
       'ai-call-records': '培育引擎 / AI 外呼话单',
       'ai-call-record-detail': '培育引擎 / AI 外呼话单 / 话单详情',
@@ -102,6 +103,7 @@
       'schedule': '投放运营 / 排期管理',
       'schedule-policy': '投放运营 / 排期管理 / 处理策略',
       'schedule-editor': '投放运营 / 排期管理 / 排期配置',
+      'schedule-supplier-goals': '投放运营 / 排期管理 / 供应商达标情况',
       'dk-report': '投放运营 / 排期管理 / 查看报表',
       'dk-leaddetail': '投放运营 / 排期管理 / 线索明细',
       'dk-account': '投放运营 / 报表账号管理',
@@ -116,8 +118,10 @@
       'dk-report': 'schedule',
       'schedule-policy': 'schedule',
       'schedule-editor': 'schedule',
+      'schedule-supplier-goals': 'schedule',
       'dk-leaddetail': 'schedule',
       'lead-detail': 'leads',
+      'supplier-dispatch-logs': 'leads',
       'ai-call-record-detail': 'ai-call-records',
       'scmapping': 'smartcode',
       'lock-rules': 'lock-audit'
@@ -148,10 +152,13 @@
     // 拦截规则页面：渲染规则列表
     if (page === 'lead-intercept') {
       initInterceptPage();
+      var rulesBack = document.getElementById('leadRuleHitsBack');
+      if (rulesBack) rulesBack.hidden = true;
     }
     // 线索列表页面：初始化列设置
     if (page === 'leads') {
-      initColumnSettings();
+      if (typeof leadViewApplyList === 'function') leadViewApplyList(true);
+      else initColumnSettings();
     }
     if (page === 'ai-call-records' && typeof renderAiCallRecords === 'function') {
       renderAiCallRecords();
@@ -191,39 +198,39 @@
   }
 
   function navigateToLeadStatus(status, leadCode) {
+    leadListScheduleScope = null;
+    leadListFilterInputs().forEach(function (input) { input.value = ''; });
+    if (leadCode) {
+      var search = document.getElementById('leadListKeyword');
+      if (search) search.value = String(leadCode).trim();
+    }
+    var select = document.getElementById('leadListStatus');
+    if (select) select.value = status || '';
+    leadListPage = 1;
     navigateTo('leads');
-    var pageLeads = document.getElementById('page-leads');
-    if (!pageLeads) return;
-    if (leadCode) {
-      var searchInput = pageLeads.querySelector('.search-input');
-      if (searchInput) searchInput.value = String(leadCode).trim();
-      pageLeads.querySelectorAll('.filter-select').forEach(function(select) { select.value = ''; });
-    }
-    var statusSelect = pageLeads.querySelector('.filter-item .filter-select');
-    if (statusSelect) statusSelect.value = status || '';
-    filterClueList();
-    document.querySelectorAll('#page-leads .tabs .tab-btn').forEach(function(btn) {
-      btn.classList.remove('active');
+    if (!leadCode) return;
+    var row = getFilteredLeadRows().find(function (item) {
+      return (item.dataset.leadCode || item.cells[0].textContent.trim()) === String(leadCode).trim();
     });
-    var targetTab = null;
-    document.querySelectorAll('#page-leads .tabs .tab-btn').forEach(function(btn) {
-      var action = btn.getAttribute('onclick') || '';
-      if (action.indexOf("'" + status + "'") > -1) targetTab = btn;
-    });
-    if (targetTab) targetTab.classList.add('active');
-    var located = false;
-    if (leadCode) {
-      var rows = pageLeads.querySelectorAll('#clue-tbody tr');
-      for (var i = 0; i < rows.length; i++) {
-        var codeCell = rows[i].querySelector('td');
-        if (codeCell && codeCell.textContent.trim() === String(leadCode).trim() && rows[i].style.display !== 'none') {
-          rows[i].scrollIntoView({ block: 'center' });
-          located = true;
-          break;
-        }
-      }
-    }
-    showToast(leadCode ? (located ? '已定位线索 ' + leadCode : '当前列表未找到线索 ' + leadCode) : status === '5' ? '已筛选：仅接收线索' : '已进入线索列表', leadCode && !located ? 'warning' : 'info');
+    if (row) row.scrollIntoView({block: 'center'});
+    else showToast('当前列表未找到线索 ' + leadCode, 'warning');
+  }
+
+  var leadRuleHitsReturn = null;
+
+  function openLeadRuleHits() {
+    leadRuleHitsReturn = {focus:document.activeElement, scroll:window.scrollY || 0};
+    navigateTo('lead-intercept');
+    switchInterceptTab('logs');
+    document.getElementById('leadRuleHitsBack').hidden = false;
+  }
+
+  function returnFromLeadRuleHits() {
+    navigateTo('leads');
+    if (!leadRuleHitsReturn) return;
+    window.scrollTo(0, leadRuleHitsReturn.scroll);
+    if (leadRuleHitsReturn.focus?.isConnected) leadRuleHitsReturn.focus.focus({preventScroll:true});
+    leadRuleHitsReturn = null;
   }
 
   function navigateToLeadInterceptTab(tab) {
@@ -233,12 +240,9 @@
     }, 0);
   }
 
-  function toggleLeadDetailFilters() {
-    var panel = document.getElementById('leadDetailFilterMore');
-    var btn = document.getElementById('leadDetailFilterToggle');
-    if (!panel || !btn) return;
-    var collapsed = panel.classList.toggle('is-collapsed');
-    btn.innerHTML = collapsed ? '更多筛选 <span>⌄</span>' : '更多筛选&nbsp;&nbsp;<span>收起 ⌃</span>';
+  function resetLeadDetailAccountFilter() {
+    document.getElementById('leadDetailAccountId').value = '';
+    document.getElementById('leadDetailAccountDropdown').style.display = 'none';
   }
 
   function getLeadDetailAccountRows() {

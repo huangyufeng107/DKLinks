@@ -1006,94 +1006,197 @@
     });
   }
 
-  // 线索列表过滤
-  function clearClueFilter() {
-    var pageLeads = document.getElementById('page-leads');
-    if (!pageLeads) return;
-    var searchInput = pageLeads.querySelector('.search-input');
-    var selects = pageLeads.querySelectorAll('.filter-select');
-    if (searchInput) searchInput.value = '';
-    selects.forEach(function(sel) { sel.value = ''; });
-    filterClueList();
-    // 重置Tab到全部
-    document.querySelectorAll('#page-leads .tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
-    var firstTab = document.querySelector('#page-leads .tabs .tab-btn');
-    if (firstTab) firstTab.classList.add('active');
-    var tbody = document.getElementById('clue-tbody');
-    if (tbody) tbody.querySelectorAll('tr').forEach(function(r) { r.style.display = ''; });
-    var infoEl = document.querySelector('#page-leads .pagination-info');
-    if (infoEl) infoEl.textContent = '共 11 条数据';
-    if (typeof leadViewApplyList === 'function') leadViewApplyList();
+  var leadListPage = 1;
+  var leadListMatches = [];
+  var leadListScheduleScope = null;
+  var leadListFilters = [
+    'leadListKeyword', 'leadListBrand', 'leadListSeries', 'leadListChannel', 'leadListLevel',
+    'cluePhoneStatusFilter', 'leadListStatus', 'leadDispatchOriginFilter', 'leadDispatchReasonFilter'
+  ];
+
+  function leadListFilterInputs() {
+    return leadListFilters.map(function (id) { return document.getElementById(id); }).filter(Boolean)
+      .concat(Array.from(document.querySelectorAll('#page-leads .lead-view-extra-filter [data-field-key]')));
   }
 
-  function filterClueList() {
-    var pageLeads = document.getElementById('page-leads');
-    if (!pageLeads) return;
-    
-    var searchInput = pageLeads.querySelector('.search-input');
-    var selects = pageLeads.querySelectorAll('.filter-select');
-    
-    var searchKeyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    var statusFilter = selects[0] ? selects[0].value : '';
-    var phoneStatusFilter = document.getElementById('cluePhoneStatusFilter') ? document.getElementById('cluePhoneStatusFilter').value : '';
-    var levelFilter = selects[2] ? selects[2].value : '';
-    var channelFilter = selects[3] ? selects[3].value : '';
-    var brandFilter = selects[4] ? selects[4].value : '';
-    var vehicleFilter = selects[5] ? selects[5].value : '';
-    
+  function openAllLeadList() {
+    if (leadListScheduleScope) {
+      leadListScheduleScope = null;
+      clearClueFilter();
+    }
+    navigateTo('leads');
+  }
+
+  function openScheduleLeadList(id) {
+    var schedule = scheduleData.find(function (item) { return item.id === id; });
+    if (!schedule) return;
+    // The older June report has its own detail table. All other schedules use their linked records.
+    if (id === '04') { navigateTo('dk-leaddetail'); return; }
+    leadListScheduleScope = {id:schedule.id, name:schedule.name};
+    clearClueFilter();
+    navigateTo('leads');
+  }
+
+  function clearClueFilter() {
+    leadListFilterInputs().forEach(function (input) { input.value = ''; });
+    if (typeof leadViewApplyList === 'function') leadViewApplyList();
+    else filterClueList();
+  }
+
+  function showLeadStops() {
+    var reason = document.getElementById('leadDispatchReasonFilter');
+    var status = document.getElementById('leadListStatus');
+    var wasOn = reason.value === 'blocked' && status.value === '5';
+    reason.value = wasOn ? '' : 'blocked';
+    status.value = wasOn ? '' : '5';
+    filterClueList();
+  }
+
+  function getFilteredLeadRows() { return leadListMatches.slice(); }
+
+  function renderLeadListPage() {
+    var select = document.getElementById('leadListPageSize');
+    var size = Number(select?.value) || 20;
+    var pages = Math.max(1, Math.ceil(leadListMatches.length / size));
+    leadListPage = Math.max(1, Math.min(pages, leadListPage));
+    var offset = (leadListPage - 1) * size;
+    var activeRows = new Set(leadListMatches.slice(offset, offset + size));
+    document.querySelectorAll('#clue-tbody tr').forEach(function (row) {
+      row.style.display = activeRows.has(row) ? '' : 'none';
+    });
+    var empty = document.getElementById('leadListEmpty');
+    if (empty) empty.hidden = leadListMatches.length > 0;
+    var info = document.getElementById('leadListPageInfo');
+    if (info) info.textContent = leadListMatches.length
+      ? '共 ' + leadListMatches.length + ' 条数据 · 第 ' + (offset + 1) + '–' + Math.min(offset + size, leadListMatches.length) + ' 条'
+      : '共 0 条数据';
+    var nav = document.getElementById('leadListPages');
+    if (!nav) return;
+    function button(label, page, attributes) {
+      return '<button class="pagination-btn' + (page === leadListPage && attributes.includes('aria-current') ? ' active' : '') +
+        '" type="button" onclick="changeLeadListPage(' + page + ')" ' + attributes + '>' + label + '</button>';
+    }
+    var numbers = Array.from(new Set([1, leadListPage - 1, leadListPage, leadListPage + 1, pages]))
+      .filter(function (page) { return page > 0 && page <= pages; }).sort(function (a, b) { return a - b; });
+    var previous = 0;
+    var links = numbers.map(function (page) {
+      var gap = previous && page - previous > 1 ? '<span class="lead-list-page-gap" aria-hidden="true">…</span>' : '';
+      previous = page;
+      return gap + button(page, page, 'aria-label="第 ' + page + ' 页"' + (page === leadListPage ? ' aria-current="page"' : ''));
+    }).join('');
+    nav.innerHTML = button('‹', leadListPage - 1, 'aria-label="上一页"' + (leadListPage === 1 ? ' disabled' : '')) +
+      (leadListMatches.length ? links : '') +
+      button('›', leadListPage + 1, 'aria-label="下一页"' + (leadListPage === pages ? ' disabled' : ''));
+  }
+
+  function changeLeadListPage(page) {
+    leadListPage = page;
+    renderLeadListPage();
+    document.getElementById('leadListPages')?.querySelector('[aria-current="page"]')?.focus();
+  }
+
+  function showActiveLeadFilters() {
+    var chipList = document.getElementById('leadListActiveFilters');
+    if (!chipList) return;
+    var inputs = leadListFilterInputs().filter(function (input) { return input.id !== 'leadListStatus' && input.value.trim(); });
+    chipList.hidden = !inputs.length;
+    chipList.replaceChildren();
+    inputs.forEach(function (input) {
+      var label = input.labels?.[0]?.querySelector('span')?.textContent ||
+        input.closest('.lead-view-extra-filter')?.querySelector('.filter-label')?.textContent ||
+        { leadListKeyword: '关键词', leadDispatchOriginFilter: '记录来源', leadDispatchReasonFilter: '处理原因' }[input.id] ||
+        input.labels?.[0]?.textContent.trim() || '筛选';
+      var value = input.selectedOptions?.[0]?.textContent.trim() || input.value.trim();
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'lead-filter-chip';
+      chip.textContent = label + ' · ' + value + ' ×';
+      chip.setAttribute('aria-label', '清除' + label + '筛选：' + value);
+      chip.onclick = function () {
+        input.value = '';
+        if (input.id === 'leadListBrand' && typeof leadViewApplyList === 'function') leadViewApplyList();
+        else filterClueList();
+      };
+      chipList.appendChild(chip);
+    });
+  }
+
+  function filterClueList(preservePage) {
     var tbody = document.getElementById('clue-tbody');
     if (!tbody) return;
-    
-    var rows = tbody.querySelectorAll('tr');
-    var visibleCount = 0;
-    
-    rows.forEach(function(row) {
-      var cells = row.querySelectorAll('td');
-      if (cells.length < 11) {
-        row.style.display = '';
-        visibleCount++;
-        return;
-      }
-      
-      var clueCode = cells[0].textContent.toLowerCase();
-      var customerInfo = cells[1].textContent.toLowerCase();
-      var brand = cells[2].textContent.trim();
-      var vehicle = cells[3].textContent.trim();
-      var level = cells[4].textContent.trim();
-      var channel = cells[5].textContent.trim();
-      var statusBadge = cells[7].querySelector('.status-badge');
-      var status = statusBadge ? statusBadge.textContent.trim() : cells[7].textContent.trim();
-      var phoneStatusMarker = cells[8].querySelector('.phone-status-marker');
-      var phoneStatus = phoneStatusMarker ? phoneStatusMarker.getAttribute('data-phone-status') : 'NOT_DETECTED';
-      
-      // 状态映射
-      var statusMap = {'待处理':'1', '处理中':'2', '已下发':'3', '下发失败':'4', '仅接收':'5', '待人工处理':'6'};
-      // 等级映射
-      var levelMap = {'A级(高意向)':'A', 'B级(中意向)':'B', 'C级(低意向)':'C', 'D级(无意向)':'D'};
-      
-      var searchMatch = searchKeyword === '' || clueCode.indexOf(searchKeyword) > -1 || customerInfo.indexOf(searchKeyword) > -1;
-      var statusMatch = statusFilter === '' || statusMap[status] === statusFilter;
-      var phoneStatusMatch = phoneStatusFilter === '' || phoneStatus === phoneStatusFilter;
-      var levelValue = levelMap[levelFilter] || '';
-      var levelMatch = levelFilter === '' || level === levelValue;
-      var channelMatch = channelFilter === '' || channel === channelFilter;
-      var brandMatch = brandFilter === '' || brand === brandFilter;
-      var vehicleMatch = vehicleFilter === '' || vehicle === vehicleFilter;
-      
-      if (searchMatch && statusMatch && phoneStatusMatch && levelMatch && channelMatch && brandMatch && vehicleMatch) {
-        row.style.display = '';
-        visibleCount++;
-      } else {
-        row.style.display = 'none';
-      }
-    });
-    
-    // 更新分页信息
-    var paginationInfo = pageLeads.querySelector('.pagination-info');
-    if (paginationInfo) {
-      paginationInfo.textContent = '共 ' + visibleCount + ' 条数据';
+    if (preservePage !== true) leadListPage = 1;
+    var statusCodes = {'待处理':'1', '处理中':'2', '已下发':'3', '下发失败':'4', '仅接收':'5', '待人工处理':'6', '已锁单':'7'};
+    var levelCodes = {'A级(高意向)':'A', 'B级(中意向)':'B', 'C级(低意向)':'C', 'D级(无意向)':'D'};
+    var criteria = Object.fromEntries(leadListFilters.map(function (id) {
+      return [id, document.getElementById(id)?.value.trim() || ''];
+    }));
+    var records = Array.from(tbody.rows || tbody.querySelectorAll('tr')).filter(function (row) { return row.cells.length >= 11; });
+    var scope = document.getElementById('leadListScheduleScope');
+    if (scope) {
+      scope.hidden = !leadListScheduleScope;
+      document.getElementById('leadListScheduleScopeName').textContent = leadListScheduleScope ? '归属排期 · ' + leadListScheduleScope.name : '';
     }
-    if (typeof leadViewFilterExtras === 'function') leadViewFilterExtras();
+    if (leadListScheduleScope) records = records.filter(function (row) {
+      if (row.dataset.scheduleId) return row.dataset.scheduleId === leadListScheduleScope.id;
+      var code = row.dataset.leadCode || row.cells[0].querySelector('code')?.textContent.trim();
+      var evidence = window.LeadPolicyEvidence?.get(code);
+      return (row.dataset.scheduleName || evidence?.scheduleName) === leadListScheduleScope.name;
+    });
+    [['leadListChannel', 5], ['leadListSeries', 3]].forEach(function (entry) {
+      var select = document.getElementById(entry[0]);
+      if (!select?.options) return;
+      var values = new Set(Array.from(select.options).map(function (option) { return option.value; }));
+      records.forEach(function (row) {
+        var value = row.cells[entry[1]].textContent.trim();
+        if (value && value !== '—' && value !== '未记录' && !values.has(value)) {
+          var option = document.createElement('option');
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+          values.add(value);
+        }
+      });
+    });
+    var recordDetails = new Map(typeof leadDetailExamples === 'undefined' ? [] : Object.values(leadDetailExamples).map(function (detail) { return [detail.code, detail]; }));
+    var equals = function (filter, value) { return !filter || filter === value; };
+    var keyword = criteria.leadListKeyword.toLowerCase();
+    var statusCount = { '': 0 };
+    var extraMatches = typeof getLeadViewFilterPredicate === 'function' ? getLeadViewFilterPredicate() : function () { return true; };
+    leadListMatches = records.filter(function (row) {
+      var cells = row.cells;
+      var code = row.dataset.leadCode || cells[0].querySelector('code')?.textContent.trim() || cells[0].textContent.trim();
+      var detail = recordDetails.get(code);
+      var state = cells[7].querySelector('.status-badge')?.textContent.trim() || cells[7].textContent.trim();
+      var stateCode = statusCodes[state];
+      var phone = cells[8].querySelector('.phone-status-marker')?.getAttribute('data-phone-status') || 'NOT_DETECTED';
+      var reason = row.dataset.dispatchBlocked === 'true' ? 'blocked' : row.dataset.processingReason ||
+        (detail?.blacklistCheck?.includes('命中') && !detail.blacklistCheck.includes('未命中') ? 'blacklist' : '');
+      var searchValues = [code, cells[0].textContent, cells[1].textContent, detail?.sourceId];
+      var matches = (!keyword || searchValues.some(function (value) { return String(value || '').toLowerCase().includes(keyword); })) &&
+        equals(criteria.leadListBrand, cells[2].textContent.trim()) &&
+        equals(criteria.leadListSeries, cells[3].textContent.trim()) &&
+        equals(criteria.leadListChannel, cells[5].textContent.trim()) &&
+        equals(levelCodes[criteria.leadListLevel], cells[4].textContent.trim()) &&
+        equals(criteria.cluePhoneStatusFilter, phone) &&
+        equals(criteria.leadDispatchOriginFilter, row.dataset.dispatchOrigin || 'original') &&
+        equals(criteria.leadDispatchReasonFilter, reason) && extraMatches(row);
+      if (!matches) return false;
+      statusCount['']++;
+      if (stateCode) statusCount[stateCode] = (statusCount[stateCode] || 0) + 1;
+      return equals(criteria.leadListStatus, stateCode);
+    });
+
+    document.querySelectorAll('#page-leads [data-lead-status]').forEach(function (tab) {
+      var code = tab.dataset.leadStatus;
+      var selected = code === criteria.leadListStatus;
+      tab.classList.toggle('active', selected);
+      tab.setAttribute('aria-pressed', String(selected));
+      tab.querySelector('[data-lead-count]').textContent = statusCount[code] || 0;
+    });
+    var stopShortcut = document.getElementById('leadStoppedShortcut');
+    if (stopShortcut) stopShortcut.setAttribute('aria-pressed', String(criteria.leadDispatchReasonFilter === 'blocked' && criteria.leadListStatus === '5'));
+    showActiveLeadFilters();
+    renderLeadListPage();
   }
 
   // 导出线索数据（异步）
@@ -1280,7 +1383,7 @@
     for (var i = 0; i < state.visible.length; i++) {
       if (!state.visible[i]) {
         var n = i + 1;
-        css += '#page-leads th:nth-child(' + n + '),#page-leads td:nth-child(' + n + '){display:none;}\n';
+        css += '#leadListTable th:nth-child(' + n + '),#leadListTable td:nth-child(' + n + '){display:none;}\n';
       }
     }
     styleEl.textContent = css;

@@ -136,6 +136,7 @@
   }
 
   window.renderLeadTrace = function (type, data) {
+    var originalType = type;
     if (type === 'brandLinkedManual') type = 'nissanLinkedManual';
     data = data || {};
     var evidence = data.policyEvidenceSnapshot;
@@ -168,12 +169,23 @@
       next = review.status === '仅接收' ? '人工处理完成，本条不再自动下发。' : '等待重新校验结果；真实队列未接入，不代表检测或下发成功。';
       events.push(event(review.at, '人工核查处理', 'info', review.reason, '操作人：' + review.actor + '；备注：' + review.remark, '原暂停快照保留；复核当前排期及发布依赖', review.reason, next, data.code));
     }
+    if (data.supplierDispatchEvidence) {
+      var supplierRecord = data.supplierDispatchEvidence;
+      status = supplierRecord.lead.blocked || supplierRecord.lead.processing === 'stopped' ? '仅接收' : '处理中';
+      reason = supplierRecord.lead.blocked ?
+        (supplierRecord.lead.supplierName || 'A1供应商') + ' 在 ' + (supplierRecord.lead.scheduleName || 'A 排期') + ' 已锁 ' + supplierRecord.lead.count + ' 台／分配 ' + (supplierRecord.lead.target ?? 3) + ' 台，供应商锁单目标已达成' :
+        data.dispatchDecision;
+      next = supplierRecord.lead.blocked || supplierRecord.lead.processing === 'stopped' ?
+        '查看本条保存的接收与拦截依据' :
+        supplierRecord.lead.processing === 'waiting' ? '等待原线索外呼处理完成' : '等待本门店的厂商下发结果';
+      events = [];
+    }
     if (Array.isArray(data.scheduleGoalTraceStages)) { status = data.policyEvidenceSnapshot.outcome; reason = data.policyEvidenceSnapshot.reason; next = data.scheduleGoalNextAction; }
     if (events.every(function (item) { return item.record && Number.isInteger(item.record.sequence); })) {
       events.sort(function (left, right) { return left.record.sequence - right.record.sequence; });
     }
 
-    renderProgress(type, data, events, status, reason, next);
+    renderProgress(type, data, events, status, reason, next, originalType);
   };
 
   var stageNames = ['鉴权与接收字段校验', '来源线索 ID 检查', '黑名单', '接收去重规则', '号码状态检测', '外呼处理', '厂商下发'];
@@ -322,7 +334,7 @@
     parent.appendChild(detail);
   }
 
-  function renderProgress(type, data, events, status, reason, next) {
+  function renderProgress(type, data, events, status, reason, next, originalType) {
     var stages = progressStages(type, data, events, status);
     var snapshot = data.policyEvidenceSnapshot;
     if (snapshot && Array.isArray(snapshot.stageEvidence)) {
@@ -342,6 +354,7 @@
     }
 
     if (Array.isArray(data.scheduleGoalTraceStages) && data.scheduleGoalTraceStages.length === stageNames.length) stages = data.scheduleGoalTraceStages;
+    if (Array.isArray(data.supplierDispatchStages)) stages = data.supplierDispatchStages;
     if (type === 'nissanLinkedManual' && data.decisionActor) {
       stages.forEach(function (stage) { stage.current = false; });
       stages[6] = { name: stageNames[6], state: status === '仅接收' ? 'skipped' : 'processing', current: true, reason: data.dispatchDecision, evidence: data.note, events: events.slice(-1) };
@@ -355,14 +368,20 @@
     document.getElementById('leadTraceCurrentStatus').textContent = status;
     document.getElementById('leadTraceCurrentReason').textContent = reason;
     document.getElementById('leadTraceNextAction').textContent = next;
-    document.getElementById('leadProgressLocation').textContent = current
-      ? current.name + (current.state === 'stopped' ? ' · 已停止' : current.state === 'processing' ? ' · 处理中' : ' · ' + stateNames[current.state]) : '当前环节未记录';
-    document.getElementById('leadTraceOverviewActions').hidden = !(type === 'nissanLinkedManual' && !data.decisionActor);
+    document.getElementById('leadProgressLocation').textContent = data.supplierDispatchEvidence?.lead.blocked
+      ? '供应商锁单目标判断 · 已停止'
+      : current ? current.name + ' · ' + stateNames[current.state] : '当前环节未记录';
+    var reviewable = ['nissanLinkedManual', 'brandLinkedManual'].includes(originalType) && !data.decisionActor && status === '待人工处理';
+    var reviewEntry = document.getElementById('leadTraceOverviewActions');
+    if (reviewEntry) reviewEntry.hidden = !reviewable;
+    var reviewAction = document.getElementById('leadTraceReviewAction');
+    if (reviewAction) reviewAction.onclick = reviewable ? function () { openManualDispatchReview(originalType); } : null;
     document.getElementById('leadTraceEventCount').textContent = stages.length + ' 个环节';
     var container = document.getElementById('leadTraceEvents');
     container.replaceChildren();
     stages.forEach(function (stage, index) {
       var row = node('details', 'lead-progress-stage is-' + stage.state + (stage.current ? ' is-current' : ''));
+      row.open = !!stage.current;
       var summary = node('summary', 'lead-progress-stage-summary');
       summary.appendChild(node('span', 'lead-progress-number', index + 1));
       var main = node('span', 'lead-progress-main');

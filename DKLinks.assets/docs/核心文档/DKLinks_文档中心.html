@@ -277,7 +277,7 @@ html, body {
     <button class="tab-btn" data-tab="2" onclick="switchTab(2)">产品原型</button>
     <button class="tab-btn" data-tab="3" onclick="switchTab(3)">功能文档</button>
     <button class="tab-btn" data-tab="4" onclick="switchTab(4)">交互流程图</button>
-    <button class="tab-btn" data-tab="5" onclick="switchTab(5)">业务流程图</button>
+    <button class="tab-btn" data-tab="5" onclick="switchTab(5)">业务场景与流程</button>
     <button class="tab-btn" data-tab="6" onclick="switchTab(6)">系统蓝图</button>
     <button class="tab-btn" data-tab="7" onclick="switchTab(7)">需求说明</button>
   </div>
@@ -300,7 +300,7 @@ html, body {
   <iframe id="frame2" onload="onFrameLoad(2)" onerror="onFrameError(2)"></iframe>
   <iframe id="frame3" onload="onFrameLoad(3)" onerror="onFrameError(3)"></iframe>
   <iframe id="frame4" onload="onFrameLoad(4)" onerror="onFrameError(4)"></iframe>
-  <iframe id="frame5" onload="onFrameLoad(5)" onerror="onFrameError(5)"></iframe>
+  <iframe id="frame5" allowfullscreen onload="onFrameLoad(5)" onerror="onFrameError(5)"></iframe>
   <iframe id="frame6" onload="onFrameLoad(6)" onerror="onFrameError(6)"></iframe>
   <iframe id="frame7" title="需求说明" onload="onFrameLoad(7)" onerror="onFrameError(7)"></iframe>
 </div>
@@ -319,16 +319,16 @@ var currentTab = -1;
 var tabCount = 8;
 var loadingTimer = null;
 
-var tabNames = ['版本号日志', '功能清单', '产品原型', '功能文档', '交互流程图', '业务流程图', '系统蓝图', '需求说明'];
+var tabNames = ['版本号日志', '功能清单', '产品原型', '功能文档', '交互流程图', '业务场景与流程', '系统蓝图', '需求说明'];
 var tabUrls = [
-  './DKLinks_版本日志.html?v=20261112-lead-import',
-  './DKLinks_功能清单.html?v=20261112-lead-import',
+  './DKLinks_版本日志.html?v=20261118-schedule-flow-details',
+  './DKLinks_功能清单.html?v=20261118-lead-ops-docs',
   '../../../DKLinks.html?standalone=1#dk-prototype',
-  './DKLinks_功能文档.html?v=20261112-lead-import',
-  './DKLinks_交互流程图.html?v=20261112-lead-import',
-  './业务时序图.html?v=20261112-lead-import',
-  './线索下发与防死循环技术规格方案.html?v=20261023-v121-appendix-notes',
-  '../需求说明/index.html?v=20261103-flow-review'
+  './DKLinks_功能文档.html?v=20261118-lead-ops-docs',
+  './DKLinks_交互流程图.html?v=20261118-lead-ops-docs',
+  './业务时序图.html?v=20261119-flow-viewer',
+  './线索下发与防死循环技术规格方案.html?v=20261118-lead-ops-docs',
+  '../需求说明/index.html?v=20261118-lead-ops-docs'
 ];
 
 

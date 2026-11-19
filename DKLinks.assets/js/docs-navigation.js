@@ -13,13 +13,13 @@
 
   const tabs = [
     ['prototype', '产品原型', './DKLinks.html'],
-    ['requirements', '需求说明', 'DKLinks.assets/docs/需求说明/index.html?v=20261112-lead-import'],
-    ['system-blueprint', '系统蓝图', 'DKLinks.assets/docs/核心文档/线索下发与防死循环技术规格方案.html?v=20261023-v121-appendix-notes'],
-    ['function-doc', '功能文档', 'DKLinks.assets/docs/核心文档/DKLinks_功能文档.html?v=20261112-lead-import'],
-    ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_交互流程图.html?v=20261112-lead-import'],
-    ['business-flow', '业务流程图', 'DKLinks.assets/docs/核心文档/业务时序图.html?v=20261112-lead-import'],
-    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能清单.html?v=20261112-lead-import'],
-    ['version-log', '版本号日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261112-lead-import']
+    ['requirements', '需求说明', 'DKLinks.assets/docs/需求说明/index.html?v=20261118-lead-ops-docs'],
+    ['system-blueprint', '系统蓝图', 'DKLinks.assets/docs/核心文档/线索下发与防死循环技术规格方案.html?v=20261118-lead-ops-docs'],
+    ['function-doc', '功能文档', 'DKLinks.assets/docs/核心文档/DKLinks_功能文档.html?v=20261118-lead-ops-docs'],
+    ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_交互流程图.html?v=20261118-lead-ops-docs'],
+    ['business-flow', '业务场景与流程', 'DKLinks.assets/docs/核心文档/业务时序图.html?v=20261119-flow-viewer'],
+    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能清单.html?v=20261118-lead-ops-docs'],
+    ['version-log', '版本号日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261118-schedule-flow-details']
   ];
   const normalizeTabId = (id) => {
     if (id === 'blueprint') return 'system-blueprint';
@@ -79,6 +79,7 @@
       const frame = document.createElement('iframe');
       frame.className = 'dk-docs-frame';
       frame.title = label;
+      if (key === 'business-flow') frame.allowFullscreen = true;
       frame.addEventListener('load', () => { if (current === key) loading.hidden = true; });
       frame.src = path + (pendingAnchors.has(key) ? '#' + encodeURIComponent(pendingAnchors.get(key)) : '');
       view.append(frame);
