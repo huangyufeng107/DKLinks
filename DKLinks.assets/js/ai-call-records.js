@@ -22,9 +22,22 @@
       attempts: [], result: null
     }
   ];
+  var smsSample = {brand:'DONGFENG_NISSAN',channel:'DFN_AI_STANDARD',taskId:'DEMO-SMS-CALL-001',callId:'DEMO-SMS-CDR-001',
+    phone:'13900000021',seriesId:'DFN_SYLPHY',seconds:45,tags:['PURCHASE_INTENT'],final:true};
+  var sampleAt = '2026-11-24 10:00:00';
+  records.push({
+    id:smsSample.taskId, brandCode:smsSample.brand, brand:'东风日产', taskState:'已完成', resultState:'有可用结果',
+    routeSnapshot:{systemCode:'DFN_AI_OUTBOUND',systemName:'日产 AI 外呼',typeCode:smsSample.channel,typeName:'日产 AI 外呼 · 标准线路'},
+    createdAt:sampleAt,finishedAt:sampleAt,leadIds:[],sourceLeadId:'未记录',
+    attempts:[{no:1,vendorCallId:smsSample.callId,calledNumber:'139****0021',callTags:[{code:'PURCHASE_INTENT',name:'有购车意向'}],
+      startedAt:'2026-11-24 09:59:05',answeredAt:'2026-11-24 09:59:15',endedAt:sampleAt,recordGeneratedAt:sampleAt,
+      status:'已接通',talkSeconds:smsSample.seconds,ringSeconds:10,reason:'正常结束',resultAt:sampleAt}],
+    result:{callStatus:'CONNECTED',tags:smsSample.tags,generatedAt:sampleAt}
+  });
   var selectedId = records[0].id;
   var selectedAttempt = 0;
   var listScrollY = 0;
+  var smsReturn = null;
   var exactLeadQuery = '';
   var relatedLeadTaskId = '';
   var relatedLeadChoices = [];
@@ -260,18 +273,50 @@
       '<div class="ai-call-section"><h3>任务概览</h3><div class="ai-call-field-grid">' + technicalField('任务状态', record.taskState) + technicalField('结果状态', record.resultState) + technicalField('品牌', record.brand) + technicalField('外呼系统', routing(record).systemName) + technicalField('外呼类型', routing(record).typeName) + technicalField('来源线索', record.sourceLeadId) + technicalField('关联线索', record.leadIds.join('、')) + technicalField('创建时间', record.createdAt) + technicalField('结束时间', record.finishedAt) + '</div>' +
       (accessibleRelatedLeads(record).length ? '<div class="ai-call-related"><button type="button" class="btn btn-secondary btn-sm" onclick="openLeadFromAiCall(\'' + record.id + '\')">查看关联线索的处理进度</button></div>' : '') + '</div>' +
       '<div class="ai-call-section"><h3>拨打记录</h3>' + attempts + attemptDetail + '</div>' +
+      (record.id === smsSample.taskId ? renderSmsDemoSection() : '') +
       '<div class="ai-call-section"><h3>录音与转写</h3><p class="ai-call-absence">暂无录音与转写记录</p></div>' +
       '</div>';
   }
-  function selectAiCallRecord(id) {
-    if (!records.some(function (item) { return item.id === id; })) return;
+  function renderSmsDemoSection() {
+    var outcome;
+    try { outcome=window.SmsImport?.callResult(smsSample.brand,smsSample.channel,smsSample.callId); } catch (_) {}
+    return '<div class="ai-call-section"><h3>短信触达演示</h3><p class="form-hint">样例：轩逸 · 45 秒 · 有购车意向。模拟回传后，使用当前启用规则和同号 72 小时记录判定。</p>'+
+      '<div class="ai-call-related"><button type="button" class="btn btn-secondary btn-sm" onclick="simulateAiCallSms(this)">模拟话单回传</button>'+
+      '<button type="button" class="btn btn-secondary btn-sm" onclick="openSmsRecordsFromAiCall()">查看下发记录</button></div>'+
+      '<p class="form-hint" role="status">'+(outcome ? escapeHtml(outcome.reason+(outcome.rule?' · '+outcome.rule:'')) : '尚未模拟回传')+'</p></div>';
+  }
+  window.simulateAiCallSms = async function (button) {
+    button.disabled=true;
+    try {
+      var event=await window.SmsImport.simulateCall(smsSample);
+      if(selectedId===smsSample.taskId) renderAiCallDetail();
+      showToast(event.replay?'重复话单回传，沿用原判定':event.reason,'success');
+    } catch (_) { showToast('无法保存模拟结果，请检查浏览器存储。','error'); }
+    finally { button.disabled=false; }
+  };
+  window.openSmsRecordsFromAiCall = function () {
+    navigateTo('sms-touch');
+    document.getElementById('smsRecordsTab').click();
+  };
+  function selectAiCallRecord(id, context) {
+    var record = records.find(function (item) { return item.id === id; });
+    if (!record) return false;
     listScrollY = window.scrollY || 0;
+    smsReturn = context && typeof context.onBack === 'function' ? context.onBack : null;
     selectedId = id;
-    selectedAttempt = 0;
+    selectedAttempt = context && context.callId ? Math.max(0, record.attempts.findIndex(function(attempt) { return attempt.vendorCallId === context.callId; })) : 0;
+    document.getElementById('aiCallDetailBack').textContent = smsReturn ? '返回下发记录' : '返回话单列表';
     navigateTo('ai-call-record-detail');
     window.scrollTo(0, 0);
+    return true;
   }
   function returnToAiCallList() {
+    if (smsReturn) {
+      var back = smsReturn;
+      smsReturn = null;
+      back();
+      return;
+    }
     navigateTo('ai-call-records');
     window.scrollTo(0, listScrollY);
   }

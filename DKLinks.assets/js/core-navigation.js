@@ -127,6 +127,7 @@
       'dk-account': '投放运营 / 报表账号管理',
       'smartcode': '投放运营 / SmartCode管理',
       'scmapping': '投放运营 / SmartCode管理 / SmartCode映射',
+      'sms-touch': '培育引擎 / 短信触达',
       'dcc-outbound-config': '培育引擎 / AI 外呼配置'
     };
     document.getElementById('currentPageName').textContent = names[page] || page;
@@ -210,6 +211,7 @@
       if (typeof refreshSystemDictionaryBrandChoices === 'function') refreshSystemDictionaryBrandChoices();
       else renderOutboundChannelDictionary();
     }
+    if (page === 'sms-touch' && window.SmsRules) window.SmsRules.render();
     if (page === 'dcc-outbound-config' && typeof refreshOutboundBrandConfig === 'function') {
       refreshOutboundBrandConfig();
     }

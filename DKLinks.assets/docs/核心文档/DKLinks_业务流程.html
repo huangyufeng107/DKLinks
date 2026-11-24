@@ -79,7 +79,7 @@ html { scrollbar-gutter: stable; }
   </header>
   <div class="layout">
     <aside class="sidebar">
-      <div class="panel-title"><h2>业务场景 <span class="panel-count"><span id="scene-count">9</span>项</span></h2><button class="sidebar-collapse-unified panel-toggle" type="button" id="sidebar-collapse" aria-label="收起业务场景目录">收起侧栏</button></div>
+      <div class="panel-title"><h2>业务场景 <span class="panel-count"><span id="scene-count">10</span>项</span></h2><button class="sidebar-collapse-unified panel-toggle" type="button" id="sidebar-collapse" aria-label="收起业务场景目录">收起侧栏</button></div>
       <nav class="scene-nav" aria-label="业务场景切换">
         <a href="#FLOW-001-overview" class="active" data-scene-link="FLOW-001" aria-current="page"><span class="nav-code">FLOW-001</span><span class="scene-name">线索接收与下发</span><span class="scene-state">接收与门店下发</span></a>
         <a href="#FLOW-002-overview" data-scene-link="FLOW-002"><span class="nav-code">FLOW-002</span><span class="scene-name">下发前预评分</span><span class="scene-state">取分与无分兜底</span></a>
@@ -90,6 +90,7 @@ html { scrollbar-gutter: stable; }
 <a href="#FLOW-007-overview" data-scene-link="FLOW-007"><span class="nav-code">FLOW-007</span><span class="scene-name">下发失败核查与补发</span><span class="scene-state">失败核查与补发</span></a>
 <a href="#FLOW-008-overview" data-scene-link="FLOW-008"><span class="nav-code">FLOW-008</span><span class="scene-name">锁单自动排查与人工改判</span><span class="scene-state">异常锁单核实</span></a>
 <a href="#FLOW-009-overview" data-scene-link="FLOW-009"><span class="nav-code">FLOW-009</span><span class="scene-name">投放效果复盘与问题定位</span><span class="scene-state">报表与达标追溯</span></a>
+<a href="#FLOW-010-overview" data-scene-link="FLOW-010"><span class="nav-code">FLOW-010</span><span class="scene-name">短信触达与结果追溯</span><span class="scene-state">AI 话单与批量导入</span></a>
 </nav>
       <p class="nav-hint">左侧切换业务场景，右侧目录定位本场景的流程、规则和验收。</p>
     </aside>
@@ -1166,6 +1167,7 @@ html { scrollbar-gutter: stable; }
   <p class="scene-related"><a href="#FLOW-001-dispatch-routing">返回下发与来源规则</a> · <a href="DKLinks_功能说明.html#spec-7-source-stats" data-docs-crosslink="function-doc" data-docs-anchor="spec-7-source-stats">查看报表功能说明</a> · <a href="DKLinks_功能说明.html#spec-7-lock-entries" data-docs-crosslink="function-doc" data-docs-anchor="spec-7-lock-entries">查看锁单明细说明</a></p></div></details>
 <details class="card scene-detail" id="FLOW-009-boundary"><summary>原型与联调边界</summary><div class="scene-detail-body"><p class="lead">当前报表与明细主要展示演示资料，工作台指标也不是正式在线统计。实际查询、报表口径、费用关联与导出范围仍需确认；本图不新增自动扣费、结算审批、成交回传或原型没有的跨页自动钻取。</p><p class="scene-related">功能对照：<a href="DKLinks_功能说明.html#tab-panel-0" data-docs-crosslink="function-doc" data-docs-anchor="tab-panel-0">工作台</a> · <a href="DKLinks_功能说明.html#tab-panel-7" data-docs-crosslink="function-doc" data-docs-anchor="tab-panel-7">排期与报表</a> · <a href="DKLinks_功能说明.html#tab-panel-11" data-docs-crosslink="function-doc" data-docs-anchor="tab-panel-11">线索列表</a> · <a href="DKLinks_功能说明.html#tab-panel-aicalls" data-docs-crosslink="function-doc" data-docs-anchor="tab-panel-aicalls">AI 外呼话单</a></p></div></details>
 </div>
+<div class="scene-content" data-scene-content="FLOW-010" hidden><section class="card" id="FLOW-010-overview"><h2>场景 · 触达一位客户，并能查到发送依据</h2><p class="scene-entry"><strong>操作入口</strong>　培育引擎 → 短信触达／AI 外呼话单</p><p class="lead">AI 最终话单触发规则判断；运营确认名单后触发导入执行。两个入口使用同一套模板能力和同号 72 小时限制。</p></section><section class="card" id="FLOW-010-flow"><h2>处理流程</h2><div class="table-wrap"><table><thead><tr><th scope="col">来源</th><th scope="col">进入处理</th><th scope="col">结果</th></tr></thead><tbody><tr><td>AI 外呼</td><td>收到最终单次话单 → 判重 → 匹配首条启用规则 → 核对模板及手机号</td><td>没有命中在话单留存判定；明确不发送或被拦截则记录原因。</td></tr><tr><td>批量导入</td><td>选品牌与模板 → 上传 Excel → 校验预览 → 确认 → 再查模板和手机号</td><td>校验失败保留批次明细；确认后通过的记录才继续。</td></tr><tr><td>共用处理</td><td>按规范化手机号查询 72 小时 → 放行才提交通道 → 核对受理及送达</td><td>明确受理开始计时；待核对时暂停同号再次提交；按来源保留模板内容及证据。</td></tr></tbody></table></div></section><section class="card" id="FLOW-010-rules"><h2>关键规则</h2><ul><li>组合规则按品牌及线路隔离，同线路只执行首条命中的启用规则；拦截后不换模板重试。</li><li>跨品牌、跨触发入口共用 72 小时窗口。到达整 72 小时方可重新判断。</li><li>模板以品牌为范围。预览后模板变化需重新校验；历史记录读取当时版本。</li></ul></section><section class="card" id="FLOW-010-acceptance"><h2>验收清单</h2><ol><li>打开 AI 外呼样例 DEMO-SMS-CALL-001，模拟回传并再次回传，核对记录只生成一次。</li><li>加载导入样例，预览后模拟 AI 受理，再确认；核对被拦截行及批次返回。</li><li>从下发详情查到 AI 通话或导入明细；切换状态和日期查询，核对列表。</li></ol><p>当前为本地原型。真实话单接入、品牌权限校验、短信通道受理与送达、服务端持久化及跨入口并发控制待实施与联调。</p><p><a href="DKLinks_功能说明.html#tab-panel-sms" data-docs-crosslink="function-doc" data-docs-anchor="tab-panel-sms">查看短信触达功能说明</a></p></section></div>
     </main>
     <aside class="outline" id="scene-outline">
   <div class="panel-title"><h2>本场景目录 <span class="panel-count" id="outline-count">12项</span></h2><button class="panel-toggle" type="button" id="outline-collapse" aria-label="收起本场景目录">收起</button></div>
@@ -1244,6 +1246,7 @@ html { scrollbar-gutter: stable; }
   <a href="#FLOW-009-source-breakdown">供应商达标与来源追溯</a>
   <a href="#FLOW-009-boundary">原型与联调边界</a>
 </nav>
+<nav class="outline-nav scene-outline" data-outline="FLOW-010" aria-label="FLOW-010 场景目录" hidden><a href="#FLOW-010-overview">场景与前后变化</a><a href="#FLOW-010-flow">处理流程</a><a href="#FLOW-010-rules">关键规则</a><a href="#FLOW-010-acceptance">验收清单</a></nav>
 </aside>
     <button class="panel-reopen panel-reopen-left" type="button" id="sidebar-reopen" aria-label="展开业务场景目录">≡ 展开业务场景</button>
     <button class="panel-reopen panel-reopen-right" type="button" id="outline-reopen" aria-label="展开本场景目录">展开本场景目录</button>

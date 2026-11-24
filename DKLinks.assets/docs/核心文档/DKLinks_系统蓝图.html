@@ -164,10 +164,11 @@ li+li{margin-top:5px}
         </article>
         <article class="capability-card" aria-labelledby="domain-4">
           <h4 id="domain-4">线索培育</h4>
-          <p>按适用策略进行号码检测、预评分和 AI 外呼，记录处理结果，支持运营核查话单和处理待人工线索。</p>
+          <p>按适用策略进行号码检测、预评分和 AI 外呼，记录处理结果并支持人工处理。最终话单还可触发短信规则，与运营导入共用品牌模板和手机号去重。</p>
           <div class="capability-links">
             <a href="DKLinks_功能说明.html#tab-panel-aiconfig">AI 外呼配置</a>
             <a href="DKLinks_功能说明.html#tab-panel-aicalls">AI 外呼话单</a>
+            <a href="DKLinks_功能说明.html#tab-panel-sms">短信触达</a>
           </div>
         </article>
         <article class="capability-card" aria-labelledby="domain-5">
@@ -258,6 +259,7 @@ li+li{margin-top:5px}
     <tr><th scope="row">渠道接收</th><td>渠道与接入研发核对鉴权、来源 ID 作用域、字段、拒绝语义与重试。接收去重拒绝入库按已确认的 409 口径。</td><td>同来源的首次与重复提交指向同一接收记录；拒绝分支保存命中依据。</td></tr>
     <tr><th scope="row">号码检测</th><td>检测服务对接确认状态映射、限流、超时、退避及不可重试错误。</td><td>明确状态与 UNKNOWN 分开记录，服务失败保留原因。</td></tr>
     <tr><th scope="row">预评分</th><td>数据组确认线索标识、分值范围、空值语义、响应关联与重试预算。</td><td>路由和传分可复用本次快照；超过 6 分钟按无分处理。</td></tr>
+    <tr><th scope="row">短信通道（待联调）</th><td>D客连负责规则、模板快照和手机号去重；短信通道提供受理与送达事实。</td><td>核对受理时间、失败边界、回执查询、同号并发及结果不明后的对账。</td></tr>
     <tr><th scope="row">AI 外呼</th><td>外呼对接确认通道、任务 ID、回调验证、事件键、终态及话单字段。</td><td>核对同任务的正常、重复和迟到事件，以及各关联线索的独立决定。</td></tr>
     <tr><th scope="row">品牌下发</th><td>品牌或线索中心对接确认鉴权、必填字段、回执、外部 ID、查询、重试及来源回流识别。</td><td>分别留存明确成功、明确拒绝和结果未知的记录及关联尝试。</td></tr>
     <tr><th scope="row">锁单同步</th><td>数据组与排期运营确认锁单标识、线索归属、同步频率和缺失或更正口径。</td><td>重复锁单只计一次，缺失与零值分开。更正影响按确认口径验收。</td></tr>

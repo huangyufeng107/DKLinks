@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D客连 · 短信触达功能设计</title>
+<style>
+:root{color-scheme:light;--ink:#182230;--muted:#50617a;--line:#dce5f2;--blue:#1749a4;--soft:#eff5ff}
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:var(--ink);font:15px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:1160px;margin:auto;padding:24px 20px 56px}header{background:linear-gradient(120deg,#003594,#2345a5);border-radius:12px;padding:26px 28px;color:#fff}
+h1,h2,h3,p{margin:0 0 10px}h1{font-size:27px}h2{font-size:20px}h3{font-size:16px}header a{color:#fff}
+nav{display:flex;gap:8px 20px;flex-wrap:wrap;margin:18px 2px}a{color:var(--blue);text-underline-offset:3px}
+section{padding:22px;background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:15px;scroll-margin-top:12px}
+p:last-child{margin-bottom:0}.muted{color:var(--muted)}.note{background:var(--soft);border-radius:7px;padding:10px 13px}
+.table{overflow:auto}table{width:100%;border-collapse:collapse;min-width:520px}th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}thead th{background:#eff4fb}tbody th{font-weight:600}
+.steps,.actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.steps span{background:#eff4fb;color:#234771;padding:4px 9px;border-radius:5px}
+button{border:1px solid #aac3ea;background:#fff;color:var(--blue);border-radius:6px;padding:6px 11px;font:inherit;cursor:pointer}
+button:disabled{cursor:default;color:#64748b;background:#f1f5f9}button:focus-visible,a:focus-visible{outline:2px solid #175cd3;outline-offset:3px}
+#demo-result{min-height:44px}@media(max-width:600px){main{padding:12px}section,header{padding:16px}}
+</style>
+</head>
+<body><main>
+<header><h1>D客连 · 短信触达功能设计</h1><p>AI 外呼结果自动触发、手工导入确认后发送，共用品牌模板和手机号去重。</p><a href="index.html">返回需求目录</a> · 2026-11-24 · 功能设计稿</header>
+<nav aria-label="文档目录"><a href="#entry">功能入口</a><a href="#rules">AI 短信规则</a><a href="#import">批量导入</a><a href="#templates">短信模板库</a><a href="#records">短信下发记录</a><a href="#dedup">72 小时规则</a><a href="#demo">交互演示</a><a href="#acceptance">验收与联调</a></nav>
+<section id="entry"><h2>1. 功能入口</h2>
+<p>建议在「培育引擎」新增「短信触达」，包含 AI 短信规则、批量导入、短信模板库、短信下发记录四个页签。品牌运营在授权品牌内配置、导入和查询；查询权限与发送、启停、模板编辑权限分别授予。</p>
+<p class="note">现有 AI 外呼话单提供来源和结果依据；线索下发到门店及其报表口径继续沿用现行规则。已同步至 v1.2.5 本地原型。页面及模拟边界见 <a href="../核心文档/DKLinks_功能说明.html#tab-panel-sms">功能说明</a> 与 <a href="../核心文档/DKLinks_版本日志.html#version-125">版本日志</a>。</p>
+</section>
+<section id="rules"><h2>2. AI 短信规则</h2>
+<p>列表按品牌、AI 线路和启用状态筛选。每行显示名称、优先级、条件摘要、发送动作、模板、状态和更新时间；支持查看、新建、编辑、启停。新规则默认停用。</p>
+<div class="table"><table><thead><tr><th scope="col">配置项</th><th scope="col">操作与校验</th></tr></thead><tbody>
+<tr><th scope="row">品牌与 AI 线路</th><td>先选品牌，再选该品牌可用线路。更换品牌或线路时清除失效选项，按新范围重选标签、车系和模板。</td></tr>
+<tr><th scope="row">标签</th><td>按线路展示可选标签，按稳定标签编码匹配。包含标签可选满足任一或全部；可选排除标签，命中任一排除标签则本条不命中。至少选择一个包含标签。</td></tr>
+<tr><th scope="row">车系 ID</th><td>按品牌多选车系，界面显示名称及 ID，有选项时按任一 ID 命中。数据来自该话单关联的线索；不选择则不限。已限制车系而线索未记录 ID 时，本条不命中。</td></tr>
+<tr><th scope="row">通话时长</th><td>单位为秒，支持仅填下限、仅填上限或填写闭区间，端点均包含。校验非负整数且下限不大于上限。留空则不限；已配置而话单缺失时长时，本条不命中。已明确记录的 0 秒可参与比较。</td></tr>
+<tr><th scope="row">动作与优先级</th><td>各类条件同时满足才命中。动作可选「发送短信」或「不发送」；发送须选本品牌可用模板。建议同品牌、同线路的启用规则优先级唯一，数字越小越优先。只执行第一条命中的规则；不发送、去重拦截、模板不可用均不继续尝试低优先级模板。</td></tr>
+</tbody></table></div>
+<p>在收到有效的最终通话话单后判断。同一次通话的重复回传只处理一次；规则使用本次判定时的生效配置，记录所用版本。通话标签和时长须取自同一通话记录，按外呼任务记录的品牌及线路匹配，不用一个任务里多次通话的字段拼接判断。</p>
+</section>
+<section id="import"><h2>3. 批量导入短信</h2>
+<div class="steps"><span>选择品牌和模板</span><span>下载并上传名单</span><span>校验</span><span>预览</span><span>确认发送</span><span>查看批次结果</span></div>
+<p>建议一期使用 Excel 模板，手机号为必填。手机号按文本读取并按统一口径规范化；预览显示脱敏号码、文件行号和处理原因。校验结果分为「可发送」「格式错误」「批次内重复」「近 72 小时已发送」「发送状态待核对」。同一批归一后的同号仅首条有效行可进入发送。</p>
+<p>预览展示品牌、模板内容和各类条数，可下载有问题的行。无可发送项时不可确认。确认时冻结批次和模板内容，由系统异步执行；重复点击不会生成第二个批次。执行每一行时重新检查模板可用性、号码状态和 72 小时记录，实际结果以批次记录为准。</p>
+</section>
+<section id="templates"><h2>4. 短信模板库</h2>
+<p>按品牌查询，列表展示模板名称、内容摘要、状态、关联规则数和更新时间。支持新建、预览、编辑、启停；模板须绑定短信通道认可的签名及模板标识后方可用于发送。本期建议用固定正文，名单不支持自由填写短信内容。</p>
+<p>停用前展示影响的规则；已停用模板不能新增引用，也不会继续发送。编辑生成新版本，已生成的发送记录保留当时使用的版本和正文；已确认的待发记录使用冻结内容，发送前若对应模板已停用，则跳过并记录原因。</p>
+</section>
+<section id="records"><h2>5. 短信下发记录</h2>
+<p>按时间、品牌、来源、模板、状态及手机号查询，支持从批次列表下钻。列表显示记录时间、脱敏手机号、来源、模板和处理结果；详情显示执行时间、去重原因、通道回执以及规则版本和话单，或批次编号和操作人。待核对记录可由有权限人员查看处理依据；跨品牌去重只显示拦截原因。</p>
+<div class="table"><table><thead><tr><th scope="col">状态</th><th scope="col">界面含义</th></tr></thead><tbody>
+<tr><th scope="row">待发送／提交中</th><td>已进入发送队列，或正在等待通道确认。</td></tr>
+<tr><th scope="row">已受理／已送达</th><td>通道已接受请求；收到明确送达回执后显示已送达。72 小时从受理时刻开始。</td></tr>
+<tr><th scope="row">发送失败</th><td>区分通道明确未受理和受理后送达失败。前者不占 72 小时，后者仍占用原窗口。</td></tr>
+<tr><th scope="row">已跳过</th><td>已命中不发送、近 72 小时已发送、模板不可用等，展示具体原因。未命中规则的判定保留在话单关联结果，便于核查。</td></tr>
+<tr><th scope="row">待核对</th><td>请求超时且无法确认是否受理；对账前不自动补发，也不放行同号的另一条请求。</td></tr>
+</tbody></table></div>
+</section>
+<section id="dedup"><h2>6. 72 小时内只受理一条</h2>
+<p>平台按规范化后的手机号查询，AI 和导入共用，同号跨品牌也适用。距离最近一次已受理不足 72 小时时拦截；到达整 72 小时可重新按当前业务条件判断。示例：周一 10:00 受理，周四 09:59 拦截，周四 10:00 可以重新判断。</p>
+<p class="note">发送前须对同号请求做并发控制。两个入口同时触发时，只能有一个向通道提交；明确未受理可释放，结果待核对时保留占用，核对到受理则用原受理时刻起算，核对到未受理则释放。补发或后续重试也走同一限制。</p>
+</section>
+<section id="demo"><h2>7. 交互演示 · 预览后再次校验</h2>
+<p>使用一条脱敏样例号码。先预览，再模拟 AI 已发送，最后确认导入，查看批次为何跳过。</p>
+<div class="actions"><button type="button" id="preview">校验并预览</button><button type="button" id="simulate">模拟 AI 通道已受理</button><button type="button" id="submit" disabled>确认发送</button><button type="button" id="reset">重置样例</button></div>
+<p class="note" id="demo-result" role="status">等待上传样例名单。所有操作仅模拟页面状态。</p>
+</section>
+<section id="acceptance"><h2>8. 验收与联调</h2>
+<div class="table"><table><thead><tr><th scope="col">场景</th><th scope="col">通过条件</th></tr></thead><tbody>
+<tr><th scope="row">品牌、线路与组合条件</th><td>同标签但品牌、线路或车系不符时不发；通话时长等于区间端点可命中；所需字段缺失不命中。</td></tr>
+<tr><th scope="row">规则冲突与话单重放</th><td>同时命中两条时只执行最高优先级；最高优先级为不发送时不落到下一条；重复回传不产生第二次发送。</td></tr>
+<tr><th scope="row">导入确认与并发</th><td>未确认无发送；重复确认只生成一批。预览后同号被 AI 触达则实际跳过；两个入口同时触发只提交一次，规范化后同号同样拦截。</td></tr>
+<tr><th scope="row">72 小时与异常回执</th><td>71 小时 59 分拦截，达到整 72 小时重新判断。明确未受理不占用；已受理后未送达仍占用；受理不明进入待核对，同号不会被自动补发。</td></tr>
+<tr><th scope="row">模板与权限</th><td>停用模板不可继续发送；修改模板不改变历史正文。跨品牌无权限查看号码或发送细节，跨品牌去重仍生效。</td></tr>
+</tbody></table></div>
+<p class="muted">联调需核实真实话单的事件唯一标识、线路标签字典、车系 ID 来源、通话时长字段、手机号规范化方案，以及短信通道的受理时间、结果查询和请求去重能力。确认回执契约后再定对账时效与告警。</p>
+</section>
+</main>
+<script>
+(() => {
+  const el = id => document.getElementById(id);
+  const show = message => { el('demo-result').textContent = message; };
+  let accepted = false;
+  el('preview').onclick = () => {
+    show(accepted ? '预览：0 条可发送；1 条近 72 小时已发送。' : '预览：138****1234，1 条可发送。');
+    el('submit').disabled = accepted;
+  };
+  el('simulate').onclick = () => {
+    accepted = true;
+    el('simulate').disabled = true;
+    show('AI 样例短信已受理。已生成的导入预览保持原结果。');
+  };
+  el('submit').onclick = () => {
+    if (el('submit').disabled) return;
+    show(accepted ? '导入批次：0 条已受理，1 条已跳过。原因：近 72 小时已发送。' : '导入批次：1 条已受理，0 条已跳过。已开始计算 72 小时。');
+    accepted = true;
+    el('submit').disabled = true;
+    el('simulate').disabled = true;
+  };
+  el('reset').onclick = () => {
+    accepted = false;
+    el('submit').disabled = true;
+    el('simulate').disabled = false;
+    show('等待上传样例名单。所有操作仅模拟页面状态。');
+  };
+})();
+</script>
+</body></html>

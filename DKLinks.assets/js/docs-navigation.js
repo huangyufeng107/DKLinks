@@ -1,13 +1,21 @@
 (() => {
   'use strict';
   // Only the version log's sample links open a review page on load.
+  const smsReviewTabs = new Map([['sms-rules','smsRulesTab'],['sms-templates','smsTemplatesTab'],['sms-import','smsImportTab'],['sms-records','smsRecordsTab']]);
+  function openSmsReview(review) {
+    const tab=document.getElementById(smsReviewTabs.get(review) || '');
+    if (!tab) return false;
+    navigateTo('sms-touch');
+    tab.click();
+    return true;
+  }
   document.addEventListener('DOMContentLoaded', () => {
     const login = document.getElementById('loginPage');
     const app = document.getElementById('mainApp');
     if (!login || !app) return;
     const review = new URLSearchParams(window.location.search).get('prototypeReview');
     const isPrototypeView = !location.hash || location.hash === '#dk-prototype';
-    if (review && isPrototypeView && typeof openSupplierGoalReview === 'function' && openSupplierGoalReview(review)) {
+    if (review && isPrototypeView && (openSmsReview(review) || (typeof openSupplierGoalReview === 'function' && openSupplierGoalReview(review)))) {
       login.style.display = 'none';
       app.classList.add('active');
       return;
@@ -20,13 +28,13 @@
 
   const tabs = [
     ['prototype', '产品原型', './DKLinks.html'],
-    ['requirements', '需求说明', 'DKLinks.assets/docs/需求说明/index.html?v=20261118-lead-ops-docs'],
-    ['system-blueprint', '技术参考 · 系统蓝图', 'DKLinks.assets/docs/核心文档/DKLinks_系统蓝图.html?v=20261119-capability-map'],
-    ['function-doc', '功能说明', 'DKLinks.assets/docs/核心文档/DKLinks_功能说明.html?v=20261119-docs-cleanup'],
+    ['requirements', '需求说明', 'DKLinks.assets/docs/需求说明/index.html?v=20261124-sms-v125'],
+    ['system-blueprint', '技术参考 · 系统蓝图', 'DKLinks.assets/docs/核心文档/DKLinks_系统蓝图.html?v=20261124-sms-v125'],
+    ['function-doc', '功能说明', 'DKLinks.assets/docs/核心文档/DKLinks_功能说明.html?v=20261124-sms-v125'],
     ['interaction', '页面交互图', 'DKLinks.assets/docs/核心文档/DKLinks_页面交互图.html?v=20261118-lead-ops-docs'],
-    ['business-flow', '业务流程', 'DKLinks.assets/docs/核心文档/DKLinks_业务流程.html?v=20261119-flow-viewer'],
-    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能点清单.html?v=20261118-lead-ops-docs'],
-    ['version-log', '版本日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261119-direct-review']
+    ['business-flow', '业务流程', 'DKLinks.assets/docs/核心文档/DKLinks_业务流程.html?v=20261124-sms-v125'],
+    ['feature-list', '功能点清单', 'DKLinks.assets/docs/核心文档/DKLinks_功能点清单.html?v=20261124-sms-v125'],
+    ['version-log', '版本日志', 'DKLinks.assets/docs/核心文档/DKLinks_版本日志.html?v=20261124-sms-v125']
   ];
   const primaryTabs = ['prototype', 'function-doc', 'business-flow', 'version-log'];
   const primaryTabFor = {

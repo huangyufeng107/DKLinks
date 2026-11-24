@@ -191,7 +191,7 @@ html { scrollbar-gutter: stable; }
   <div class="doc-meta-list">
     <span><span class="meta-label">系统：</span>D客连 · SaaS平台</span>
     <span><span class="meta-label">板块：</span>多板块</span>
-    <span><span class="meta-label">版本：</span>v1.2.4</span>
+    <span><span class="meta-label">版本：</span>v1.2.5</span>
     <span><span class="meta-label">日期：</span>2026-11-18</span>
   </div>
 </div>
@@ -222,6 +222,7 @@ html { scrollbar-gutter: stable; }
     <button class="tab-btn" data-tab="role">角色管理</button>
     <button class="tab-btn" data-tab="aiconfig">AI 外呼配置</button>
     <button class="tab-btn" data-tab="aicalls">AI 外呼话单</button>
+    <button class="tab-btn" data-tab="sms">短信触达</button>
     <button class="tab-btn" data-tab="dictionaries">数据字典管理</button>
 
   </div>
@@ -229,8 +230,8 @@ html { scrollbar-gutter: stable; }
   <main class="catalog-main">
 
 <div class="summary-cards">
-  <div class="summary-card"><div class="summary-label">功能菜单</div><div class="summary-value">23</div></div>
-  <div class="summary-card"><div class="summary-label">功能条目</div><div class="summary-value" id="totalFeatures">178</div></div>
+  <div class="summary-card"><div class="summary-label">功能菜单</div><div class="summary-value">24</div></div>
+  <div class="summary-card"><div class="summary-label">功能条目</div><div class="summary-value" id="totalFeatures">182</div></div>
   <div class="summary-card"><div class="summary-label">板块分类</div><div class="summary-value">6</div></div>
 </div>
 
@@ -240,7 +241,7 @@ html { scrollbar-gutter: stable; }
 <div class="tab-content" id="tab-overview">
 <div class="table-card">
   <div class="table-toolbar">
-    <div><span class="toolbar-title">全部功能条目</span><span class="toolbar-count">（178条）</span></div>
+    <div><span class="toolbar-title">全部功能条目</span><span class="toolbar-count">（182条）</span></div>
     <div class="toolbar-actions">
       <button class="btn btn-primary" data-export-table="tbl-overview" data-export-name="D客连_功能清单_全部">导出CSV</button>
     </div>
@@ -251,6 +252,7 @@ html { scrollbar-gutter: stable; }
 </div>
 
 <!-- ====== 各菜单 Tab ====== -->
+<div class="tab-content" id="tab-sms"><div class="table-card"><div class="table-toolbar"><div><span class="toolbar-title">短信触达</span><span class="toolbar-count">（4条）</span></div></div><div class="table-wrap"><table id="tbl-sms"><thead><tr><th>项目版本号</th><th>修订类型</th><th>系统</th><th>板块</th><th>子板块</th><th>功能模块</th><th>描述</th><th>需求来源</th></tr></thead><tbody><tr id="feature-125-1"><td>v1.2.5</td><td>新增</td><td>D客连</td><td>培育引擎</td><td>短信触达</td><td>AI 短信规则</td><td>按品牌和线路组合标签、车系 ID 与通话时长；样例话单按首条命中规则模拟判定。</td><td><a href="DKLinks_功能说明.html#sms-spec-rules">功能说明</a> · 运营反馈</td></tr><tr id="feature-125-2"><td>v1.2.5</td><td>新增</td><td>D客连</td><td>培育引擎</td><td>短信触达</td><td>短信模板库</td><td>按品牌维护固定正文、签名和通道模板编号；停用前核对引用，编辑保留历史版本。</td><td><a href="DKLinks_功能说明.html#sms-spec-templates">功能说明</a> · 运营反馈</td></tr><tr id="feature-125-3"><td>v1.2.5</td><td>新增</td><td>D客连</td><td>培育引擎</td><td>短信触达</td><td>批量导入短信</td><td>Excel 名单逐行校验，预览后确认；执行时再核对同号 72 小时和模板版本。</td><td><a href="DKLinks_功能说明.html#sms-spec-import">功能说明</a> · 运营反馈</td></tr><tr id="feature-125-4"><td>v1.2.5</td><td>新增</td><td>D客连</td><td>培育引擎</td><td>短信触达</td><td>短信下发记录</td><td>按来源、号码、状态等查询；导入记录回查批次，AI 样例回查拨打详情。</td><td><a href="DKLinks_功能说明.html#sms-spec-records">功能说明</a> · 运营反馈</td></tr></tbody></table></div></div></div>
 <div class="tab-content" id="tab-dictionaries"><div class="table-card"><div class="table-toolbar"><div><span class="toolbar-title">数据字典管理</span><span class="toolbar-count"></span></div><button class="btn btn-primary" data-export-table="tbl-dictionaries" data-export-name="D客连_功能清单_数据字典管理">导出CSV</button></div><div class="search-box" style="padding:12px 16px"><input class="search-input" data-table="tbl-dictionaries" placeholder="搜索功能名称或描述..."></div><div class="table-scroll"><table id="tbl-dictionaries"><thead><tr><th>项目版本号</th><th>修订类型</th><th>系统</th><th>板块</th><th>子板块</th><th>功能模块</th><th>描述</th><th>需求来源</th></tr></thead><tbody><tr><td>v1.2.1</td><td>新增</td><td>D客连</td><td>系统管理</td><td>数据字典管理</td><td>外呼系统与类型维护</td><td>配置外呼系统、类型及关联品牌和场景；历史任务保留创建时系统与类型快照。</td><td>当前原型与运营确认</td></tr><tr><td>v1.2.1</td><td>新增</td><td>D客连</td><td>系统管理</td><td>数据字典管理</td><td>号码检测状态字典</td><td>维护检测状态及启用项，品牌逐状态设置处理动作；新增明确状态未配置动作时需补齐重新启用。</td><td>当前原型与运营确认</td></tr></tbody></table></div></div></div>
 
 <div class="tab-content" id="tab-aicalls"><div class="table-card"><div class="table-toolbar"><div><span class="toolbar-title">AI 外呼话单</span><span class="toolbar-count"></span></div><button class="btn btn-primary" data-export-table="tbl-aicalls" data-export-name="D客连_功能清单_AI 外呼话单">导出CSV</button></div><div class="search-box" style="padding:12px 16px"><input class="search-input" data-table="tbl-aicalls" placeholder="搜索功能名称或描述..."></div><div class="table-scroll"><table id="tbl-aicalls"><thead><tr><th>项目版本号</th><th>修订类型</th><th>系统</th><th>板块</th><th>子板块</th><th>功能模块</th><th>描述</th><th>需求来源</th></tr></thead><tbody><tr><td>v1.2.1</td><td>新增</td><td>D客连</td><td>培育引擎</td><td>话单查询</td><td>独立列表与组合筛选</td><td>按任务或线索、品牌、外呼系统、类型、任务状态与结果状态查询；返回列表保留筛选。</td><td>当前原型与运营确认</td></tr><tr><td>v1.2.1</td><td>新增</td><td>D客连</td><td>培育引擎</td><td>话单详情</td><td>任务概览字段说明</td><td>任务状态、结果状态、品牌、系统、类型、来源及关联线索、创建和结束时间，支持问号弹窗说明。</td><td>当前原型与运营确认</td></tr><tr><td>v1.2.1</td><td>新增</td><td>D客连</td><td>培育引擎</td><td>拨打详情</td><td>逐次通话字段与小结</td><td>每次拨打独立展示通话ID、电话号码、标签、微信号、开始结束及生成时间、秒数、状态与通话小结。</td><td>当前原型与运营确认</td></tr><tr><td>v1.2.1</td><td>变更</td><td>D客连</td><td>培育引擎</td><td>话单详情</td><td>中文显示与内容收敛</td><td>状态和标签显示中文；删除独立AI结果卡及技术追溯区；无单次小结显示暂无，不复制任务级结果。</td><td>当前原型与运营确认</td></tr></tbody></table></div></div></div>
@@ -379,7 +381,7 @@ var catalogGroups = [
   ['投放运营', ['schedule','dkaccount','smartcode']],
   ['拦截管理', ['intercept']],
   ['线索管理', ['leads','leadview','customfields','lockaudit']],
-  ['培育引擎', ['aiconfig','aicalls']],
+  ['培育引擎', ['aiconfig','aicalls','sms']],
   ['系统设置', ['dictionaries','account','permission','role']]
 ];
 var catalogNav = document.getElementById('tabNav');
